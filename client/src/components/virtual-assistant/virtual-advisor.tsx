@@ -108,23 +108,26 @@ export default function VirtualAdvisor() {
 
   // Function to load the D-ID agent
   const loadDIDAgent = () => {
-    if (agentContainerRef.current && !didAgentLoaded) {
-      // Clear any existing content
-      agentContainerRef.current.innerHTML = '';
-      
-      // Create script element
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = 'https://agent.d-id.com/v1/index.js';
-      script.setAttribute('data-name', 'did-agent');
-      script.setAttribute('data-mode', 'fabio'); // Or use 'widget' for corner view
-      script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-      script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
-      script.setAttribute('data-monitor', 'true');
-      
-      // Append script to container
-      agentContainerRef.current.appendChild(script);
-      setDidAgentLoaded(true);
+    if (!didAgentLoaded) {
+      // Use a safer approach by adding the script to the document head
+      const existingScript = document.getElementById('did-agent-script');
+      if (!existingScript) {
+        const script = document.createElement('script');
+        script.id = 'did-agent-script';
+        script.type = 'module';
+        script.src = 'https://agent.d-id.com/v1/index.js';
+        script.setAttribute('data-name', 'did-agent');
+        script.setAttribute('data-mode', 'fabio'); // Or use 'widget' for corner view
+        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+        script.setAttribute('data-monitor', 'true');
+        
+        // Append script to document head
+        document.head.appendChild(script);
+        setDidAgentLoaded(true);
+      } else {
+        setDidAgentLoaded(true);
+      }
     }
   };
 
@@ -426,8 +429,11 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* D-ID Agent container */}
-            <div id="agent-container" ref={agentContainerRef} className="w-full min-h-[400px] flex items-center justify-center">
+            {/* This is placed here explicitly for D-ID agent to attach to */}
+            <div id="did-agent-target" className="w-full min-h-[300px]"></div>
+            
+            {/* Backup container if D-ID agent doesn't load */}
+            <div id="agent-container" ref={agentContainerRef} className="w-full min-h-[300px] flex items-center justify-center">
               {!didAgentLoaded && (
                 <div className="flex flex-col items-center justify-center">
                   <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />

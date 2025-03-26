@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import VirtualAdvisor from "@/components/virtual-assistant/virtual-advisor";
 import { useAuth } from "@/hooks/use-auth";
@@ -8,11 +8,39 @@ import { Bot, Info, Users, FileText, Zap } from "lucide-react";
 
 export default function VirtualAssistantPage() {
   const { user } = useAuth();
+  
+  useEffect(() => {
+    // For D-ID agent loading, will attempt to load it this way as well
+    if (!document.getElementById('did-agent-script')) {
+      const script = document.createElement('script');
+      script.id = 'did-agent-script';
+      script.type = 'module';
+      script.src = 'https://agent.d-id.com/v1/index.js';
+      script.setAttribute('data-name', 'did-agent');
+      script.setAttribute('data-mode', 'fabio');
+      script.setAttribute('data-target', '#did-agent-target');
+      script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+      script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+      script.setAttribute('data-monitor', 'true');
+      document.head.appendChild(script);
+    }
+  }, []);
 
   return (
     <>
       <Helmet>
         <title>Virtual Consultant | MetaWorks</title>
+        {/* Add D-ID agent script inline */}
+        <script
+          type="module"
+          src="https://agent.d-id.com/v1/index.js"
+          data-name="did-agent"
+          data-mode="fabio"
+          data-target="#did-agent-target"
+          data-client-key="YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag=="
+          data-agent-id="agt_954OZ9Ea"
+          data-monitor="true"
+        />
       </Helmet>
 
       <div className="container mx-auto px-4 py-8">
