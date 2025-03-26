@@ -137,12 +137,19 @@ export default function VirtualAdvisor() {
       // Reset agent loading state
       setDidAgentLoaded(false);
       
-      // Hide the loading indicator after a delay to allow iframe to load
-      const timer = setTimeout(() => {
-        setDidAgentLoaded(true);
-      }, 5000);
-      
-      return () => clearTimeout(timer);
+      // Try to load the D-ID agent
+      setTimeout(() => {
+        if (typeof (window as any).loadDIDAgent === 'function') {
+          (window as any).loadDIDAgent();
+          
+          // Hide the loading indicator after a delay to allow agent to load
+          const timer = setTimeout(() => {
+            setDidAgentLoaded(true);
+          }, 5000);
+          
+          return () => clearTimeout(timer);
+        }
+      }, 500);
     }
   }, [activeTab]);
 
@@ -427,16 +434,14 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* D-ID Agent iframe */}
+            {/* D-ID Agent container */}
             <div className="w-full min-h-[400px] border rounded-lg overflow-hidden relative">
-              {activeTab === 'assistant' && (
-                <iframe 
-                  src="/did-agent.html" 
-                  className="w-full h-[400px] border-none"
-                  title="D-ID Virtual Agent"
-                  allow="camera; microphone; fullscreen; autoplay"
-                />
-              )}
+              {/* This div will be the target for the D-ID agent */}
+              <div 
+                id="agent-container" 
+                className="w-full h-[400px]"
+                style={{ display: didAgentLoaded ? 'block' : 'none' }}
+              ></div>
               
               {!didAgentLoaded && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-blue-900/50 to-blue-900/70">
@@ -466,18 +471,29 @@ export default function VirtualAdvisor() {
                 <Button 
                   variant="outline"
                   onClick={() => {
-                    setDidAgentLoaded(false);
-                    // Force iframe to reload by updating a key
-                    const iframe = document.querySelector('iframe');
-                    if (iframe) {
-                      const src = iframe.src;
-                      iframe.src = '';
-                      setTimeout(() => {
-                        iframe.src = src + '?t=' + new Date().getTime();
-                        // After 2 seconds, hide the loading indicator
-                        setTimeout(() => setDidAgentLoaded(true), 2000);
-                      }, 100);
+                    // Reset the agent container if it exists
+                    const container = document.getElementById('agent-container');
+                    if (container) {
+                      // Clear any previous content
+                      container.innerHTML = '';
+                      // Hide the container initially
+                      container.style.display = 'none';
                     }
+                    
+                    // Show loading indicator
+                    setDidAgentLoaded(false);
+                    
+                    // Call the loadDIDAgent function to reload the agent
+                    setTimeout(() => {
+                      if (typeof (window as any).loadDIDAgent === 'function') {
+                        (window as any).loadDIDAgent();
+                        
+                        // After 3 seconds, hide the loading overlay
+                        setTimeout(() => {
+                          setDidAgentLoaded(true);
+                        }, 3000);
+                      }
+                    }, 500);
                   }}
                 >
                   Refresh Agent

@@ -9,18 +9,42 @@ import { Bot, Info, Users, FileText, Zap } from "lucide-react";
 export default function VirtualAssistantPage() {
   const { user } = useAuth();
   
-  // We'll no longer try to dynamically load the D-ID script
+  // Add the loadDIDAgent function directly to the window
   useEffect(() => {
     console.log("Virtual Assistant page loaded");
     
-    // No more dynamic script loading - we'll use the static UI instead
+    // Define the loadDIDAgent function on the window object
+    (window as any).loadDIDAgent = function() {
+      console.log("Loading D-ID Agent...");
+      const container = document.getElementById('agent-container');
+      if (container && container.innerHTML === '') {
+        console.log("Agent container found, loading script");
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://agent.d-id.com/v1/index.js';
+        script.setAttribute('data-name', 'did-agent');
+        script.setAttribute('data-target', '#agent-container');
+        script.setAttribute('data-mode', 'fabio'); // Or use 'widget' for corner view
+        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+        script.setAttribute('data-monitor', 'true');
+        container.appendChild(script);
+        container.style.display = 'block';
+      } else {
+        console.log("Agent container not found or not empty");
+      }
+    };
+    
+    // Clean up function
+    return () => {
+      delete (window as any).loadDIDAgent;
+    };
   }, []);
 
   return (
     <>
       <Helmet>
         <title>Virtual Consultant | MetaWorks</title>
-        {/* No script loaded - using static fallback UI */}
       </Helmet>
 
       <div className="container mx-auto px-4 py-8">
