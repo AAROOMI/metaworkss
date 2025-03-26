@@ -134,10 +134,15 @@ export default function VirtualAdvisor() {
   // Set UI state when tab changes to 'assistant'
   useEffect(() => {
     if (activeTab === 'assistant') {
-      // Set loading state to false after a short delay to hide the loader
-      setTimeout(() => {
+      // Reset agent loading state
+      setDidAgentLoaded(false);
+      
+      // Hide the loading indicator after a delay to allow iframe to load
+      const timer = setTimeout(() => {
         setDidAgentLoaded(true);
-      }, 1000);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
     }
   }, [activeTab]);
 
@@ -422,22 +427,26 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* Fallback version with static image */}
+            {/* D-ID Agent iframe */}
             <div className="w-full min-h-[400px] border rounded-lg overflow-hidden relative">
-              <div className="w-full h-[400px] flex items-center justify-center bg-gradient-to-b from-blue-900/10 to-blue-900/20 relative">
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-                  <div className="w-32 h-32 rounded-full bg-primary/20 mb-4 flex items-center justify-center">
-                    <Bot className="h-16 w-16 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-medium mb-2">Virtual Cybersecurity Consultant</h3>
-                  <p className="text-sm text-muted-foreground max-w-md">
-                    The D-ID agent integration appears to be unavailable. You can continue using the text-based chat by clicking the "Start Text Chat" button below.
+              {activeTab === 'assistant' && (
+                <iframe 
+                  src="/did-agent.html" 
+                  className="w-full h-[400px] border-none"
+                  title="D-ID Virtual Agent"
+                  allow="camera; microphone; fullscreen; autoplay"
+                />
+              )}
+              
+              {!didAgentLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-blue-900/50 to-blue-900/70">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                  <p className="text-foreground max-w-md">
+                    Loading D-ID agent... If it doesn't appear, please try refreshing.
                   </p>
                 </div>
-              </div>
+              )}
             </div>
-            
-            {/* No more loading indicator needed as we're using static fallback */}
             
             <div className="max-w-sm mt-4">
               <h3 className="text-xl font-semibold">Virtual Cybersecurity Consultant</h3>
@@ -457,10 +466,21 @@ export default function VirtualAdvisor() {
                 <Button 
                   variant="outline"
                   onClick={() => {
-                    window.open('https://presentation.d-id.com', '_blank');
+                    setDidAgentLoaded(false);
+                    // Force iframe to reload by updating a key
+                    const iframe = document.querySelector('iframe');
+                    if (iframe) {
+                      const src = iframe.src;
+                      iframe.src = '';
+                      setTimeout(() => {
+                        iframe.src = src + '?t=' + new Date().getTime();
+                        // After 2 seconds, hide the loading indicator
+                        setTimeout(() => setDidAgentLoaded(true), 2000);
+                      }, 100);
+                    }
                   }}
                 >
-                  View Demo (External)
+                  Refresh Agent
                 </Button>
               </div>
             </div>
