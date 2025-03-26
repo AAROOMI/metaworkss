@@ -130,7 +130,7 @@ export default function HeroSection() {
         </div>
       </div>
       
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse-slow {
           0%, 100% {
             opacity: 1;
@@ -143,7 +143,7 @@ export default function HeroSection() {
         .animate-pulse-slow {
           animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-      `}</style>
+      `}} />
     </section>
   );
 }

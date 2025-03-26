@@ -241,7 +241,7 @@ export default function AuthPage() {
         </div>
       </div>
       
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes flow {
           0% {
             transform: translateY(-100%);
@@ -265,7 +265,7 @@ export default function AuthPage() {
             radial-gradient(circle at 20% 30%, rgba(0, 183, 235, 0.05) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%, rgba(78, 204, 163, 0.05) 0%, transparent 50%);
         }
-      `}</style>
+      `}} />
     </div>
   );
 }
