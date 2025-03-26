@@ -108,27 +108,41 @@ export default function VirtualAdvisor() {
 
   // Function to check if the D-ID agent is loaded
   const checkDIDAgent = React.useCallback(() => {
-    // Check every second if the agent is loaded by looking for D-ID related elements
-    const checkInterval = setInterval(() => {
-      const agentElement = document.querySelector('[data-agent-status]') || 
-                          document.getElementById('did-agent-iframe') ||
-                          document.querySelector('.did-agent-container');
-      
-      if (agentElement) {
-        console.log('D-ID agent detected in DOM');
-        setDidAgentLoaded(true);
-        clearInterval(checkInterval);
-      }
-    }, 1000);
+    console.log("Refreshing D-ID agent...");
     
-    // Clear interval after 10 seconds to prevent infinite checking
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      if (!didAgentLoaded) {
-        console.log('D-ID agent loading timeout');
+    // Access the iframe and reload it
+    const iframe = document.querySelector('iframe[title="D-ID Virtual Agent"]') as HTMLIFrameElement;
+    if (iframe) {
+      console.log("Reloading D-ID agent iframe");
+      // Force the iframe to reload
+      iframe.src = iframe.src.split('?')[0] + "?reload=" + new Date().getTime();
+      
+      setTimeout(() => {
+        setDidAgentLoaded(true);
+        console.log("D-ID agent status updated");
+      }, 1000);
+    } else {
+      console.log("D-ID agent iframe not found");
+      
+      // Try to refresh the container
+      const container = document.querySelector('div.w-full.min-h-\\[400px\\].border');
+      if (container) {
+        console.log("Found container, attempting to refresh content");
+        const newIframe = document.createElement('iframe');
+        newIframe.src = '/did-agent.html?t=' + new Date().getTime();
+        newIframe.className = 'w-full h-[400px] border-none';
+        newIframe.title = 'D-ID Virtual Agent';
+        
+        // Replace the content
+        container.innerHTML = '';
+        container.appendChild(newIframe);
+        
+        setTimeout(() => {
+          setDidAgentLoaded(true);
+        }, 1000);
       }
-    }, 10000);
-  }, [didAgentLoaded]);
+    }
+  }, []);
 
   // Scroll to bottom of messages whenever messages change
   useEffect(() => {
@@ -429,29 +443,20 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* D-ID agent will be inserted here with direct script tag */}
-            <div className="w-full min-h-[400px] border rounded-lg overflow-hidden">
-              {/* Load D-ID script directly as recommended by D-ID */}
-              <div dangerouslySetInnerHTML={{
-                __html: `
-                <script
-                  type="module"
-                  src="https://agent.d-id.com/v1/index.js"
-                  data-name="did-agent"
-                  data-mode="fabio"
-                  data-client-key="YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag=="
-                  data-agent-id="agt_954OZ9Ea"
-                  data-monitor="true">
-                </script>
-                `
-              }} />
+            {/* D-ID agent will be loaded in an iframe */}
+            <div className="w-full min-h-[400px] border rounded-lg overflow-hidden relative">
+              <iframe 
+                src="/did-agent.html" 
+                className="w-full h-[400px] border-none"
+                title="D-ID Virtual Agent"
+              />
             </div>
             
-            {/* Backup container if D-ID agent doesn't appear */}
+            {/* Loading indicator only shown while iframe is initializing */}
             {!didAgentLoaded && (
               <div className="flex flex-col items-center justify-center mt-4">
                 <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                <p>Loading virtual assistant...</p>
+                <p>Loading virtual assistant... Please wait or click "Refresh Assistant" if it doesn't appear.</p>
               </div>
             )}
             
@@ -473,9 +478,8 @@ export default function VirtualAdvisor() {
                 <Button 
                   variant="outline" 
                   onClick={checkDIDAgent}
-                  disabled={didAgentLoaded}
                 >
-                  {didAgentLoaded ? "Assistant Loaded" : "Check Assistant Status"}
+                  Refresh Assistant
                 </Button>
               </div>
             </div>
