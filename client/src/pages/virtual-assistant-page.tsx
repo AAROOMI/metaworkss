@@ -9,26 +9,47 @@ import { Bot, Info, Users, FileText, Zap } from "lucide-react";
 export default function VirtualAssistantPage() {
   const { user } = useAuth();
   
-  // We no longer need to add the script here as it's handled by the VirtualAdvisor component
+  // Load the D-ID agent at the page level for better stability
   useEffect(() => {
-    // This is an empty effect that can be used for future page-level setup if needed
+    // We'll use a more reliable method to load the script
+    const loadScript = () => {
+      if (!document.getElementById('did-agent-script')) {
+        const script = document.createElement('script');
+        script.id = 'did-agent-script';
+        script.type = 'module';
+        script.src = 'https://agent.d-id.com/v1/index.js';
+        script.setAttribute('data-name', 'did-agent');
+        script.setAttribute('data-mode', 'fabio');
+        script.setAttribute('data-target', '#did-agent-target');
+        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+        script.setAttribute('data-monitor', 'true');
+        
+        // Append the script to the document head
+        document.head.appendChild(script);
+        
+        console.log("D-ID agent script added to head");
+      }
+    };
+    
+    // Load after a short delay to ensure DOM is ready
+    setTimeout(loadScript, 500);
+    
+    // Clean up function
+    return () => {
+      const script = document.getElementById('did-agent-script');
+      if (script) {
+        script.remove();
+        console.log("D-ID agent script removed");
+      }
+    };
   }, []);
 
   return (
     <>
       <Helmet>
         <title>Virtual Consultant | MetaWorks</title>
-        {/* Add D-ID agent script inline */}
-        <script
-          type="module"
-          src="https://agent.d-id.com/v1/index.js"
-          data-name="did-agent"
-          data-mode="fabio"
-          data-target="#did-agent-target"
-          data-client-key="YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag=="
-          data-agent-id="agt_954OZ9Ea"
-          data-monitor="true"
-        />
+        {/* D-ID agent script is now loaded dynamically in the useEffect */}
       </Helmet>
 
       <div className="container mx-auto px-4 py-8">

@@ -106,31 +106,29 @@ export default function VirtualAdvisor() {
   const inputRef = useRef<HTMLInputElement>(null);
   const agentContainerRef = useRef<HTMLDivElement>(null);
 
-  // Function to load the D-ID agent
-  const loadDIDAgent = () => {
-    if (!didAgentLoaded) {
-      // Use a safer approach by adding the script to the document head
-      const existingScript = document.getElementById('did-agent-script');
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.id = 'did-agent-script';
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-mode', 'fabio'); // Or use 'widget' for corner view
-        script.setAttribute('data-target', '#did-agent-target'); // Add target attribute
-        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
-        script.setAttribute('data-monitor', 'true');
-        
-        // Append script to document head
-        document.head.appendChild(script);
+  // Function to check if the D-ID agent is loaded
+  const checkDIDAgent = React.useCallback(() => {
+    // Check every second if the agent is loaded by looking for D-ID related elements
+    const checkInterval = setInterval(() => {
+      const agentElement = document.querySelector('[data-agent-status]') || 
+                          document.getElementById('did-agent-iframe') ||
+                          document.querySelector('.did-agent-container');
+      
+      if (agentElement) {
+        console.log('D-ID agent detected in DOM');
         setDidAgentLoaded(true);
-      } else {
-        setDidAgentLoaded(true);
+        clearInterval(checkInterval);
       }
-    }
-  };
+    }, 1000);
+    
+    // Clear interval after 10 seconds to prevent infinite checking
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      if (!didAgentLoaded) {
+        console.log('D-ID agent loading timeout');
+      }
+    }, 10000);
+  }, [didAgentLoaded]);
 
   // Scroll to bottom of messages whenever messages change
   useEffect(() => {
@@ -142,12 +140,13 @@ export default function VirtualAdvisor() {
     inputRef.current?.focus();
   }, []);
   
-  // Load D-ID agent when tab changes to 'assistant'
+  // Check for D-ID agent when tab changes to 'assistant'
   useEffect(() => {
     if (activeTab === 'assistant') {
-      loadDIDAgent();
+      // The script is loaded in the page component, we just need to check for it
+      checkDIDAgent();
     }
-  }, [activeTab]);
+  }, [activeTab, checkDIDAgent]);
 
   // Function to handle sending a message
   const handleSendMessage = async () => {
@@ -460,10 +459,10 @@ export default function VirtualAdvisor() {
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={loadDIDAgent}
+                  onClick={checkDIDAgent}
                   disabled={didAgentLoaded}
                 >
-                  {didAgentLoaded ? "Assistant Loaded" : "Reload Assistant"}
+                  {didAgentLoaded ? "Assistant Loaded" : "Check Assistant Status"}
                 </Button>
               </div>
             </div>
