@@ -7,6 +7,7 @@ import { storage as dbStorage } from "./storage";
 import { files, insertFileSchema, type InsertFile } from "@shared/schema";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { neon } from "@neondatabase/serverless";
+import { eq } from "drizzle-orm";
 
 // Setup storage locations
 const UPLOADS_DIR = path.resolve("uploads");
@@ -82,11 +83,15 @@ export const documentUpload = multer({
 });
 
 // Initialize PostgreSQL client
-const sql = process.env.DATABASE_URL 
-  ? neon(process.env.DATABASE_URL) 
-  : null;
-
-const db = sql ? drizzle(sql) : null;
+let db = null;
+if (process.env.DATABASE_URL) {
+  try {
+    const sql = neon(process.env.DATABASE_URL);
+    db = drizzle(sql);
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+  }
+}
 
 // File service functions
 export const saveFileToDatabase = async (
@@ -137,7 +142,7 @@ export const getFileById = async (fileId: number) => {
   if (db) {
     // Using PostgreSQL
     try {
-      const fileData = await db.select().from(files).where(files.id === fileId);
+      const fileData = await db.select().from(files).where(eq(files.id, fileId));
       return fileData[0];
     } catch (error) {
       console.error("Error getting file from database:", error);
@@ -158,7 +163,7 @@ export const deleteFile = async (fileId: number) => {
     
     if (db) {
       // Delete from database
-      await db.delete(files).where(files.id === fileId);
+      await db.delete(files).where(eq(files.id, fileId));
     }
   }
 };

@@ -150,15 +150,17 @@ export class MemStorage implements IStorage {
   
   // Policy methods
   async savePolicy(policy: Partial<Policy>): Promise<Policy> {
-    const id = this.currentId.policy++;
+    const id = policy.id || this.currentId.policy++;
     const now = new Date().toISOString();
+    const existingPolicy = this.policyDocuments.get(id);
     
     const policyDoc: Policy = {
       id,
-      title: policy.title || "Untitled Policy",
-      type: policy.type || "general",
-      content: policy.content || "",
-      createdAt: policy.createdAt || now,
+      title: policy.title || (existingPolicy?.title || "Untitled Policy"),
+      type: policy.type || (existingPolicy?.type || "general"),
+      content: policy.content !== undefined ? policy.content : (existingPolicy?.content || null),
+      fileId: policy.fileId !== undefined ? policy.fileId : (existingPolicy?.fileId || null),
+      createdAt: policy.createdAt || (existingPolicy?.createdAt || now),
       updatedAt: policy.updatedAt || now
     };
     
@@ -168,6 +170,10 @@ export class MemStorage implements IStorage {
   
   async getPolicies(): Promise<Policy[]> {
     return Array.from(this.policyDocuments.values());
+  }
+  
+  async getPolicyById(id: number): Promise<Policy | undefined> {
+    return this.policyDocuments.get(id);
   }
 }
 
