@@ -33,6 +33,7 @@ export interface IStorage {
   // Policy management
   savePolicy(policy: Partial<Policy>): Promise<Policy>;
   getPolicies(): Promise<Policy[]>;
+  getPolicyById(id: number): Promise<Policy | undefined>;
   
   // Session storage
   sessionStore: session.Store;
@@ -116,10 +117,11 @@ export class MemStorage implements IStorage {
     const companyInfo: CompanyInfo = {
       id,
       companyName: info.companyName || (existingInfo?.companyName || ""),
-      ceoName: info.ceoName || (existingInfo?.ceoName || ""),
-      cioName: info.cioName || (existingInfo?.cioName || ""),
-      ctoName: info.ctoName || (existingInfo?.ctoName || ""),
-      cisoName: info.cisoName || (existingInfo?.cisoName || "")
+      ceoName: info.ceoName !== undefined ? info.ceoName : (existingInfo?.ceoName || null),
+      cioName: info.cioName !== undefined ? info.cioName : (existingInfo?.cioName || null),
+      ctoName: info.ctoName !== undefined ? info.ctoName : (existingInfo?.ctoName || null),
+      cisoName: info.cisoName !== undefined ? info.cisoName : (existingInfo?.cisoName || null),
+      logoId: info.logoId !== undefined ? info.logoId : (existingInfo?.logoId || null)
     };
     
     this.companyData.set(id, companyInfo);
