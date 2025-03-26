@@ -100,9 +100,33 @@ export default function VirtualAdvisor() {
   const [avatarState, setAvatarState] = useState<AvatarState>("neutral");
   const [voiceState, setVoiceState] = useState<VoiceState>("off");
   const [activeTab, setActiveTab] = useState<string>("chat");
+  const [didAgentLoaded, setDidAgentLoaded] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const agentContainerRef = useRef<HTMLDivElement>(null);
+
+  // Function to load the D-ID agent
+  const loadDIDAgent = () => {
+    if (agentContainerRef.current && !didAgentLoaded) {
+      // Clear any existing content
+      agentContainerRef.current.innerHTML = '';
+      
+      // Create script element
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://agent.d-id.com/v1/index.js';
+      script.setAttribute('data-name', 'did-agent');
+      script.setAttribute('data-mode', 'fabio'); // Or use 'widget' for corner view
+      script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+      script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+      script.setAttribute('data-monitor', 'true');
+      
+      // Append script to container
+      agentContainerRef.current.appendChild(script);
+      setDidAgentLoaded(true);
+    }
+  };
 
   // Scroll to bottom of messages whenever messages change
   useEffect(() => {
@@ -113,6 +137,13 @@ export default function VirtualAdvisor() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+  
+  // Load D-ID agent when tab changes to 'assistant'
+  useEffect(() => {
+    if (activeTab === 'assistant') {
+      loadDIDAgent();
+    }
+  }, [activeTab]);
 
   // Function to handle sending a message
   const handleSendMessage = async () => {
@@ -395,40 +426,37 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            <div className="relative w-40 h-40 bg-gradient-to-br from-primary/30 to-primary rounded-full flex items-center justify-center">
-              {/* This is where you would integrate a proper 3D/2D avatar */}
-              <div className="absolute inset-0 rounded-full overflow-hidden flex items-center justify-center">
-                <div className={cn(
-                  "flex flex-col items-center justify-center transition-all duration-300",
-                  avatarState === "thinking" && "animate-pulse",
-                  avatarState === "happy" && "scale-110",
-                  avatarState === "confused" && "rotate-2"
-                )}>
-                  <Bot className="h-20 w-20 text-primary-foreground" />
-                  <div className="mt-2 font-semibold text-primary-foreground">
-                    {avatarState === "neutral" && "Ready to assist"}
-                    {avatarState === "thinking" && "Thinking..."}
-                    {avatarState === "happy" && "Happy to help!"}
-                    {avatarState === "confused" && "Let me check..."}
-                  </div>
+            {/* D-ID Agent container */}
+            <div id="agent-container" ref={agentContainerRef} className="w-full min-h-[400px] flex items-center justify-center">
+              {!didAgentLoaded && (
+                <div className="flex flex-col items-center justify-center">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                  <p>Loading virtual assistant...</p>
                 </div>
-              </div>
+              )}
             </div>
             
-            <div className="max-w-sm">
+            <div className="max-w-sm mt-4">
               <h3 className="text-xl font-semibold">Virtual Cybersecurity Consultant</h3>
               <p className="text-sm text-muted-foreground mt-2">
                 I can answer questions about NCA ECC controls, help you understand compliance requirements, and guide you through implementing essential cybersecurity measures.
               </p>
               
-              <div className="mt-4">
+              <div className="mt-4 flex space-x-4">
                 <Button onClick={() => {
                   setActiveTab("chat");
                   setTimeout(() => {
                     inputRef.current?.focus();
                   }, 100);
                 }}>
-                  Start Conversation
+                  Start Text Chat
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={loadDIDAgent}
+                  disabled={didAgentLoaded}
+                >
+                  {didAgentLoaded ? "Assistant Loaded" : "Reload Assistant"}
                 </Button>
               </div>
             </div>
