@@ -10,6 +10,7 @@ import {
   Clock,
   Settings,
   LogOut,
+  Bot,
 } from "lucide-react";
 
 const menuItems = [
@@ -39,6 +40,11 @@ const menuItems = [
     path: "/tasks",
   },
   {
+    name: "Virtual Assistant",
+    icon: Bot,
+    path: "/virtual-assistant",
+  },
+  {
     name: "Settings",
     icon: Settings,
     path: "/settings",
@@ -54,6 +60,9 @@ export default function Sidebar() {
       return true;
     }
     if (path === "/admin" && location === "/admin") {
+      return true;
+    }
+    if (path === "/virtual-assistant" && location === "/virtual-assistant") {
       return true;
     }
     return location === path;
