@@ -20,7 +20,7 @@ export default function VirtualAssistantPage() {
     <>
       <Helmet>
         <title>Virtual Consultant | MetaWorks</title>
-        {/* D-ID agent script is now loaded dynamically in the useEffect */}
+        {/* No script loaded - using static fallback UI */}
       </Helmet>
 
       <div className="container mx-auto px-4 py-8">

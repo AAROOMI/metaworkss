@@ -437,13 +437,7 @@ export default function VirtualAdvisor() {
               </div>
             </div>
             
-            {/* Loading indicator only shown while iframe is initializing */}
-            {!didAgentLoaded && (
-              <div className="flex flex-col items-center justify-center mt-4">
-                <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                <p>Loading virtual assistant... Please wait or click "Refresh Assistant" if it doesn't appear.</p>
-              </div>
-            )}
+            {/* No more loading indicator needed as we're using static fallback */}
             
             <div className="max-w-sm mt-4">
               <h3 className="text-xl font-semibold">Virtual Cybersecurity Consultant</h3>
@@ -461,10 +455,12 @@ export default function VirtualAdvisor() {
                   Start Text Chat
                 </Button>
                 <Button 
-                  variant="outline" 
-                  onClick={checkDIDAgent}
+                  variant="outline"
+                  onClick={() => {
+                    window.open('https://presentation.d-id.com', '_blank');
+                  }}
                 >
-                  Refresh Assistant
+                  View Demo (External)
                 </Button>
               </div>
             </div>
