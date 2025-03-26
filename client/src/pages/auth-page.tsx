@@ -71,26 +71,18 @@ export default function AuthPage() {
   const isPending = loginMutation.isPending || registerMutation.isPending || isLoading;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 relative">
-      {/* Animated background lines */}
-      <div className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden -z-10">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div 
-            key={i}
-            style={{
-              position: "absolute",
-              top: `${(i + 1) * 10}%`,
-              left: 0,
-              width: "100%",
-              height: "1px",
-              background: "linear-gradient(90deg, transparent, rgba(0, 183, 235, 0.2), transparent)",
-              animation: `flow 15s linear infinite ${i * 2}s`,
-              opacity: 0
-            }}
-            className="line"
-          />
-        ))}
-      </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Background image */}
+      <div 
+        className="absolute top-0 left-0 right-0 bottom-0 -z-10 bg-cover bg-center"
+        style={{
+          backgroundImage: 'url("/attached_assets/metawork background.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/40 -z-10" />
       
       <div className="max-w-6xl w-full flex flex-col md:flex-row gap-8 items-center">
         {/* Left side - Login/Register form */}

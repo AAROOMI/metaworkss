@@ -28,13 +28,13 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              <span className="block">One-Click</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
+              <span className="block bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">One-Click</span>
               <span className="block">Cybersecurity</span>
               <span className="block">Compliance</span>
-              <span className="block">Solution</span>
+              <span className="block bg-gradient-to-r from-emerald-400 to-primary bg-clip-text text-transparent">Solution</span>
             </h1>
-            <p className="text-lg text-gray-300 mb-8">
+            <p className="text-lg text-gray-300 mb-8 backdrop-blur-sm bg-black/20 p-4 rounded-lg border border-primary/20">
               Innovative Cybersecurity Solutions for Comprehensive Compliance and Protection with NCA ECC regulations.
             </p>
             

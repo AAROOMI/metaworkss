@@ -8,26 +8,19 @@ import Footer from "@/components/landing/footer";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
-      {/* Animated background lines */}
-      <div className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden -z-10">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div 
-            key={i}
-            style={{
-              position: "absolute",
-              top: `${(i + 1) * 10}%`,
-              left: 0,
-              width: "100%",
-              height: "1px",
-              background: "linear-gradient(90deg, transparent, rgba(0, 183, 235, 0.2), transparent)",
-              animation: `flow 15s linear infinite ${i * 2}s`,
-              opacity: 0
-            }}
-            className="line"
-          />
-        ))}
-      </div>
+    <div className="min-h-screen text-foreground relative">
+      {/* Background image */}
+      <div 
+        className="fixed top-0 left-0 right-0 bottom-0 -z-10 bg-cover bg-center"
+        style={{
+          backgroundImage: 'url("/attached_assets/metawork background.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      />
+      <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/40 -z-10" />
       
       <Header />
       <HeroSection />
