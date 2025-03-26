@@ -9,40 +9,11 @@ import { Bot, Info, Users, FileText, Zap } from "lucide-react";
 export default function VirtualAssistantPage() {
   const { user } = useAuth();
   
-  // Load the D-ID agent at the page level for better stability
+  // No need to load D-ID agent at the page level anymore
+  // It's now embedded directly in the component using dangerouslySetInnerHTML
   useEffect(() => {
-    // We'll use a more reliable method to load the script
-    const loadScript = () => {
-      if (!document.getElementById('did-agent-script')) {
-        const script = document.createElement('script');
-        script.id = 'did-agent-script';
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-mode', 'fabio');
-        script.setAttribute('data-target', '#did-agent-target');
-        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
-        script.setAttribute('data-monitor', 'true');
-        
-        // Append the script to the document head
-        document.head.appendChild(script);
-        
-        console.log("D-ID agent script added to head");
-      }
-    };
-    
-    // Load after a short delay to ensure DOM is ready
-    setTimeout(loadScript, 500);
-    
-    // Clean up function
-    return () => {
-      const script = document.getElementById('did-agent-script');
-      if (script) {
-        script.remove();
-        console.log("D-ID agent script removed");
-      }
-    };
+    // For future page-level initialization if needed
+    console.log("Virtual Assistant page loaded");
   }, []);
 
   return (

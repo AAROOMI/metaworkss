@@ -429,18 +429,31 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* This is placed here explicitly for D-ID agent to attach to */}
-            <div id="did-agent-target" className="w-full min-h-[300px]"></div>
-            
-            {/* Backup container if D-ID agent doesn't load */}
-            <div id="agent-container" ref={agentContainerRef} className="w-full min-h-[300px] flex items-center justify-center">
-              {!didAgentLoaded && (
-                <div className="flex flex-col items-center justify-center">
-                  <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                  <p>Loading virtual assistant...</p>
-                </div>
-              )}
+            {/* D-ID agent will be inserted here with direct script tag */}
+            <div className="w-full min-h-[400px] border rounded-lg overflow-hidden">
+              {/* Load D-ID script directly as recommended by D-ID */}
+              <div dangerouslySetInnerHTML={{
+                __html: `
+                <script
+                  type="module"
+                  src="https://agent.d-id.com/v1/index.js"
+                  data-name="did-agent"
+                  data-mode="fabio"
+                  data-client-key="YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag=="
+                  data-agent-id="agt_954OZ9Ea"
+                  data-monitor="true">
+                </script>
+                `
+              }} />
             </div>
+            
+            {/* Backup container if D-ID agent doesn't appear */}
+            {!didAgentLoaded && (
+              <div className="flex flex-col items-center justify-center mt-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                <p>Loading virtual assistant...</p>
+              </div>
+            )}
             
             <div className="max-w-sm mt-4">
               <h3 className="text-xl font-semibold">Virtual Cybersecurity Consultant</h3>
