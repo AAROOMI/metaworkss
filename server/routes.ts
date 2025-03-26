@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth } from "./auth";
+import { setupAuth, hashPassword } from "./auth";
 import path from "path";
 import { logoUpload, documentUpload, saveFileToDatabase, getFileById, deleteFile } from "./file-service";
 
@@ -219,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password and create user
       const user = await storage.createUser({
         username,
-        password, // In a real app, this would be hashed
+        password: await hashPassword(password),
         role,
         accessLevel,
         isActive
