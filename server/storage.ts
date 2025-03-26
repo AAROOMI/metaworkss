@@ -10,9 +10,11 @@ import {
   type Policy
 } from "@shared/schema";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
 // Interface for storage operations
 export interface IStorage {
@@ -39,142 +41,148 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private companyData: Map<number, CompanyInfo>;
-  private staffMembers: Map<number, CybersecurityStaff[]>;
-  private policyDocuments: Map<number, Policy>;
-  currentId: {
-    users: number;
-    company: number;
-    staff: number;
-    policy: number;
-  };
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.companyData = new Map();
-    this.staffMembers = new Map();
-    this.policyDocuments = new Map();
-    this.currentId = {
-      users: 1,
-      company: 1,
-      staff: 1,
-      policy: 1
-    };
-    
-    // Initialize session store
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000 // prune expired entries every 24h
-    });
-    
-    // Create a default admin user
-    this.createUser({
-      username: "admin",
-      password: "password123", // Would be hashed in production
-      role: "admin",
-      accessLevel: "premium",
-      isActive: true
+    // Create a session store with PostgreSQL
+    this.sessionStore = new PostgresSessionStore({
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
+      },
+      createTableIfMissing: true
     });
   }
 
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: Partial<User>): Promise<User> {
-    const id = this.currentId.users++;
-    const user: User = { 
-      id, 
-      username: insertUser.username || `user${id}`, 
-      password: insertUser.password || "password",
-      role: insertUser.role || "user",
-      accessLevel: insertUser.accessLevel || "trial",
+    const [user] = await db.insert(users).values({
+      username: insertUser.username || '',
+      password: insertUser.password || '',
+      role: insertUser.role || 'user',
+      accessLevel: insertUser.accessLevel || 'trial',
       isActive: insertUser.isActive !== undefined ? insertUser.isActive : true
-    };
-    this.users.set(id, user);
+    }).returning();
     return user;
   }
   
   async getUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
   
   // Company info methods
   async saveCompanyInfo(info: Partial<CompanyInfo>): Promise<CompanyInfo> {
-    // In this simple implementation, we only store one company record
-    const id = 1; // Always use ID 1 for the company
-    const existingInfo = this.companyData.get(id);
+    // First check if there's an existing company record
+    const existingCompany = await this.getCompanyInfo();
     
-    const companyInfo: CompanyInfo = {
-      id,
-      companyName: info.companyName || (existingInfo?.companyName || ""),
-      ceoName: info.ceoName !== undefined ? info.ceoName : (existingInfo?.ceoName || null),
-      cioName: info.cioName !== undefined ? info.cioName : (existingInfo?.cioName || null),
-      ctoName: info.ctoName !== undefined ? info.ctoName : (existingInfo?.ctoName || null),
-      cisoName: info.cisoName !== undefined ? info.cisoName : (existingInfo?.cisoName || null),
-      logoId: info.logoId !== undefined ? info.logoId : (existingInfo?.logoId || null)
-    };
-    
-    this.companyData.set(id, companyInfo);
-    return companyInfo;
+    if (existingCompany) {
+      // Update existing company
+      const [updated] = await db.update(companyInfo)
+        .set({
+          companyName: info.companyName || existingCompany.companyName,
+          ceoName: info.ceoName !== undefined ? info.ceoName : existingCompany.ceoName,
+          cioName: info.cioName !== undefined ? info.cioName : existingCompany.cioName,
+          ctoName: info.ctoName !== undefined ? info.ctoName : existingCompany.ctoName,
+          cisoName: info.cisoName !== undefined ? info.cisoName : existingCompany.cisoName,
+          logoId: info.logoId !== undefined ? info.logoId : existingCompany.logoId
+        })
+        .where(eq(companyInfo.id, existingCompany.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new company
+      const [company] = await db.insert(companyInfo).values({
+        companyName: info.companyName || '',
+        ceoName: info.ceoName,
+        cioName: info.cioName,
+        ctoName: info.ctoName,
+        cisoName: info.cisoName,
+        logoId: info.logoId
+      }).returning();
+      return company;
+    }
   }
   
   async getCompanyInfo(): Promise<CompanyInfo | undefined> {
-    return this.companyData.get(1); // Always use ID 1 for the company
+    const [company] = await db.select().from(companyInfo).limit(1);
+    return company;
   }
   
   // Staff methods
   async saveCybersecurityStaff(companyId: number, staffNames: string[]): Promise<CybersecurityStaff[]> {
-    const staffMembers: CybersecurityStaff[] = staffNames.map(name => ({
-      id: this.currentId.staff++,
+    // First delete existing staff for this company
+    await db.delete(cybersecurityStaff).where(eq(cybersecurityStaff.companyId, companyId));
+    
+    // Then insert new staff
+    if (staffNames.length === 0) {
+      return [];
+    }
+    
+    const staffValues = staffNames.map(name => ({
       companyId,
       staffName: name
     }));
     
-    this.staffMembers.set(companyId, staffMembers);
-    return staffMembers;
+    return await db.insert(cybersecurityStaff).values(staffValues).returning();
   }
   
   async getCybersecurityStaff(companyId: number): Promise<CybersecurityStaff[]> {
-    return this.staffMembers.get(companyId) || [];
+    return await db.select().from(cybersecurityStaff).where(eq(cybersecurityStaff.companyId, companyId));
   }
   
   // Policy methods
   async savePolicy(policy: Partial<Policy>): Promise<Policy> {
-    const id = policy.id || this.currentId.policy++;
     const now = new Date().toISOString();
-    const existingPolicy = this.policyDocuments.get(id);
     
-    const policyDoc: Policy = {
-      id,
-      title: policy.title || (existingPolicy?.title || "Untitled Policy"),
-      type: policy.type || (existingPolicy?.type || "general"),
-      content: policy.content !== undefined ? policy.content : (existingPolicy?.content || null),
-      fileId: policy.fileId !== undefined ? policy.fileId : (existingPolicy?.fileId || null),
-      createdAt: policy.createdAt || (existingPolicy?.createdAt || now),
-      updatedAt: policy.updatedAt || now
-    };
+    if (policy.id) {
+      // Update existing policy
+      const [existingPolicy] = await db.select().from(policies).where(eq(policies.id, policy.id));
+      
+      if (existingPolicy) {
+        const [updated] = await db.update(policies)
+          .set({
+            title: policy.title || existingPolicy.title,
+            type: policy.type || existingPolicy.type,
+            content: policy.content !== undefined ? policy.content : existingPolicy.content,
+            fileId: policy.fileId !== undefined ? policy.fileId : existingPolicy.fileId,
+            updatedAt: now
+          })
+          .where(eq(policies.id, policy.id))
+          .returning();
+        return updated;
+      }
+    }
     
-    this.policyDocuments.set(id, policyDoc);
-    return policyDoc;
+    // Create new policy
+    const [newPolicy] = await db.insert(policies).values({
+      title: policy.title || 'Untitled Policy',
+      type: policy.type || 'general',
+      content: policy.content,
+      fileId: policy.fileId,
+      createdAt: policy.createdAt || now,
+      updatedAt: now
+    }).returning();
+    return newPolicy;
   }
   
   async getPolicies(): Promise<Policy[]> {
-    return Array.from(this.policyDocuments.values());
+    return await db.select().from(policies);
   }
   
   async getPolicyById(id: number): Promise<Policy | undefined> {
-    return this.policyDocuments.get(id);
+    const [policy] = await db.select().from(policies).where(eq(policies.id, id));
+    return policy;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
