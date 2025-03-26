@@ -107,41 +107,18 @@ export default function VirtualAdvisor() {
   const agentContainerRef = useRef<HTMLDivElement>(null);
 
   // Function to check if the D-ID agent is loaded
+  // Simplified function that just shows a message instead of trying to load D-ID agent
   const checkDIDAgent = React.useCallback(() => {
-    console.log("Refreshing D-ID agent...");
+    console.log("D-ID agent refresh requested...");
     
-    // Access the iframe and reload it
-    const iframe = document.querySelector('iframe[title="D-ID Virtual Agent"]') as HTMLIFrameElement;
-    if (iframe) {
-      console.log("Reloading D-ID agent iframe");
-      // Force the iframe to reload
-      iframe.src = iframe.src.split('?')[0] + "?reload=" + new Date().getTime();
-      
-      setTimeout(() => {
-        setDidAgentLoaded(true);
-        console.log("D-ID agent status updated");
-      }, 1000);
-    } else {
-      console.log("D-ID agent iframe not found");
-      
-      // Try to refresh the container
-      const container = document.querySelector('div.w-full.min-h-\\[400px\\].border');
-      if (container) {
-        console.log("Found container, attempting to refresh content");
-        const newIframe = document.createElement('iframe');
-        newIframe.src = '/did-agent.html?t=' + new Date().getTime();
-        newIframe.className = 'w-full h-[400px] border-none';
-        newIframe.title = 'D-ID Virtual Agent';
-        
-        // Replace the content
-        container.innerHTML = '';
-        container.appendChild(newIframe);
-        
-        setTimeout(() => {
-          setDidAgentLoaded(true);
-        }, 1000);
-      }
-    }
+    // Show that we tried to refresh
+    setDidAgentLoaded(true);
+    
+    // After 1.5 seconds, show it as not loaded again so user can click refresh again if needed
+    setTimeout(() => {
+      setDidAgentLoaded(false);
+    }, 1500);
+    
   }, []);
 
   // Scroll to bottom of messages whenever messages change
@@ -154,13 +131,15 @@ export default function VirtualAdvisor() {
     inputRef.current?.focus();
   }, []);
   
-  // Check for D-ID agent when tab changes to 'assistant'
+  // Set UI state when tab changes to 'assistant'
   useEffect(() => {
     if (activeTab === 'assistant') {
-      // The script is loaded in the page component, we just need to check for it
-      checkDIDAgent();
+      // Set loading state to false after a short delay to hide the loader
+      setTimeout(() => {
+        setDidAgentLoaded(true);
+      }, 1000);
     }
-  }, [activeTab, checkDIDAgent]);
+  }, [activeTab]);
 
   // Function to handle sending a message
   const handleSendMessage = async () => {
@@ -443,13 +422,19 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* D-ID agent will be loaded in an iframe */}
+            {/* Fallback version with static image */}
             <div className="w-full min-h-[400px] border rounded-lg overflow-hidden relative">
-              <iframe 
-                src="/did-agent.html" 
-                className="w-full h-[400px] border-none"
-                title="D-ID Virtual Agent"
-              />
+              <div className="w-full h-[400px] flex items-center justify-center bg-gradient-to-b from-blue-900/10 to-blue-900/20 relative">
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+                  <div className="w-32 h-32 rounded-full bg-primary/20 mb-4 flex items-center justify-center">
+                    <Bot className="h-16 w-16 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-medium mb-2">Virtual Cybersecurity Consultant</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    The D-ID agent integration appears to be unavailable. You can continue using the text-based chat by clicking the "Start Text Chat" button below.
+                  </p>
+                </div>
+              </div>
             </div>
             
             {/* Loading indicator only shown while iframe is initializing */}

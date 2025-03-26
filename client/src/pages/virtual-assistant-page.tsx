@@ -9,11 +9,11 @@ import { Bot, Info, Users, FileText, Zap } from "lucide-react";
 export default function VirtualAssistantPage() {
   const { user } = useAuth();
   
-  // No need to load D-ID agent at the page level anymore
-  // It's now embedded directly in the component using dangerouslySetInnerHTML
+  // We'll no longer try to dynamically load the D-ID script
   useEffect(() => {
-    // For future page-level initialization if needed
     console.log("Virtual Assistant page loaded");
+    
+    // No more dynamic script loading - we'll use the static UI instead
   }, []);
 
   return (
