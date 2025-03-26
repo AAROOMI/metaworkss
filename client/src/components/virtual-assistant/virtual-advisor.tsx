@@ -118,6 +118,7 @@ export default function VirtualAdvisor() {
         script.src = 'https://agent.d-id.com/v1/index.js';
         script.setAttribute('data-name', 'did-agent');
         script.setAttribute('data-mode', 'fabio'); // Or use 'widget' for corner view
+        script.setAttribute('data-target', '#did-agent-target'); // Add target attribute
         script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
         script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
         script.setAttribute('data-monitor', 'true');

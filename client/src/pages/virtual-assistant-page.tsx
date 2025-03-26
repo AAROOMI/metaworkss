@@ -9,21 +9,9 @@ import { Bot, Info, Users, FileText, Zap } from "lucide-react";
 export default function VirtualAssistantPage() {
   const { user } = useAuth();
   
+  // We no longer need to add the script here as it's handled by the VirtualAdvisor component
   useEffect(() => {
-    // For D-ID agent loading, will attempt to load it this way as well
-    if (!document.getElementById('did-agent-script')) {
-      const script = document.createElement('script');
-      script.id = 'did-agent-script';
-      script.type = 'module';
-      script.src = 'https://agent.d-id.com/v1/index.js';
-      script.setAttribute('data-name', 'did-agent');
-      script.setAttribute('data-mode', 'fabio');
-      script.setAttribute('data-target', '#did-agent-target');
-      script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-      script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
-      script.setAttribute('data-monitor', 'true');
-      document.head.appendChild(script);
-    }
+    // This is an empty effect that can be used for future page-level setup if needed
   }, []);
 
   return (
