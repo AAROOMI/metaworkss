@@ -47,23 +47,6 @@ export default function HeroSection() {
               Innovative Cybersecurity Solutions for Comprehensive Compliance and Protection.
             </p>
             
-            {/* Clickable Comprehensive Compliance Features Section */}
-            <div 
-              className="mb-8 p-4 backdrop-blur-sm bg-primary/10 rounded-lg border border-primary/30 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:bg-primary/20"
-              onClick={() => navigate("/dashboard/compliance-features")}
-            >
-              <h3 className="text-xl font-semibold text-primary mb-2">Comprehensive Compliance Features</h3>
-              <p className="text-gray-300">
-                Our platform offers everything you need to achieve and maintain NCA ECC compliance with minimal effort.
-              </p>
-              <div className="mt-2 text-sm text-primary flex items-center">
-                <span>Learn more</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-            
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               {/* Dashboard Button */}
               <button 
