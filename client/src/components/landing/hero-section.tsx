@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Shield } from "lucide-react";
+import metaLogo from "@assets/metawork keylogo.webp";
 
 export default function HeroSection() {
   const [_, navigate] = useLocation();
@@ -30,8 +31,7 @@ export default function HeroSection() {
         {/* MetaWorks Logo */}
         <div className="flex justify-start mb-8">
           <div className="flex items-center">
-            <Shield className="w-8 h-8 text-primary" />
-            <span className="ml-2 text-lg font-bold text-primary">Meta Works</span>
+            <img src={metaLogo} alt="Meta Works" className="h-20 w-auto" />
           </div>
         </div>
         
