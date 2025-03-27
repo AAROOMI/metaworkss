@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Shield } from "lucide-react";
+import backgroundImage from "@assets/metawork background.png";
 
 export default function HeroSection() {
   const [_, navigate] = useLocation();
@@ -24,8 +25,25 @@ export default function HeroSection() {
   };
   
   return (
-    <section className="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section 
+      className="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden" 
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* MetaWorks Logo */}
+        <div className="flex justify-start mb-8">
+          <div className="flex items-center">
+            <Shield className="w-8 h-8 text-primary" />
+            <span className="ml-2 text-lg font-bold text-primary">Meta Works</span>
+          </div>
+        </div>
+        
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
@@ -35,7 +53,7 @@ export default function HeroSection() {
               <span className="block bg-gradient-to-r from-emerald-400 to-primary bg-clip-text text-transparent">Solution</span>
             </h1>
             <p className="text-lg text-gray-300 mb-8 backdrop-blur-sm bg-black/20 p-4 rounded-lg border border-primary/20">
-              Innovative Cybersecurity Solutions for Comprehensive Compliance and Protection with NCA ECC regulations.
+              Innovative Cybersecurity Solutions for Comprehensive Compliance and Protection.
             </p>
             
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
@@ -74,55 +92,48 @@ export default function HeroSection() {
           </div>
           
           <div className="md:w-1/2 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-lg">
-              {/* Shield Illustration with Animation */}
-              <div className="w-full h-full relative flex items-center justify-center">
-                <div className="relative w-64 h-64 md:w-80 md:h-80 animate-pulse-slow">
-                  <Shield className="w-full h-full text-primary" />
-                  
-                  {/* Create a layered effect for the shield */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <svg width="70%" height="70%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" 
-                        fill="rgba(0, 183, 235, 0.2)" 
-                        stroke="rgba(0, 183, 235, 0.7)" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" />
-                    </svg>
+            <div className="relative w-full max-w-lg backdrop-blur-sm bg-black/10 rounded-2xl p-6 border border-primary/20">
+              {/* AI-powered features list */}
+              <h3 className="text-2xl font-bold mb-4 text-primary">AI-Powered Security</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start space-x-3">
+                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
                   </div>
-                  
-                  {/* Keyhole element */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <svg width="30%" height="30%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="10" r="3" fill="#80DEEA" />
-                      <rect x="10" y="10" width="4" height="6" fill="#80DEEA" />
-                    </svg>
+                  <span className="text-gray-300">Automated compliance gap analysis</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
                   </div>
+                  <span className="text-gray-300">Real-time threat detection</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
+                  </div>
+                  <span className="text-gray-300">Intelligent policy generation</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
+                  </div>
+                  <span className="text-gray-300">Interactive D-ID virtual security consultant</span>
+                </li>
+              </ul>
+              
+              {/* Small floating elements */}
+              <div className="absolute -top-4 -right-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                  <span className="text-xs font-semibold">Active Protection</span>
                 </div>
-                
-                {/* Binary overlay effect */}
-                <div className="absolute inset-0 overflow-hidden opacity-20">
-                  <div className="w-full h-full flex flex-wrap">
-                    {Array.from({ length: 100 }).map((_, i) => (
-                      <span key={i} className="text-xs text-primary">{Math.round(Math.random())}</span>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Small floating elements */}
-                <div className="absolute -top-4 -right-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-xs font-semibold">Active Protection</span>
-                  </div>
-                </div>
-                
-                <div className="absolute -bottom-4 -left-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-primary animate-pulse"></div>
-                    <span className="text-xs font-semibold">AI Powered</span>
-                  </div>
+              </div>
+              
+              <div className="absolute -bottom-4 -left-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-primary animate-pulse"></div>
+                  <span className="text-xs font-semibold">ECC Compliant</span>
                 </div>
               </div>
             </div>
