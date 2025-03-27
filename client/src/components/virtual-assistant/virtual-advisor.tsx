@@ -137,19 +137,31 @@ export default function VirtualAdvisor() {
       // Reset agent loading state
       setDidAgentLoaded(false);
       
-      // Try to load the D-ID agent
-      setTimeout(() => {
-        if (typeof (window as any).loadDIDAgent === 'function') {
-          (window as any).loadDIDAgent();
-          
-          // Hide the loading indicator after a delay to allow agent to load
-          const timer = setTimeout(() => {
-            setDidAgentLoaded(true);
-          }, 5000);
-          
-          return () => clearTimeout(timer);
+      // Set up an event listener for the iframe's load event
+      const handleIframeLoad = () => {
+        setTimeout(() => {
+          setDidAgentLoaded(true);
+        }, 2000); // Give a little extra time for the agent to initialize
+      };
+      
+      // Find the iframe and add the load listener
+      const iframe = document.getElementById('did-agent-iframe') as HTMLIFrameElement;
+      if (iframe) {
+        iframe.addEventListener('load', handleIframeLoad);
+      }
+      
+      // Set a fallback timer in case the load event doesn't fire
+      const fallbackTimer = setTimeout(() => {
+        setDidAgentLoaded(true);
+      }, 8000);
+      
+      return () => {
+        // Clean up event listener and timer
+        if (iframe) {
+          iframe.removeEventListener('load', handleIframeLoad);
         }
-      }, 500);
+        clearTimeout(fallbackTimer);
+      };
     }
   }, [activeTab]);
 
@@ -434,14 +446,18 @@ export default function VirtualAdvisor() {
         
         <TabsContent value="assistant" className="flex-1 flex flex-col items-center justify-center p-0 m-0">
           <div className="flex flex-col items-center justify-center space-y-4 p-4 text-center">
-            {/* D-ID Agent container */}
+            {/* D-ID Agent iframe */}
             <div className="w-full min-h-[400px] border rounded-lg overflow-hidden relative">
-              {/* This div will be the target for the D-ID agent */}
-              <div 
-                id="agent-container" 
-                className="w-full h-[400px]"
-                style={{ display: didAgentLoaded ? 'block' : 'none' }}
-              ></div>
+              {activeTab === 'assistant' && (
+                <iframe 
+                  src="/did-agent.html" 
+                  className="w-full h-[400px] border-none"
+                  title="D-ID Virtual Agent"
+                  id="did-agent-iframe"
+                  allowFullScreen
+                  allow="camera; microphone; autoplay"
+                />
+              )}
               
               {!didAgentLoaded && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-blue-900/50 to-blue-900/70">
@@ -471,29 +487,21 @@ export default function VirtualAdvisor() {
                 <Button 
                   variant="outline"
                   onClick={() => {
-                    // Reset the agent container if it exists
-                    const container = document.getElementById('agent-container');
-                    if (container) {
-                      // Clear any previous content
-                      container.innerHTML = '';
-                      // Hide the container initially
-                      container.style.display = 'none';
-                    }
-                    
                     // Show loading indicator
                     setDidAgentLoaded(false);
                     
-                    // Call the loadDIDAgent function to reload the agent
-                    setTimeout(() => {
-                      if (typeof (window as any).loadDIDAgent === 'function') {
-                        (window as any).loadDIDAgent();
-                        
-                        // After 3 seconds, hide the loading overlay
-                        setTimeout(() => {
-                          setDidAgentLoaded(true);
-                        }, 3000);
-                      }
-                    }, 500);
+                    // Find the iframe and refresh it
+                    const iframe = document.getElementById('did-agent-iframe') as HTMLIFrameElement;
+                    if (iframe) {
+                      // Force iframe reload by appending timestamp to URL
+                      const currentSrc = iframe.src.split('?')[0];
+                      iframe.src = currentSrc + '?t=' + new Date().getTime();
+                      
+                      // After 3 seconds, hide the loading overlay
+                      setTimeout(() => {
+                        setDidAgentLoaded(true);
+                      }, 3000);
+                    }
                   }}
                 >
                   Refresh Agent
