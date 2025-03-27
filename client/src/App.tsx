@@ -15,6 +15,7 @@ import NcaEccAssessmentPage from "@/pages/frameworks/nca-ecc-assessment-page";
 import SamaPage from "@/pages/frameworks/sama-page";
 import PdplPage from "@/pages/frameworks/pdpl-page";
 import Iso27001Page from "@/pages/frameworks/iso-27001-page";
+import RiskManagementPage from "@/pages/risk-management-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 import ThemeProvider from "@/components/layout/theme-switch";
@@ -27,6 +28,7 @@ function Router() {
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/admin" component={AdminPage} />
       <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
+      <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
       <Route path="/did-agent" component={DIDAgentPage} />
       <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
       <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />

@@ -78,8 +78,16 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Risk Heatmap */}
             <Card className="md:col-span-2 backdrop-blur-sm bg-card/50 border-primary/10">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>Risk Heatmap</CardTitle>
+                <Button 
+                  variant="link" 
+                  size="sm" 
+                  className="text-xs text-muted-foreground"
+                  onClick={() => window.location.href = "/risk-management"}
+                >
+                  View Full Risk Management →
+                </Button>
               </CardHeader>
               <CardContent>
                 <RiskHeatmap />

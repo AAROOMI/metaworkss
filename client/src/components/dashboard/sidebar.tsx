@@ -12,6 +12,8 @@ import {
   LogOut,
   Bot,
   Presentation,
+  BarChart4,
+  AlertTriangle,
 } from "lucide-react";
 
 const menuItems = [
@@ -31,9 +33,14 @@ const menuItems = [
     path: "/policies",
   },
   {
-    name: "Risk Assessment",
+    name: "Risk Management",
+    icon: AlertTriangle,
+    path: "/risk-management",
+  },
+  {
+    name: "NCA ECC Assessment",
     icon: Star,
-    path: "/risk",
+    path: "/frameworks/nca-ecc-assessment",
   },
   {
     name: "Compliance Tasks",
@@ -72,6 +79,12 @@ export default function Sidebar() {
       return true;
     }
     if (path === "/did-agent" && location === "/did-agent") {
+      return true;
+    }
+    if (path === "/risk-management" && location === "/risk-management") {
+      return true;
+    }
+    if (path === "/frameworks/nca-ecc-assessment" && location === "/frameworks/nca-ecc-assessment") {
       return true;
     }
     return location === path;
