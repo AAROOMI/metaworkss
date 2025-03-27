@@ -84,6 +84,9 @@ export default function Sidebar() {
     if (path === "/risk-management" && location === "/risk-management") {
       return true;
     }
+    if (path === "/policies" && location === "/policies") {
+      return true;
+    }
     if (path === "/frameworks/nca-ecc-assessment" && location === "/frameworks/nca-ecc-assessment") {
       return true;
     }

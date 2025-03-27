@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Sidebar from "@/components/dashboard/sidebar";
 import ComplianceScore from "@/components/dashboard/compliance-score";
 import RiskHeatmap from "@/components/dashboard/risk-heatmap";
+import { Link } from "wouter";
 import { Shield, AlertTriangle, CheckCircle, Clock, FileText } from "lucide-react";
 
 export default function DashboardPage() {
@@ -80,14 +81,15 @@ export default function DashboardPage() {
             <Card className="md:col-span-2 backdrop-blur-sm bg-card/50 border-primary/10">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>Risk Heatmap</CardTitle>
-                <Button 
-                  variant="link" 
-                  size="sm" 
-                  className="text-xs text-muted-foreground"
-                  onClick={() => window.location.href = "/risk-management"}
-                >
-                  View Full Risk Management →
-                </Button>
+                <Link href="/risk-management">
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    className="text-xs text-muted-foreground"
+                  >
+                    View Full Risk Management →
+                  </Button>
+                </Link>
               </CardHeader>
               <CardContent>
                 <RiskHeatmap />
