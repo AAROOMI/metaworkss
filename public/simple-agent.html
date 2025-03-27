@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D-ID Agent Test Page</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    #did-agent {
+      width: 100%;
+      height: 100%;
+    }
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      background: rgba(0,0,0,0.7);
+      text-align: center;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>D-ID Agent Test Page</h1>
+  </div>
+  <div id="did-agent"></div>
+
+  <script
+    type="module"
+    src="https://agent.d-id.com/v1/index.js"
+    data-name="did-agent"
+    data-target="#did-agent"
+    data-mode="fabio"
+    data-client-key="YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag=="
+    data-agent-id="agt_954OZ9Ea"
+    data-monitor="true">
+  </script>
+</body>
+</html>

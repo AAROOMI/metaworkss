@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Bot,
+  Presentation,
 } from "lucide-react";
 
 const menuItems = [
@@ -45,6 +46,11 @@ const menuItems = [
     path: "/virtual-assistant",
   },
   {
+    name: "D-ID Agent",
+    icon: Presentation,
+    path: "/did-agent",
+  },
+  {
     name: "Settings",
     icon: Settings,
     path: "/settings",
@@ -63,6 +69,9 @@ export default function Sidebar() {
       return true;
     }
     if (path === "/virtual-assistant" && location === "/virtual-assistant") {
+      return true;
+    }
+    if (path === "/did-agent" && location === "/did-agent") {
       return true;
     }
     return location === path;

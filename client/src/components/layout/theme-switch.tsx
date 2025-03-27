@@ -52,7 +52,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function ThemeSwitch() {
+export function ThemeSwitch({ children }: { children?: ReactNode } = {}) {
   const { theme, toggleTheme } = useTheme();
   
   return (
@@ -64,6 +64,7 @@ export function ThemeSwitch() {
         aria-label="Toggle theme"
       />
       <Moon className="h-4 w-4 text-muted-foreground" />
+      {children && <span className="sr-only">{children}</span>}
     </div>
   );
 }
