@@ -2,7 +2,6 @@ import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Shield } from "lucide-react";
-import backgroundImage from "@assets/metawork background.png";
 
 export default function HeroSection() {
   const [_, navigate] = useLocation();
@@ -25,16 +24,8 @@ export default function HeroSection() {
   };
   
   return (
-    <section 
-      className="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden" 
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60"></div>
+    <section className="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden bg-background">
+      <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-primary/5"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* MetaWorks Logo */}
         <div className="flex justify-start mb-8">
