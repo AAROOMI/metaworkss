@@ -28,10 +28,10 @@ export default function HeroSection() {
     <section className="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden bg-background">
       <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-primary/5"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* MetaWorks Logo */}
-        <div className="flex justify-start mb-8">
-          <div className="flex items-center">
-            <img src={metaLogo} alt="Meta Works" className="h-20 w-auto" />
+        {/* Header area with positioning for logo */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-2xl font-bold text-primary">
+            <span>Meta Works</span>
           </div>
         </div>
         
@@ -82,50 +82,20 @@ export default function HeroSection() {
             </div>
           </div>
           
-          <div className="md:w-1/2 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-lg backdrop-blur-sm bg-black/10 rounded-2xl p-6 border border-primary/20">
-              {/* AI-powered features list */}
-              <h3 className="text-2xl font-bold mb-4 text-primary">AI-Powered Security</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start space-x-3">
-                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
-                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
-                  </div>
-                  <span className="text-gray-300">Automated compliance gap analysis</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
-                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
-                  </div>
-                  <span className="text-gray-300">Real-time threat detection</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
-                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
-                  </div>
-                  <span className="text-gray-300">Intelligent policy generation</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <div className="mt-1 h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
-                    <div className="h-3 w-3 rounded-full bg-primary animate-pulse"></div>
-                  </div>
-                  <span className="text-gray-300">Interactive D-ID virtual security consultant</span>
-                </li>
-              </ul>
+          <div className="md:w-1/2 flex justify-center lg:justify-end relative">
+            {/* MetaWorks Logo - Large on right side */}
+            <div className="relative flex justify-center items-center">
+              <img src={metaLogo} alt="Meta Works Security Shield" className="h-80 w-auto z-10" />
               
-              {/* Small floating elements */}
-              <div className="absolute -top-4 -right-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                  <span className="text-xs font-semibold">Active Protection</span>
-                </div>
-              </div>
-              
-              <div className="absolute -bottom-4 -left-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-primary animate-pulse"></div>
-                  <span className="text-xs font-semibold">ECC Compliant</span>
-                </div>
+              {/* Glowing effect behind logo */}
+              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full z-0"></div>
+            </div>
+            
+            {/* Small floating element */}
+            <div className="absolute bottom-4 right-4 backdrop-blur-sm bg-primary/10 p-3 rounded-lg shadow-lg border border-primary/20 z-20">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="text-xs font-semibold">ECC Compliant</span>
               </div>
             </div>
           </div>
