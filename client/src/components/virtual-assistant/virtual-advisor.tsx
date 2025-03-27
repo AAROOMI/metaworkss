@@ -101,6 +101,7 @@ export default function VirtualAdvisor() {
   const [voiceState, setVoiceState] = useState<VoiceState>("off");
   const [activeTab, setActiveTab] = useState<string>("chat");
   const [didAgentLoaded, setDidAgentLoaded] = useState(false);
+  const [iframeKey, setIframeKey] = useState<number>(Date.now());
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -450,12 +451,13 @@ export default function VirtualAdvisor() {
             <div className="w-full min-h-[400px] border rounded-lg overflow-hidden relative">
               {activeTab === 'assistant' && (
                 <iframe 
-                  src="/did-agent.html" 
+                  key={iframeKey}
+                  src={`/did-agent.html?t=${iframeKey}`}
                   className="w-full h-[400px] border-none"
                   title="D-ID Virtual Agent"
                   id="did-agent-iframe"
                   allowFullScreen
-                  allow="camera; microphone; autoplay"
+                  allow="camera; microphone; autoplay; clipboard-write"
                 />
               )}
               
@@ -490,18 +492,13 @@ export default function VirtualAdvisor() {
                     // Show loading indicator
                     setDidAgentLoaded(false);
                     
-                    // Find the iframe and refresh it
-                    const iframe = document.getElementById('did-agent-iframe') as HTMLIFrameElement;
-                    if (iframe) {
-                      // Force iframe reload by appending timestamp to URL
-                      const currentSrc = iframe.src.split('?')[0];
-                      iframe.src = currentSrc + '?t=' + new Date().getTime();
-                      
-                      // After 3 seconds, hide the loading overlay
-                      setTimeout(() => {
-                        setDidAgentLoaded(true);
-                      }, 3000);
-                    }
+                    // Force iframe reload by updating the key
+                    setIframeKey(Date.now());
+                    
+                    // After 5 seconds, hide the loading overlay
+                    setTimeout(() => {
+                      setDidAgentLoaded(true);
+                    }, 5000);
                   }}
                 >
                   Refresh Agent
