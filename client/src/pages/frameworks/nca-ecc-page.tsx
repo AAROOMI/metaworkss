@@ -420,7 +420,7 @@ export default function NcaEccPage() {
                     </p>
                     <div className="flex justify-center mt-4">
                       <Button size="lg" className="gap-2" asChild>
-                        <Link href="/dashboard">
+                        <Link href="/frameworks/nca-ecc-assessment">
                           <FileText className="h-5 w-5" />
                           Start ECC Assessment
                         </Link>
@@ -440,7 +440,7 @@ export default function NcaEccPage() {
               </Link>
             </Button>
             <Button className="flex items-center gap-2" asChild>
-              <Link href="/dashboard">
+              <Link href="/frameworks/nca-ecc-assessment">
                 <FileText className="h-4 w-4 mr-2" />
                 Start ECC Assessment
               </Link>
