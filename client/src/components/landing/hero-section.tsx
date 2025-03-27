@@ -35,7 +35,7 @@ export default function HeroSection() {
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row items-center">
+        <div className="flex flex-col md:flex-row items-start">
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
               <span className="block bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">One-Click</span>
@@ -82,7 +82,7 @@ export default function HeroSection() {
             </div>
           </div>
           
-          <div className="md:w-1/2 flex justify-center lg:justify-end relative">
+          <div className="md:w-1/2 flex justify-center lg:justify-end relative md:-mt-8">
             {/* MetaWorks Logo - Extra Large on right side */}
             <div className="relative flex justify-center items-center">
               <img src={metaLogo} alt="Meta Works Security Shield" className="h-96 lg:h-[450px] w-auto z-10" />
