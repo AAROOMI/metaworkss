@@ -4,6 +4,7 @@ import HeroSection from "@/components/landing/hero-section";
 import FeaturesSection from "@/components/landing/features-section";
 import AdminPreview from "@/components/landing/admin-preview";
 import CompanyInfoSection from "@/components/landing/company-info-section";
+import ComplianceLogos from "@/components/landing/compliance-logos";
 import Footer from "@/components/landing/footer";
 
 export default function HomePage() {
@@ -24,6 +25,7 @@ export default function HomePage() {
       
       <Header />
       <HeroSection />
+      <ComplianceLogos />
       <FeaturesSection />
       <AdminPreview />
       <CompanyInfoSection />
