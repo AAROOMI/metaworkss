@@ -2,14 +2,46 @@ import React, { useState } from "react";
 import Sidebar from "@/components/dashboard/sidebar";
 import UserForm from "@/components/admin/user-form";
 import UserList from "@/components/admin/user-list";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CompanyInfoForm from "@/components/company/company-info-form";
 import PolicyUpload from "@/components/company/policy-upload";
 import PolicyList from "@/components/company/policy-list";
+import { useClerkUser } from "@/components/clerk/clerk-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { ClerkUserButton } from "@/components/clerk/clerk-auth";
+import { Shield, ServerCog, UserCog, Building, FileText } from "lucide-react";
 
 export default function AdminPage() {
   const [showUserForm, setShowUserForm] = useState(false);
+  const { isSignedIn, user: clerkUser } = useClerkUser();
+  const { user } = useAuth();
+  
+  // Check if user has admin access (either through Clerk or regular auth)
+  const hasAccess = isSignedIn || (user && user.role === 'admin');
+  
+  if (!hasAccess) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center max-w-md p-6 bg-card rounded-lg border border-border shadow-md">
+          <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Admin Access Required</h2>
+          <p className="text-muted-foreground mb-4">
+            You need administrator privileges to access this page. Please sign in with an admin account.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button asChild variant="default">
+              <a href="/clerk-auth">Sign in with Clerk</a>
+            </Button>
+            <Button asChild variant="outline">
+              <a href="/auth">Sign in with Password</a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -21,14 +53,36 @@ export default function AdminPage() {
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h1 className="text-2xl font-bold">Admin Control Panel</h1>
+            <div>
+              <h1 className="text-2xl font-bold flex items-center">
+                <ServerCog className="mr-2 h-6 w-6 text-primary" />
+                Admin Control Panel
+              </h1>
+              <p className="text-muted-foreground mt-1">Manage users, company information, and system settings</p>
+            </div>
+            
+            {isSignedIn && (
+              <div className="flex items-center gap-2 bg-card/60 backdrop-blur-sm rounded-lg p-2 border border-border">
+                <span className="text-sm">Admin: {clerkUser?.firstName || clerkUser?.username || 'Admin'}</span>
+                <ClerkUserButton />
+              </div>
+            )}
           </div>
           
           <Tabs defaultValue="users" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="users">User Management</TabsTrigger>
-              <TabsTrigger value="company">Company Information</TabsTrigger>
-              <TabsTrigger value="policies">Policy Management</TabsTrigger>
+            <TabsList className="grid grid-cols-3 md:w-auto w-full">
+              <TabsTrigger value="users" className="flex items-center">
+                <UserCog className="mr-2 h-4 w-4" />
+                User Management
+              </TabsTrigger>
+              <TabsTrigger value="company" className="flex items-center">
+                <Building className="mr-2 h-4 w-4" />
+                Company Information
+              </TabsTrigger>
+              <TabsTrigger value="policies" className="flex items-center">
+                <FileText className="mr-2 h-4 w-4" />
+                Policy Management
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="users" className="space-y-4">

@@ -48,16 +48,17 @@ function Router() {
 
 function App() {
   return (
-    /* Temporarily disabling Clerk provider due to key configuration issues */
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <HelmetProvider>
-          <ThemeProvider>
-            <Router />
-            <Toaster />
-          </ThemeProvider>
-        </HelmetProvider>
-      </AuthProvider>
+      <CustomClerkProvider>
+        <AuthProvider>
+          <HelmetProvider>
+            <ThemeProvider>
+              <Router />
+              <Toaster />
+            </ThemeProvider>
+          </HelmetProvider>
+        </AuthProvider>
+      </CustomClerkProvider>
     </QueryClientProvider>
   );
 }
