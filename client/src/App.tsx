@@ -17,15 +17,18 @@ import PdplPage from "@/pages/frameworks/pdpl-page";
 import Iso27001Page from "@/pages/frameworks/iso-27001-page";
 import RiskManagementPage from "@/pages/risk-management-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
+import ClerkAuthPage from "@/pages/clerk-auth-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 import ThemeProvider from "@/components/layout/theme-switch";
+import CustomClerkProvider from "@/components/clerk/custom-clerk-provider";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/clerk-auth" component={ClerkAuthPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/admin" component={AdminPage} />
       <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
@@ -44,16 +47,18 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <HelmetProvider>
-          <ThemeProvider>
-            <Router />
-            <Toaster />
-          </ThemeProvider>
-        </HelmetProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <CustomClerkProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <HelmetProvider>
+            <ThemeProvider>
+              <Router />
+              <Toaster />
+            </ThemeProvider>
+          </HelmetProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </CustomClerkProvider>
   );
 }
 

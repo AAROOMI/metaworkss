@@ -22,6 +22,10 @@ export default function Header() {
   const handleSignup = () => {
     navigate("/auth");
   };
+  
+  const handleClerkAuth = () => {
+    navigate("/clerk-auth");
+  };
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -93,6 +97,13 @@ export default function Header() {
                 >
                   Login
                 </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleClerkAuth}
+                  className="hidden md:inline-flex"
+                >
+                  Clerk Auth
+                </Button>
                 <Button onClick={handleSignup}>Get Started</Button>
               </>
             )}
@@ -121,13 +132,28 @@ export default function Header() {
               <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Pricing</a>
               <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">About</a>
               
-              {user && (
+              {user ? (
                 <a 
                   onClick={() => { navigate('/dashboard'); setIsMenuOpen(false); }}
                   className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
                 >
                   Dashboard
                 </a>
+              ) : (
+                <>
+                  <a 
+                    onClick={() => { navigate('/auth'); setIsMenuOpen(false); }}
+                    className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+                  >
+                    Login
+                  </a>
+                  <a 
+                    onClick={() => { navigate('/clerk-auth'); setIsMenuOpen(false); }}
+                    className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+                  >
+                    Clerk Auth
+                  </a>
+                </>
               )}
               
               <a 

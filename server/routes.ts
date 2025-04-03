@@ -4,10 +4,19 @@ import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
 import path from "path";
 import { logoUpload, documentUpload, saveFileToDatabase, getFileById, deleteFile } from "./file-service";
+import dotenv from "dotenv";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Load environment variables
+  dotenv.config();
+  
   // Setup authentication endpoints
   setupAuth(app);
+  
+  // Clerk authentication API key endpoint
+  app.get("/api/clerk-key", (req, res) => {
+    res.json({ publishableKey: process.env.CLERK_PUBLISHABLE_KEY });
+  });
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {
