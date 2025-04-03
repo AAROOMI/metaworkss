@@ -19,6 +19,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("Sending Clerk publishable key:", publishableKey);
     res.json({ publishableKey });
   });
+  
+  // D-ID API keys endpoint
+  app.get("/api/did-keys", (req, res) => {
+    const clientKey = process.env.DID_CLIENT_KEY;
+    const agentId = process.env.DID_AGENT_ID;
+    console.log("Sending D-ID keys - Client Key: (masked), Agent ID:", agentId);
+    res.json({ clientKey, agentId });
+  });
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>D-ID Agent Test Page</title>
+  <title>MetaWorks Virtual Cybersecurity Consultant</title>
   <style>
     body, html {
       margin: 0;
@@ -19,33 +19,121 @@
       width: 100%;
       height: 100%;
     }
-    .header {
+    .agent-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+    }
+    .loading {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 10px;
-      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0,0,0,0.7);
+      border-radius: 8px;
+      padding: 20px;
+      z-index: 5;
+    }
+    .loading-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #fff;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error-message {
+      display: none;
+      background-color: rgba(220, 38, 38, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px;
       text-align: center;
       z-index: 10;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>D-ID Agent Test Page</h1>
+  <div class="agent-container">
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <span>Loading your virtual consultant...</span>
+    </div>
+    <div id="error-message" class="error-message">
+      Unable to load the virtual consultant. Please check your connection and try again.
+    </div>
+    <div id="did-agent"></div>
   </div>
-  <div id="did-agent"></div>
 
-  <script
-    type="module"
-    src="https://agent.d-id.com/v1/index.js"
-    data-name="did-agent"
-    data-target="#did-agent"
-    data-mode="fabio"
-    data-client-key="YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag=="
-    data-agent-id="agt_954OZ9Ea"
-    data-monitor="true">
+  <script>
+    // Function to fetch API keys from the server
+    async function fetchApiKeys() {
+      try {
+        const response = await fetch('/api/did-keys');
+        if (!response.ok) {
+          throw new Error('Failed to fetch D-ID keys');
+        }
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching API keys:', error);
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+        return null;
+      }
+    }
+
+    // Function to initialize the D-ID agent
+    async function initializeAgent() {
+      const keys = await fetchApiKeys();
+      if (!keys) return;
+
+      const clientKey = keys.clientKey;
+      const agentId = keys.agentId;
+
+      if (!clientKey || !agentId) {
+        console.error('Missing D-ID credentials');
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+
+      // Create script element for D-ID
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://agent.d-id.com/v1/index.js';
+      script.dataset.name = 'did-agent';
+      script.dataset.target = '#did-agent';
+      script.dataset.mode = 'fabio';
+      script.dataset.clientKey = clientKey;
+      script.dataset.agentId = agentId;
+      script.dataset.monitor = 'true';
+      
+      // Add event listeners
+      script.onload = () => {
+        console.log('D-ID Agent script loaded successfully');
+        document.getElementById('loading').style.display = 'none';
+      };
+      
+      script.onerror = (error) => {
+        console.error('Error loading D-ID Agent script:', error);
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+      };
+      
+      document.body.appendChild(script);
+    }
+
+    // Initialize the agent when the page loads
+    window.addEventListener('DOMContentLoaded', initializeAgent);
   </script>
 </body>
 </html>
