@@ -47,18 +47,17 @@ function Router() {
 
 function App() {
   return (
-    <CustomClerkProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <HelmetProvider>
-            <ThemeProvider>
-              <Router />
-              <Toaster />
-            </ThemeProvider>
-          </HelmetProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </CustomClerkProvider>
+    /* Temporarily disabling Clerk provider due to key configuration issues */
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <HelmetProvider>
+          <ThemeProvider>
+            <Router />
+            <Toaster />
+          </ThemeProvider>
+        </HelmetProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
