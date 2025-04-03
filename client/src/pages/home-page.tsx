@@ -6,8 +6,14 @@ import AdminPreview from "@/components/landing/admin-preview";
 import CompanyInfoSection from "@/components/landing/company-info-section";
 import ComplianceLogos from "@/components/landing/compliance-logos";
 import Footer from "@/components/landing/footer";
+import { Button } from "@/components/ui/button";
+import { Shield, Lock } from "lucide-react";
 
 export default function HomePage() {
+  const handleClerkAdminAccess = () => {
+    window.location.href = '/clerk-auth';
+  };
+
   return (
     <div className="min-h-screen text-foreground relative">
       {/* Background image */}
@@ -22,6 +28,21 @@ export default function HomePage() {
         }}
       />
       <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/40 -z-10" />
+      
+      {/* Clerk Admin Direct Access Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="flex flex-col items-end gap-2">
+          <div className="bg-black/60 backdrop-blur-sm p-2 rounded-lg text-xs text-white">
+            Admin Access
+          </div>
+          <Button 
+            onClick={handleClerkAdminAccess}
+            className="rounded-full h-16 w-16 bg-gradient-to-r from-indigo-500 to-purple-700 hover:from-indigo-600 hover:to-purple-800 shadow-lg shadow-indigo-500/20 flex items-center justify-center"
+          >
+            <Lock className="h-6 w-6" />
+          </Button>
+        </div>
+      </div>
       
       <Header />
       <HeroSection />
