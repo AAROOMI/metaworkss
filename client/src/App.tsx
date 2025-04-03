@@ -18,8 +18,10 @@ import Iso27001Page from "@/pages/frameworks/iso-27001-page";
 import RiskManagementPage from "@/pages/risk-management-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
 import ClerkAuthPage from "@/pages/clerk-auth-page";
+import ClerkAdminPage from "@/pages/clerk-admin-page";
 import { AuthProvider } from "@/hooks/use-auth";
-import { ProtectedRoute } from "./lib/protected-route";
+import { ProtectedRoute } from "@/lib/protected-route";
+import { ClerkProtectedRoute } from "@/lib/clerk-protected-route";
 import ThemeProvider from "@/components/layout/theme-switch";
 import CustomClerkProvider from "@/components/clerk/custom-clerk-provider";
 
@@ -27,15 +29,26 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
+      
+      {/* Standard Authentication Routes */}
+      <Route path="/login" component={AuthPage} />
       <Route path="/auth" component={AuthPage} />
+      
+      {/* Clerk Authentication Routes */}
       <Route path="/clerk-auth" component={ClerkAuthPage} />
+      <Route path="/clerk-login" component={ClerkAuthPage} />
+      <ClerkProtectedRoute path="/clerk-admin" component={ClerkAdminPage} />
+      
+      {/* Protected Routes - accessible through either auth system */}
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/admin" component={AdminPage} />
       <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
       <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
       <ProtectedRoute path="/policies" component={PolicyManagementPage} />
+      
+      {/* Public Routes */}
       <Route path="/did-agent" component={DIDAgentPage} />
-      <Route path="/agent" component={DIDAgentPage} /> {/* Additional route for the agent page */}
+      <Route path="/agent" component={DIDAgentPage} />
       <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
       <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />
       <Route path="/frameworks/sama" component={SamaPage} />
