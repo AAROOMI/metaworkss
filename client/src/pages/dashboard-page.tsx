@@ -127,6 +127,11 @@ export default function DashboardPage() {
                       <p className="text-xs text-muted-foreground">Due in 7 days</p>
                     </div>
                   </div>
+                  <Link href="/did-agent">
+                    <Button variant="outline" size="sm" className="w-full mt-2">
+                      Talk to Virtual Consultant
+                    </Button>
+                  </Link>
                   <Button variant="outline" size="sm" className="w-full mt-2">
                     View All Tasks
                   </Button>

@@ -35,6 +35,7 @@ function Router() {
       <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
       <ProtectedRoute path="/policies" component={PolicyManagementPage} />
       <Route path="/did-agent" component={DIDAgentPage} />
+      <Route path="/agent" component={DIDAgentPage} /> {/* Additional route for the agent page */}
       <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
       <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />
       <Route path="/frameworks/sama" component={SamaPage} />
