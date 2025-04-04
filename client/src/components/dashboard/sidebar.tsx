@@ -15,6 +15,7 @@ import {
   BarChart4,
   AlertTriangle,
   History,
+  GraduationCap,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,6 +23,11 @@ const menuItems = [
     name: "Dashboard",
     icon: LayoutDashboard,
     path: "/dashboard",
+  },
+  {
+    name: "Onboarding",
+    icon: GraduationCap,
+    path: "/onboarding",
   },
   {
     name: "User Management",
@@ -81,6 +87,9 @@ export default function Sidebar() {
   
   const isActive = (path: string) => {
     if (path === "/dashboard" && location === "/dashboard") {
+      return true;
+    }
+    if (path === "/onboarding" && location === "/onboarding") {
       return true;
     }
     if (path === "/admin" && location === "/admin") {

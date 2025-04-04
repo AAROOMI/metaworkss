@@ -16,6 +16,8 @@ import controlsRouter from "./api/controls";
 import policyManagementRouter from "./api/policy-management";
 import companyInfoRouter from "./api/company-info";
 import { registerReportsRoutes } from "./api/reports";
+import { onboardingRouter } from "./api/onboarding";
+import { gamificationRouter } from "./api/gamification";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -305,6 +307,8 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use(assessmentResultsRouter);
   app.use("/api/policy-management", policyManagementRouter);
   app.use("/api/company", companyInfoRouter);
+  app.use("/api/onboarding", onboardingRouter);
+  app.use("/api/gamification", gamificationRouter);
   
   // Register reports API routes
   registerReportsRoutes(app);

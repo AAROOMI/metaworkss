@@ -13,7 +13,8 @@ import {
   Home,
   CheckCircle2,
   HelpCircle,
-  Settings
+  Settings,
+  GraduationCap
 } from "lucide-react";
 
 // Type for sidebar items
@@ -40,6 +41,11 @@ export default function UserSidebar() {
       title: "Dashboard",
       href: "/user-dashboard",
       icon: <BarChart3 className="h-5 w-5" />
+    },
+    {
+      title: "Onboarding",
+      href: "/onboarding",
+      icon: <GraduationCap className="h-5 w-5" />
     },
     {
       title: "Assessments",

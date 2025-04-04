@@ -15,6 +15,11 @@ import {
   policyCategories,
   policyTemplates,
   generatedPolicies,
+  onboardingSteps,
+  userProgress,
+  badges,
+  userBadges,
+  userGameStats,
   type User,
   type InsertUser,
   type CompanyInfo,
@@ -43,7 +48,17 @@ import {
   type PolicyTemplate,
   type InsertPolicyTemplate,
   type GeneratedPolicy,
-  type InsertGeneratedPolicy
+  type InsertGeneratedPolicy,
+  type OnboardingStep,
+  type InsertOnboardingStep,
+  type UserProgress,
+  type InsertUserProgress,
+  type Badge,
+  type InsertBadge,
+  type UserBadge,
+  type InsertUserBadge,
+  type UserGameStats,
+  type InsertUserGameStats
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -138,6 +153,38 @@ export interface IStorage {
   getGeneratedPolicies(companyId: number): Promise<GeneratedPolicy[]>;
   getGeneratedPolicyById(id: number): Promise<GeneratedPolicy | undefined>;
   updateGeneratedPolicyApprovalStatus(id: number, status: string, approvedBy?: number): Promise<GeneratedPolicy>;
+  
+  // Onboarding and Gamification
+  // Onboarding Steps
+  saveOnboardingStep(step: InsertOnboardingStep): Promise<OnboardingStep>;
+  getOnboardingSteps(): Promise<OnboardingStep[]>;
+  getOnboardingStepById(id: number): Promise<OnboardingStep | undefined>;
+  getOnboardingStepsByType(type: string): Promise<OnboardingStep[]>;
+  
+  // User Progress
+  saveUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
+  getUserProgressByUser(userId: number): Promise<UserProgress[]>;
+  getUserProgressByStep(stepId: number): Promise<UserProgress[]>;
+  getUserStepProgress(userId: number, stepId: number): Promise<UserProgress | undefined>;
+  updateUserProgress(id: number, progress: Partial<InsertUserProgress>): Promise<UserProgress>;
+  
+  // Badges
+  saveBadge(badge: InsertBadge): Promise<Badge>;
+  getBadges(): Promise<Badge[]>;
+  getBadgeById(id: number): Promise<Badge | undefined>;
+  getBadgesByCategory(category: string): Promise<Badge[]>;
+  
+  // User Badges
+  saveUserBadge(userBadge: InsertUserBadge): Promise<UserBadge>;
+  getUserBadgesByUser(userId: number): Promise<UserBadge[]>;
+  getUserBadgeById(id: number): Promise<UserBadge | undefined>;
+  toggleBadgeDisplay(id: number, displayed: boolean): Promise<UserBadge>;
+  
+  // User Game Stats
+  saveUserGameStats(stats: InsertUserGameStats): Promise<UserGameStats>;
+  getUserGameStats(userId: number): Promise<UserGameStats | undefined>;
+  updateUserGameStats(userId: number, stats: Partial<InsertUserGameStats>): Promise<UserGameStats>;
+  getUsersTopGameStats(limit: number): Promise<UserGameStats[]>;
   
   // Session storage
   sessionStore: session.Store;
@@ -815,6 +862,305 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updated;
+  }
+  
+  // Onboarding and Gamification Methods
+  
+  // Onboarding Steps
+  async saveOnboardingStep(step: InsertOnboardingStep): Promise<OnboardingStep> {
+    if (step.id) {
+      // Update existing step
+      const [updatedStep] = await db.update(onboardingSteps)
+        .set({
+          title: step.title,
+          description: step.description,
+          order: step.order,
+          type: step.type,
+          content: step.content,
+          points: step.points,
+          estimatedDuration: step.estimatedDuration,
+          prerequisiteStepIds: step.prerequisiteStepIds,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(onboardingSteps.id, step.id))
+        .returning();
+      return updatedStep;
+    } else {
+      // Create new step
+      const [newStep] = await db.insert(onboardingSteps).values({
+        ...step,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }).returning();
+      return newStep;
+    }
+  }
+  
+  async getOnboardingSteps(): Promise<OnboardingStep[]> {
+    return await db.select().from(onboardingSteps).orderBy(asc(onboardingSteps.order));
+  }
+  
+  async getOnboardingStepById(id: number): Promise<OnboardingStep | undefined> {
+    const [step] = await db.select().from(onboardingSteps).where(eq(onboardingSteps.id, id));
+    return step;
+  }
+  
+  async getOnboardingStepsByType(type: string): Promise<OnboardingStep[]> {
+    return await db.select().from(onboardingSteps)
+      .where(eq(onboardingSteps.type, type))
+      .orderBy(asc(onboardingSteps.order));
+  }
+  
+  // User Progress
+  async saveUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
+    // Check if progress exists
+    const existingProgress = await this.getUserStepProgress(progress.userId, progress.stepId);
+    
+    if (existingProgress) {
+      // Update existing progress
+      const [updatedProgress] = await db.update(userProgress)
+        .set({
+          ...progress,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(userProgress.id, existingProgress.id))
+        .returning();
+      return updatedProgress;
+    } else {
+      // Create new progress
+      const [newProgress] = await db.insert(userProgress).values({
+        ...progress,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }).returning();
+      return newProgress;
+    }
+  }
+  
+  async getUserProgressByUser(userId: number): Promise<UserProgress[]> {
+    return await db.select().from(userProgress).where(eq(userProgress.userId, userId));
+  }
+  
+  async getUserProgressByStep(stepId: number): Promise<UserProgress[]> {
+    return await db.select().from(userProgress).where(eq(userProgress.stepId, stepId));
+  }
+  
+  async getUserStepProgress(userId: number, stepId: number): Promise<UserProgress | undefined> {
+    const [progress] = await db.select().from(userProgress)
+      .where(
+        and(
+          eq(userProgress.userId, userId),
+          eq(userProgress.stepId, stepId)
+        )
+      );
+    return progress;
+  }
+  
+  async updateUserProgress(id: number, progress: Partial<InsertUserProgress>): Promise<UserProgress> {
+    const [updatedProgress] = await db.update(userProgress)
+      .set({
+        ...progress,
+        updatedAt: new Date().toISOString()
+      })
+      .where(eq(userProgress.id, id))
+      .returning();
+    return updatedProgress;
+  }
+  
+  // Badges
+  async saveBadge(badge: InsertBadge): Promise<Badge> {
+    if (badge.id) {
+      // Update existing badge
+      const [updatedBadge] = await db.update(badges)
+        .set(badge)
+        .where(eq(badges.id, badge.id))
+        .returning();
+      return updatedBadge;
+    } else {
+      // Create new badge
+      const [newBadge] = await db.insert(badges).values({
+        ...badge,
+        createdAt: new Date().toISOString()
+      }).returning();
+      return newBadge;
+    }
+  }
+  
+  async getBadges(): Promise<Badge[]> {
+    return await db.select().from(badges);
+  }
+  
+  async getBadgeById(id: number): Promise<Badge | undefined> {
+    const [badge] = await db.select().from(badges).where(eq(badges.id, id));
+    return badge;
+  }
+  
+  async getBadgesByCategory(category: string): Promise<Badge[]> {
+    return await db.select().from(badges).where(eq(badges.category, category));
+  }
+  
+  // User Badges
+  async saveUserBadge(userBadge: InsertUserBadge): Promise<UserBadge> {
+    // Check if already awarded
+    const [existingBadge] = await db.select().from(userBadges)
+      .where(
+        and(
+          eq(userBadges.userId, userBadge.userId),
+          eq(userBadges.badgeId, userBadge.badgeId)
+        )
+      );
+    
+    if (existingBadge) {
+      return existingBadge; // Badge already awarded, return it
+    }
+    
+    // Create new user badge
+    const [newUserBadge] = await db.insert(userBadges).values({
+      ...userBadge,
+      earnedAt: new Date().toISOString()
+    }).returning();
+    
+    // Update user game stats to reflect new badge
+    await this.updateUserGameStats(userBadge.userId, {});
+    
+    return newUserBadge;
+  }
+  
+  async getUserBadgesByUser(userId: number): Promise<UserBadge[]> {
+    return await db.select().from(userBadges).where(eq(userBadges.userId, userId));
+  }
+  
+  async getUserBadgeById(id: number): Promise<UserBadge | undefined> {
+    const [userBadge] = await db.select().from(userBadges).where(eq(userBadges.id, id));
+    return userBadge;
+  }
+  
+  async toggleBadgeDisplay(id: number, displayed: boolean): Promise<UserBadge> {
+    const [updatedUserBadge] = await db.update(userBadges)
+      .set({ displayed })
+      .where(eq(userBadges.id, id))
+      .returning();
+    return updatedUserBadge;
+  }
+  
+  // User Game Stats
+  async saveUserGameStats(stats: InsertUserGameStats): Promise<UserGameStats> {
+    const existingStats = await this.getUserGameStats(stats.userId);
+    
+    if (existingStats) {
+      // Update existing stats
+      const [updatedStats] = await db.update(userGameStats)
+        .set({
+          ...stats,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(userGameStats.userId, stats.userId))
+        .returning();
+      return updatedStats;
+    } else {
+      // Create new stats
+      const [newStats] = await db.insert(userGameStats).values({
+        ...stats,
+        updatedAt: new Date().toISOString()
+      }).returning();
+      return newStats;
+    }
+  }
+  
+  async getUserGameStats(userId: number): Promise<UserGameStats | undefined> {
+    const [stats] = await db.select().from(userGameStats).where(eq(userGameStats.userId, userId));
+    return stats;
+  }
+  
+  async updateUserGameStats(userId: number, stats: Partial<InsertUserGameStats>): Promise<UserGameStats> {
+    const existingStats = await this.getUserGameStats(userId);
+    
+    if (existingStats) {
+      // Get completed steps count
+      const completedSteps = await db.select({ count: count() }).from(userProgress)
+        .where(
+          and(
+            eq(userProgress.userId, userId),
+            eq(userProgress.completed, true)
+          )
+        );
+      
+      // Get total points from completed steps and quizzes
+      const userSteps = await this.getUserProgressByUser(userId);
+      let totalPoints = 0;
+      let quizScores: number[] = [];
+      
+      for (const step of userSteps) {
+        if (step.completed) {
+          // Get step info to add points
+          const stepInfo = await this.getOnboardingStepById(step.stepId);
+          if (stepInfo) {
+            totalPoints += stepInfo.points;
+          }
+          
+          // If it's a quiz and has a score, add to quiz scores array
+          if (step.score !== null && step.score !== undefined) {
+            quizScores.push(step.score);
+          }
+        }
+      }
+      
+      // Calculate streak days
+      const lastActivityDate = new Date(existingStats.lastActivity);
+      const now = new Date();
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      const daysSinceLastActivity = Math.floor((now.getTime() - lastActivityDate.getTime()) / oneDayMs);
+      
+      let streakDays = existingStats.streakDays;
+      if (daysSinceLastActivity === 1) {
+        // User was active yesterday, increment streak
+        streakDays += 1;
+      } else if (daysSinceLastActivity > 1) {
+        // User missed a day, reset streak
+        streakDays = 1;
+      }
+      
+      // Calculate level (1 level for every 100 points)
+      const level = Math.max(1, Math.floor(totalPoints / 100) + 1);
+      
+      // Calculate quiz average
+      const quizAverage = quizScores.length > 0 
+        ? quizScores.reduce((sum, score) => sum + score, 0) / quizScores.length 
+        : 0;
+      
+      // Update stats
+      const [updatedStats] = await db.update(userGameStats)
+        .set({
+          ...stats,
+          totalPoints,
+          level,
+          streakDays,
+          lastActivity: now.toISOString(),
+          completedSteps: completedSteps[0]?.count || 0,
+          quizAverage,
+          updatedAt: now.toISOString()
+        })
+        .where(eq(userGameStats.userId, userId))
+        .returning();
+      
+      return updatedStats;
+    } else {
+      // Create initial stats
+      return await this.saveUserGameStats({
+        userId,
+        totalPoints: 0,
+        level: 1,
+        streakDays: 1,
+        lastActivity: new Date().toISOString(),
+        completedSteps: 0,
+      });
+    }
+  }
+  
+  async getUsersTopGameStats(limit: number): Promise<UserGameStats[]> {
+    return await db.select().from(userGameStats)
+      .orderBy(desc(userGameStats.totalPoints))
+      .limit(limit);
   }
 }
 

@@ -296,3 +296,107 @@ export type GeneratedPolicy = typeof generatedPolicies.$inferSelect;
 export type InsertPolicyCategory = z.infer<typeof insertPolicyCategorySchema>;
 export type InsertPolicyTemplate = z.infer<typeof insertPolicyTemplateSchema>;
 export type InsertGeneratedPolicy = z.infer<typeof insertGeneratedPolicySchema>;
+
+// Onboarding and Gamification Schema
+export const onboardingSteps = pgTable('onboarding_steps', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  order: integer('order').notNull(),
+  type: text('type').notNull(), // 'learning', 'quiz', 'task', 'assessment'
+  content: jsonb('content').notNull(), // Contains questions, answers, and educational content
+  points: integer('points').notNull().default(10),
+  estimatedDuration: integer('estimated_duration').notNull(), // in minutes
+  prerequisiteStepIds: jsonb('prerequisite_step_ids').default([]),
+  createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow()
+});
+
+export const userProgress = pgTable('user_progress', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  stepId: integer('step_id').notNull().references(() => onboardingSteps.id),
+  completed: boolean('completed').notNull().default(false),
+  score: integer('score'),
+  answers: jsonb('answers'), // User's answers to quizzes
+  startedAt: timestamp('started_at', { mode: 'string' }),
+  completedAt: timestamp('completed_at', { mode: 'string' }),
+  attempts: integer('attempts').notNull().default(0),
+  feedback: text('feedback'),
+  createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow()
+});
+
+export const badges = pgTable('badges', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  imageUrl: text('image_url'),
+  category: text('category').notNull(), // 'achievement', 'learning', 'participation'
+  requiredPoints: integer('required_points'),
+  requiredSteps: jsonb('required_steps'),
+  isSecret: boolean('is_secret').notNull().default(false),
+  createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow()
+});
+
+export const userBadges = pgTable('user_badges', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  badgeId: integer('badge_id').notNull().references(() => badges.id),
+  earnedAt: timestamp('earned_at', { mode: 'string' }).notNull().defaultNow(),
+  displayed: boolean('displayed').notNull().default(true)
+});
+
+export const userGameStats = pgTable('user_game_stats', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id).unique(),
+  totalPoints: integer('total_points').notNull().default(0),
+  level: integer('level').notNull().default(1),
+  streakDays: integer('streak_days').notNull().default(0),
+  lastActivity: timestamp('last_activity', { mode: 'string' }).notNull().defaultNow(),
+  completedSteps: integer('completed_steps').notNull().default(0),
+  quizAverage: real('quiz_average').default('0'),
+  fastestCompletionTime: integer('fastest_completion_time'), // in seconds
+  updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow()
+});
+
+// Create insert schemas for onboarding and gamification
+export const insertOnboardingStepSchema = createInsertSchema(onboardingSteps).omit({ 
+  id: true, 
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertUserProgressSchema = createInsertSchema(userProgress).omit({ 
+  id: true, 
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertBadgeSchema = createInsertSchema(badges).omit({ 
+  id: true, 
+  createdAt: true
+});
+
+export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({ 
+  id: true, 
+  earnedAt: true
+});
+
+export const insertUserGameStatsSchema = createInsertSchema(userGameStats).omit({ 
+  id: true,
+  updatedAt: true
+});
+
+// Define onboarding and gamification types
+export type OnboardingStep = typeof onboardingSteps.$inferSelect;
+export type UserProgress = typeof userProgress.$inferSelect;
+export type Badge = typeof badges.$inferSelect;
+export type UserBadge = typeof userBadges.$inferSelect;
+export type UserGameStats = typeof userGameStats.$inferSelect;
+
+export type InsertOnboardingStep = z.infer<typeof insertOnboardingStepSchema>;
+export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
+export type InsertBadge = z.infer<typeof insertBadgeSchema>;
+export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+export type InsertUserGameStats = z.infer<typeof insertUserGameStatsSchema>;
