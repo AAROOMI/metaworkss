@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 interface DomainData {
   domain: string;
@@ -12,10 +13,10 @@ interface DomainData {
 }
 
 interface RiskHeatmapProps {
-  domains: DomainData[];
+  domains?: DomainData[];
 }
 
-export function RiskHeatmap({ domains }: RiskHeatmapProps) {
+function RiskHeatmapComponent({ domains = [] }: RiskHeatmapProps) {
   // If no domains or empty data, show placeholder
   if (!domains || domains.length === 0) {
     return (
@@ -116,3 +117,53 @@ export function RiskHeatmap({ domains }: RiskHeatmapProps) {
     </div>
   );
 }
+
+// Sample data for dashboard view when no props are provided
+const sampleDomainData: DomainData[] = [
+  {
+    domain: "Governance",
+    domainCode: "GOV",
+    controls: new Array(12),
+    implemented: 5,
+    partially_implemented: 4,
+    not_implemented: 3,
+    risk_level: 40
+  },
+  {
+    domain: "Defense",
+    domainCode: "DEF",
+    controls: new Array(8),
+    implemented: 6,
+    partially_implemented: 1,
+    not_implemented: 1,
+    risk_level: 20
+  },
+  {
+    domain: "Resilience",
+    domainCode: "RES",
+    controls: new Array(10),
+    implemented: 4,
+    partially_implemented: 3,
+    not_implemented: 3,
+    risk_level: 60
+  },
+  {
+    domain: "Risk Management",
+    domainCode: "RISK",
+    controls: new Array(7),
+    implemented: 2,
+    partially_implemented: 2,
+    not_implemented: 3,
+    risk_level: 70
+  }
+];
+
+// Default export with data fetching for dashboard
+export default function RiskHeatmap() {
+  // In a real implementation, we would fetch domain data
+  // For now, showing sample data
+  return <RiskHeatmapComponent domains={sampleDomainData} />;
+}
+
+// Named export for when data is provided
+export { RiskHeatmapComponent };

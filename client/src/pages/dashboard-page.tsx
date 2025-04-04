@@ -1,16 +1,118 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import Sidebar from "@/components/dashboard/sidebar";
 import ComplianceScore from "@/components/dashboard/compliance-score";
-import RiskHeatmap from "@/components/dashboard/risk-heatmap";
+import RiskHeatmap from "@/components/risks/risk-heatmap";
 import { Link } from "wouter";
-import { Shield, AlertTriangle, CheckCircle, Clock, FileText } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle, Clock, FileText, Download, BarChart3, Network, Lock, Database, Cloud, UserCheck, Settings, Clipboard, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Assessment, AssessmentResult, Control, Domain, Framework } from "@shared/schema";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [activeSecurityDomain, setActiveSecurityDomain] = useState("governance");
+  
+  // Get all assessments for the user
+  const { data: assessments, isLoading: assessmentsLoading } = useQuery<Assessment[]>({
+    queryKey: ['/api/assessments'],
+  });
+  
+  // Get all frameworks
+  const { data: frameworks, isLoading: frameworksLoading } = useQuery<Framework[]>({
+    queryKey: ['/api/frameworks'],
+  });
+  
+  // Get NCA ECC framework specifically
+  const ncaEccFramework = frameworks?.find((f: Framework) => f.name === "NCA ECC");
+  
+  // Get domains for the NCA ECC framework
+  const { data: domains, isLoading: domainsLoading } = useQuery<Domain[]>({
+    queryKey: ['/api/domains', ncaEccFramework?.id],
+    enabled: !!ncaEccFramework?.id,
+    queryFn: async () => {
+      if (!ncaEccFramework?.id) return [];
+      const res = await fetch(`/api/domains?frameworkId=${ncaEccFramework.id}`);
+      return await res.json();
+    }
+  });
+  
+  // Get all assessment results
+  const { data: allResults, isLoading: resultsLoading } = useQuery<AssessmentResult[]>({
+    queryKey: ['/api/assessment-results/all'],
+    enabled: !!assessments?.length,
+    queryFn: async () => {
+      if (!assessments?.length) return [];
+      
+      // Get latest assessment
+      const latestAssessment = assessments.reduce((latest: Assessment, current: Assessment) => {
+        return new Date(current.updatedAt) > new Date(latest.updatedAt) ? current : latest;
+      }, assessments[0]);
+      
+      const res = await fetch(`/api/assessment-results?assessmentId=${latestAssessment.id}`);
+      return await res.json();
+    }
+  });
+  
+  // Calculate compliance score
+  const complianceScore = () => {
+    if (!allResults || allResults.length === 0) return 0;
+    
+    const totalControls = allResults.length;
+    const implementedCount = allResults.filter((r: AssessmentResult) => r.status === "implemented").length;
+    const partiallyCount = allResults.filter((r: AssessmentResult) => r.status === "partially_implemented").length;
+    
+    return Math.round(((implementedCount + (partiallyCount * 0.5)) / totalControls) * 100);
+  };
+  
+  // Calculate risk level
+  const calculateRiskLevel = () => {
+    const score = complianceScore();
+    
+    if (score >= 85) return { level: "Low", color: "text-green-500" };
+    if (score >= 65) return { level: "Medium", color: "text-amber-500" };
+    return { level: "High", color: "text-red-500" };
+  };
+  
+  // Get controls data for tasks
+  const { data: controls, isLoading: controlsLoading } = useQuery<Control[]>({
+    queryKey: ['/api/controls'],
+    enabled: !!allResults?.length
+  });
+  
+  // Get domains for tasks
+  const { data: allDomains, isLoading: allDomainsLoading } = useQuery<Domain[]>({
+    queryKey: ['/api/domains/all'],
+    enabled: !!controls?.length,
+    queryFn: async () => {
+      const res = await fetch(`/api/domains/all`);
+      return await res.json();
+    }
+  });
+  
+  // Enhanced pending tasks with control and domain information
+  const pendingTasks = React.useMemo(() => {
+    if (!allResults || !controls || !allDomains) return [];
+    
+    const filteredTasks = allResults
+      .filter((result: AssessmentResult) => 
+        result.status === "not_implemented" || result.status === "partially_implemented")
+      .slice(0, 3);
+    
+    return filteredTasks.map((task: AssessmentResult) => {
+      const control = controls.find((c: Control) => c.id === task.controlId);
+      const domain = control ? allDomains.find((d: Domain) => d.id === control.domainId) : null;
+      
+      return {
+        ...task,
+        controlName: control?.name || `Control ${task.controlId}`,
+        domainName: domain?.name || "Security Domain"
+      };
+    });
+  }, [allResults, controls, allDomains]);
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -40,7 +142,14 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ComplianceScore score={78} />
+                {resultsLoading ? (
+                  <div className="flex flex-col items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+                    <span className="text-sm text-muted-foreground">Loading...</span>
+                  </div>
+                ) : (
+                  <ComplianceScore score={complianceScore()} />
+                )}
               </CardContent>
             </Card>
             
@@ -52,10 +161,23 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">Medium</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  5 critical issues need attention
-                </p>
+                {resultsLoading ? (
+                  <div className="flex flex-col items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+                    <span className="text-sm text-muted-foreground">Loading...</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className={`text-2xl font-bold ${calculateRiskLevel().color}`}>
+                      {calculateRiskLevel().level}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {pendingTasks.length > 0 
+                        ? `${pendingTasks.length} issues need attention` 
+                        : "No critical issues found"}
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
             
@@ -67,10 +189,22 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">63/80</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  NCA ECC controls implemented
-                </p>
+                {resultsLoading ? (
+                  <div className="flex flex-col items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+                    <span className="text-sm text-muted-foreground">Loading...</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">
+                      {allResults?.filter((r: AssessmentResult) => r.status === "implemented").length || 0}/
+                      {allResults?.length || 0}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {ncaEccFramework?.name || "NCA ECC"} controls implemented
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -106,27 +240,32 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-red-500 mt-2"></div>
-                    <div>
-                      <p className="text-sm font-medium">Update firewall rules</p>
-                      <p className="text-xs text-muted-foreground">Due in 2 days</p>
+                  {resultsLoading ? (
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+                      <span className="text-sm text-muted-foreground">Loading tasks...</span>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 mt-2"></div>
-                    <div>
-                      <p className="text-sm font-medium">Review access controls</p>
-                      <p className="text-xs text-muted-foreground">Due in 5 days</p>
+                  ) : pendingTasks.length > 0 ? (
+                    pendingTasks.map((task: AssessmentResult & { controlName?: string; domainName?: string }, index: number) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className={`w-2 h-2 rounded-full mt-2 ${
+                          task.status === "not_implemented" ? "bg-red-500" : "bg-amber-500"
+                        }`}></div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {task.controlName || `Control ${task.controlId}`}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {task.domainName || "Security Domain"} - Updated {new Date(task.updatedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-2">
+                      <p className="text-sm text-muted-foreground">No pending tasks</p>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 mt-2"></div>
-                    <div>
-                      <p className="text-sm font-medium">Update data privacy policy</p>
-                      <p className="text-xs text-muted-foreground">Due in 7 days</p>
-                    </div>
-                  </div>
+                  )}
                   <Link href="/did-agent">
                     <Button variant="outline" size="sm" className="w-full mt-2">
                       Talk to Virtual Consultant
