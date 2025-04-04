@@ -174,7 +174,7 @@ export function SecurityProgressTimeline({
         {/* Timeline events */}
         <div className="space-y-4 relative z-10">
           <AnimatePresence>
-            {visibleEvents.map((event, index) => (
+            {visibleEvents.filter(event => event !== undefined && event !== null).map((event, index) => (
               <motion.div
                 key={event.id}
                 initial={animate ? { opacity: 0, y: 20 } : false}
