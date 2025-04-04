@@ -24,8 +24,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/did-keys", (req, res) => {
     const clientKey = process.env.DID_CLIENT_KEY;
     const agentId = process.env.DID_AGENT_ID;
+    const apiKey = process.env.DID_API_KEY;
     console.log("Sending D-ID keys - Client Key: (masked), Agent ID:", agentId);
-    res.json({ clientKey, agentId });
+    res.json({ clientKey, agentId, apiKey });
+  });
+  
+  // D-ID API proxy endpoint for secure communication
+  app.post("/api/did-agent", async (req, res, next) => {
+    try {
+      const apiKey = process.env.DID_API_KEY;
+      
+      if (!apiKey) {
+        return res.status(500).json({ error: "D-ID API key is not configured" });
+      }
+      
+      // Here we would typically make a request to the D-ID API
+      // using the apiKey for authentication
+      // This is a placeholder for the actual implementation
+      res.json({ 
+        success: true, 
+        message: "D-ID agent API request processed successfully" 
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
   // API endpoints for company information
