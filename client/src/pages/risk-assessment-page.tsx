@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RiskStatusChart } from "@/components/risks/risk-status-chart";
 import { AssessmentResultItem } from "@/components/risks/assessment-result-item";
 import RiskAssessmentForm from "@/components/risks/risk-assessment-form";
+import OneClickReportButton from "@/components/reports/one-click-report-button";
 import { Framework, Assessment, AssessmentResult } from "@shared/schema";
 
 export default function RiskAssessmentPage() {
@@ -211,10 +212,19 @@ export default function RiskAssessmentPage() {
                           </Badge>
                         </CardDescription>
                       </div>
-                      <Button variant="outline" size="sm" className="gap-1">
-                        <Edit className="h-3.5 w-3.5" />
-                        Edit
-                      </Button>
+                      <div className="flex gap-2">
+                        {/* One-click report generation button */}
+                        {selectedAssessment && (
+                          <OneClickReportButton 
+                            assessmentId={selectedAssessment.id}
+                            assessmentName={selectedAssessment.name}
+                          />
+                        )}
+                        <Button variant="outline" size="sm" className="gap-1">
+                          <Edit className="h-3.5 w-3.5" />
+                          Edit
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
