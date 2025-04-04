@@ -453,11 +453,12 @@ export default function VirtualAdvisor() {
                 <iframe 
                   key={iframeKey}
                   src={`/did-agent.html?t=${iframeKey}`}
-                  className="w-full h-[400px] border-none"
+                  className="w-full h-[400px] border-none bg-black"
                   title="D-ID Virtual Agent"
                   id="did-agent-iframe"
                   allowFullScreen
-                  allow="camera; microphone; autoplay; clipboard-write"
+                  allow="camera *; microphone *; autoplay; clipboard-write"
+                  style={{ opacity: didAgentLoaded ? 1 : 0.7 }}
                 />
               )}
               
