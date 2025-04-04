@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -8,29 +8,66 @@ export default function DIDAgentPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [agentReady, setAgentReady] = useState(false);
+  const didAgentContainerRef = useRef<HTMLDivElement>(null);
 
+  // Load DID agent script on component mount
   useEffect(() => {
-    // Check if D-ID keys are available
-    async function checkDIDKeys() {
+    setIsLoading(true);
+    setAgentReady(false);
+    
+    const loadDIDAgent = () => {
       try {
-        setIsLoading(true);
-        const response = await fetch('/api/did-keys');
-        const data = await response.json();
-        
-        if (!data.clientKey || !data.agentId) {
-          setError('Missing D-ID API credentials. Please contact support.');
-        } else {
+        // If using iframe method (keeping as fallback option)
+        if (window.location.hostname === 'localhost' || process.env.NODE_ENV === 'development') {
           setAgentReady(true);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Load D-ID agent directly
+        const didScript = document.createElement('script');
+        didScript.type = 'module';
+        didScript.src = 'https://agent.d-id.com/v1/index.js';
+        didScript.dataset.name = 'did-agent';
+        didScript.dataset.mode = 'fabio';
+        didScript.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
+        didScript.dataset.agentId = 'agt_YjpQXzSG';
+        didScript.dataset.monitor = 'true';
+        
+        // Set up event handlers
+        didScript.onload = () => {
+          console.log('D-ID Agent script loaded successfully');
+          setIsLoading(false);
+          setAgentReady(true);
+        };
+        
+        didScript.onerror = (error) => {
+          console.error('Error loading D-ID Agent script:', error);
+          setError('Failed to load virtual consultant. Please try again later.');
+          setIsLoading(false);
+        };
+        
+        // Add script to container
+        if (didAgentContainerRef.current) {
+          // Clear any previous content
+          didAgentContainerRef.current.innerHTML = '';
+          didAgentContainerRef.current.appendChild(didScript);
         }
       } catch (error) {
-        console.error('Error checking D-ID keys:', error);
-        setError('Failed to connect to D-ID service. Please try again later.');
-      } finally {
+        console.error('Error initializing D-ID agent:', error);
+        setError('Failed to initialize virtual consultant. Please try again later.');
         setIsLoading(false);
       }
-    }
+    };
     
-    checkDIDKeys();
+    loadDIDAgent();
+    
+    // Cleanup function
+    return () => {
+      if (didAgentContainerRef.current) {
+        didAgentContainerRef.current.innerHTML = '';
+      }
+    };
   }, []);
 
   const handleRefresh = () => {
@@ -63,16 +100,15 @@ export default function DIDAgentPage() {
             </Alert>
           )}
           
-          <div className="flex items-center justify-center p-2">
-            <iframe 
-              src="/simple-agent.html" 
-              title="MetaWorks Virtual Consultant" 
-              className="w-full h-[600px] border rounded-lg overflow-hidden"
-              allow="camera; microphone; autoplay; clipboard-write"
-              allowFullScreen
-              style={{ opacity: agentReady ? 1 : 0 }}
-              onLoad={() => setIsLoading(false)}
-            />
+          <div className="flex items-center justify-center p-2 relative">
+            <div 
+              ref={didAgentContainerRef}
+              className="w-full h-[600px] border rounded-lg overflow-hidden bg-black"
+              style={{ opacity: agentReady ? 1 : 0.3 }}
+            >
+              {/* DID Agent script will be loaded here */}
+              <div id="did-agent" style={{ width: '100%', height: '100%' }}></div>
+            </div>
             
             {isLoading && (
               <div className="absolute flex flex-col items-center justify-center">
