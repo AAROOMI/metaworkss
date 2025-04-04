@@ -18,6 +18,7 @@ import companyInfoRouter from "./api/company-info";
 import { registerReportsRoutes } from "./api/reports";
 import { onboardingRouter } from "./api/onboarding";
 import { gamificationRouter } from "./api/gamification";
+import didAgentRouter from "./api/did-agent";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -34,35 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ publishableKey });
   });
 
-  // D-ID API keys endpoint
-  app.get("/api/did-keys", (req, res) => {
-    const clientKey = process.env.DID_CLIENT_KEY;
-    const agentId = process.env.DID_AGENT_ID;
-    const apiKey = process.env.DID_API_KEY;
-    console.log("Sending D-ID keys - Client Key: (masked), Agent ID:", agentId);
-    res.json({ clientKey, agentId, apiKey });
-  });
-
-  // D-ID API proxy endpoint for secure communication
-  app.post("/api/did-agent", async (req, res, next) => {
-    try {
-      const apiKey = process.env.DID_API_KEY;
-
-      if (!apiKey) {
-        return res.status(500).json({ error: "D-ID API key is not configured" });
-      }
-
-      // Here we would typically make a request to the D-ID API
-      // using the apiKey for authentication
-      // This is a placeholder for the actual implementation
-      res.json({ 
-        success: true, 
-        message: "D-ID agent API request processed successfully" 
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
+  // Use our dedicated DID Agent router (removed older implementation in favor of the modular one)
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {
@@ -309,6 +282,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use("/api/company", companyInfoRouter);
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/gamification", gamificationRouter);
+  app.use("/api/did-agent", didAgentRouter);
   
   // Register reports API routes
   registerReportsRoutes(app);
