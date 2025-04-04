@@ -220,7 +220,7 @@ export function OnboardingWizard() {
           <TabsContent value="content" className="p-0">
             <CardContent className="pt-6">
               <div className="prose prose-invert max-w-none">
-                {typeof currentStep.content === 'object' && 'content' in currentStep.content ? (
+                {currentStep?.content && typeof currentStep.content === 'object' && 'content' in currentStep.content ? (
                   <div dangerouslySetInnerHTML={{ __html: currentStep.content.content as string }} />
                 ) : (
                   <p className="text-muted-foreground">Content not available</p>
@@ -231,7 +231,7 @@ export function OnboardingWizard() {
 
           <TabsContent value="quiz" className="p-0">
             <CardContent className="pt-6">
-              {currentStep.type === 'quiz' && typeof currentStep.content === 'object' && 'questions' in currentStep.content ? (
+              {currentStep?.content && currentStep.type === 'quiz' && typeof currentStep.content === 'object' && 'questions' in currentStep.content ? (
                 <div className="space-y-4">
                   <p className="font-medium">Test your knowledge</p>
                   <p className="text-sm text-muted-foreground">

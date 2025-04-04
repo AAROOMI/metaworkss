@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RiskHeatmap } from "@/components/risks/risk-heatmap";
+import RiskHeatmap from "@/components/risks/risk-heatmap";
 import { RiskStatusChart } from "@/components/risks/risk-status-chart";
 import { FileText, AlertTriangle, CheckCircle } from "lucide-react";
 
@@ -190,7 +190,7 @@ export default function RiskDashboard({ assessmentId }: RiskDashboardProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-2">
-              <RiskHeatmap domains={domainResults()} />
+              <RiskHeatmap />
             </CardContent>
           </Card>
         </div>
