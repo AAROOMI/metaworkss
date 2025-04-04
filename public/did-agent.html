@@ -26,92 +26,40 @@
       text-align: center;
       padding: 20px;
     }
-    .debug-panel {
+    .loading {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      background: rgba(0,0,0,0.7);
-      color: #00ff00;
-      font-family: monospace;
-      font-size: 10px;
-      padding: 5px;
-      max-width: 100%;
-      max-height: 30%;
-      overflow: auto;
-      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0,0,0,0.7);
+      border-radius: 8px;
+      padding: 20px;
+      z-index: 5;
     }
   </style>
 </head>
 <body>
   <div id="did-agent"></div>
-  <div id="debug-panel" class="debug-panel"></div>
-  
+  <div id="loading" class="loading">Loading virtual agent...</div>
+
   <script>
-    // Debugging function
-    function log(message) {
-      console.log(message);
-      const debugPanel = document.getElementById('debug-panel');
-      if (debugPanel) {
-        const timestamp = new Date().toLocaleTimeString();
-        debugPanel.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-      }
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://agent.d-id.com/v1/index.js';
+      script.setAttribute('data-name', 'did-agent');
+      script.setAttribute('data-target', '#did-agent');
+      script.setAttribute('data-mode', 'fabio');
+      script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+      script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+      script.setAttribute('data-monitor', 'true');
 
-    // Error handler
-    window.onerror = function(message, source, lineno, colno, error) {
-      log(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
-      return false;
-    };
+      script.onload = () => {
+        document.getElementById('loading').style.display = 'none';
+      };
 
-    // Start D-ID Agent with specified parameters
-    document.addEventListener('DOMContentLoaded', function() {
-      log('DOM loaded, initializing D-ID Agent...');
-      
-      try {
-        // Create a script element to load the D-ID agent
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        
-        // Set the required attributes
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-target', '#did-agent');
-        script.setAttribute('data-mode', 'fabio');
-        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
-        script.setAttribute('data-monitor', 'true');
-        
-        // Listen for load event
-        script.onload = function() {
-          log('D-ID Agent script loaded successfully');
-        };
-        
-        // Error handling
-        script.onerror = function(e) {
-          log('Failed to load D-ID Agent script');
-          log(`Error details: ${JSON.stringify(e)}`);
-          document.getElementById('did-agent').innerHTML = `
-            <div class="fallback">
-              <h2>D-ID Agent failed to load</h2>
-              <p>Please check your internet connection and try again.</p>
-            </div>
-          `;
-        };
-        
-        // Append the script to the document
-        document.body.appendChild(script);
-        log('D-ID Agent script added to document');
-      } catch (error) {
-        log(`Exception occurred: ${error.message}`);
-      }
+      document.body.appendChild(script);
     });
-
-    // Check if we're in an iframe
-    if (window !== window.top) {
-      log('Running in iframe mode');
-    } else {
-      log('Running in standalone mode');
-    }
   </script>
 </body>
 </html>
