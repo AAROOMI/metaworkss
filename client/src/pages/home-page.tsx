@@ -8,6 +8,7 @@ import ComplianceLogos from "@/components/landing/compliance-logos";
 import Footer from "@/components/landing/footer";
 import { Button } from "@/components/ui/button";
 import { Shield, Lock } from "lucide-react";
+import backgroundImage from "@assets/metawork background.png";
 
 export default function HomePage() {
   const handleClerkAdminAccess = () => {
@@ -20,7 +21,7 @@ export default function HomePage() {
       <div 
         className="fixed top-0 left-0 right-0 bottom-0 -z-10 bg-cover bg-center"
         style={{
-          backgroundImage: 'url("/attached_assets/metawork background.png")',
+          backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
