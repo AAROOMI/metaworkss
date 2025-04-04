@@ -84,12 +84,12 @@ export default function CompanyDashboard() {
   
   // Fetch company information
   const { data: companyInfo, isLoading, isError } = useQuery({
-    queryKey: ['/api/company-info'],
+    queryKey: ['/api/company'],
   });
   
   // Fetch company documents
   const { data: documentsData, isLoading: isLoadingDocuments } = useQuery({
-    queryKey: ['/api/company-info/documents'],
+    queryKey: ['/api/company/documents'],
     enabled: activeTab === 'documents'
   });
   
@@ -122,11 +122,11 @@ export default function CompanyDashboard() {
   // Save company information mutation
   const saveCompanyMutation = useMutation({
     mutationFn: async (data: CompanyInfo) => {
-      const res = await apiRequest('POST', '/api/company-info', data);
+      const res = await apiRequest('POST', '/api/company', data);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/company-info'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/company'] });
       toast({
         title: "Company information saved",
         description: "Your company information has been updated successfully.",
@@ -146,11 +146,11 @@ export default function CompanyDashboard() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('logo', file);
-      const res = await apiRequest('POST', '/api/company-info/logo', formData, false);
+      const res = await apiRequest('POST', '/api/company/logo', formData, false);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/company-info'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/company'] });
       toast({
         title: "Logo uploaded",
         description: "Your company logo has been uploaded successfully.",
@@ -170,11 +170,11 @@ export default function CompanyDashboard() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('document', file);
-      const res = await apiRequest('POST', '/api/company-info/documents', formData, false);
+      const res = await apiRequest('POST', '/api/company/documents', formData, false);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/company-info/documents'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/company/documents'] });
       toast({
         title: "Document uploaded",
         description: "Your document has been uploaded successfully.",
@@ -192,11 +192,11 @@ export default function CompanyDashboard() {
   // Delete document mutation
   const deleteDocumentMutation = useMutation({
     mutationFn: async (documentId: number) => {
-      const res = await apiRequest('DELETE', `/api/company-info/documents/${documentId}`);
+      const res = await apiRequest('DELETE', `/api/company/documents/${documentId}`);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/company-info/documents'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/company/documents'] });
       toast({
         title: "Document deleted",
         description: "Your document has been deleted successfully.",
@@ -252,7 +252,7 @@ export default function CompanyDashboard() {
         <h3 className="text-xl font-semibold mb-2">Failed to load company information</h3>
         <p className="text-muted-foreground mb-4">There was an error loading your company information.</p>
         <Button 
-          onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/company-info'] })}
+          onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/company'] })}
           variant="outline"
         >
           Try Again
