@@ -12,6 +12,9 @@ import {
   files,
   complianceReports,
   reportShareLinks,
+  policyCategories,
+  policyTemplates,
+  generatedPolicies,
   type User,
   type InsertUser,
   type CompanyInfo,
@@ -30,10 +33,17 @@ import {
   type InsertAssessmentResult,
   type InsertRemediationTask,
   type File,
+  type InsertFile,
   type ComplianceReport,
   type InsertComplianceReport,
   type ReportShareLink,
-  type InsertReportShareLink
+  type InsertReportShareLink,
+  type PolicyCategory,
+  type InsertPolicyCategory,
+  type PolicyTemplate,
+  type InsertPolicyTemplate,
+  type GeneratedPolicy,
+  type InsertGeneratedPolicy
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -109,6 +119,25 @@ export interface IStorage {
   getReportShareLinksByReportId(reportId: number): Promise<ReportShareLink[]>;
   incrementShareLinkViewCount(id: number): Promise<ReportShareLink>;
   deactivateShareLink(id: number): Promise<ReportShareLink>;
+  
+  // Policy Management System
+  // Policy Categories
+  savePolicyCategory(category: InsertPolicyCategory): Promise<PolicyCategory>;
+  getPolicyCategories(): Promise<PolicyCategory[]>;
+  getPolicyCategoryById(id: number): Promise<PolicyCategory | undefined>;
+  
+  // Policy Templates
+  savePolicyTemplate(template: InsertPolicyTemplate): Promise<PolicyTemplate>;
+  getPolicyTemplates(): Promise<PolicyTemplate[]>;
+  getPolicyTemplateById(id: number): Promise<PolicyTemplate | undefined>;
+  getPolicyTemplatesByCategory(categoryId: number): Promise<PolicyTemplate[]>;
+  updatePolicyTemplateStatus(id: number, isActive: boolean): Promise<PolicyTemplate>;
+  
+  // Generated Policies 
+  saveGeneratedPolicy(policy: InsertGeneratedPolicy): Promise<GeneratedPolicy>;
+  getGeneratedPolicies(companyId: number): Promise<GeneratedPolicy[]>;
+  getGeneratedPolicyById(id: number): Promise<GeneratedPolicy | undefined>;
+  updateGeneratedPolicyApprovalStatus(id: number, status: string, approvedBy?: number): Promise<GeneratedPolicy>;
   
   // Session storage
   sessionStore: session.Store;
@@ -614,6 +643,175 @@ export class DatabaseStorage implements IStorage {
         isActive: false
       })
       .where(eq(reportShareLinks.id, id))
+      .returning();
+    
+    return updated;
+  }
+
+  // Policy Management System Implementation
+  // Policy Categories methods
+  async savePolicyCategory(category: InsertPolicyCategory): Promise<PolicyCategory> {
+    if ('id' in category && category.id) {
+      // Update existing category
+      const [existingCategory] = await db.select().from(policyCategories).where(eq(policyCategories.id, category.id));
+      
+      if (existingCategory) {
+        const [updated] = await db.update(policyCategories)
+          .set({
+            categoryName: category.categoryName,
+            description: category.description,
+            updatedAt: new Date().toISOString()
+          })
+          .where(eq(policyCategories.id, category.id))
+          .returning();
+        return updated;
+      }
+    }
+    
+    // Create new category
+    const [newCategory] = await db.insert(policyCategories).values({
+      categoryName: category.categoryName,
+      description: category.description,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }).returning();
+    return newCategory;
+  }
+  
+  async getPolicyCategories(): Promise<PolicyCategory[]> {
+    return await db.select().from(policyCategories).orderBy(asc(policyCategories.categoryName));
+  }
+  
+  async getPolicyCategoryById(id: number): Promise<PolicyCategory | undefined> {
+    const [category] = await db.select().from(policyCategories).where(eq(policyCategories.id, id));
+    return category;
+  }
+  
+  // Policy Templates methods
+  async savePolicyTemplate(template: InsertPolicyTemplate): Promise<PolicyTemplate> {
+    if ('id' in template && template.id) {
+      // Update existing template
+      const [existingTemplate] = await db.select().from(policyTemplates).where(eq(policyTemplates.id, template.id));
+      
+      if (existingTemplate) {
+        const [updated] = await db.update(policyTemplates)
+          .set({
+            templateName: template.templateName,
+            templateType: template.templateType,
+            fileId: template.fileId,
+            categoryId: template.categoryId,
+            uploadedBy: template.uploadedBy,
+            version: template.version,
+            placeholders: template.placeholders,
+            isActive: template.isActive !== undefined ? template.isActive : existingTemplate.isActive
+          })
+          .where(eq(policyTemplates.id, template.id))
+          .returning();
+        return updated;
+      }
+    }
+    
+    // Create new template
+    const [newTemplate] = await db.insert(policyTemplates).values({
+      templateName: template.templateName,
+      templateType: template.templateType,
+      fileId: template.fileId,
+      categoryId: template.categoryId,
+      uploadedBy: template.uploadedBy,
+      dateUploaded: new Date().toISOString(),
+      version: template.version || '1.0',
+      placeholders: template.placeholders,
+      isActive: template.isActive !== undefined ? template.isActive : true
+    }).returning();
+    return newTemplate;
+  }
+  
+  async getPolicyTemplates(): Promise<PolicyTemplate[]> {
+    return await db.select().from(policyTemplates).orderBy(asc(policyTemplates.templateName));
+  }
+  
+  async getPolicyTemplateById(id: number): Promise<PolicyTemplate | undefined> {
+    const [template] = await db.select().from(policyTemplates).where(eq(policyTemplates.id, id));
+    return template;
+  }
+  
+  async getPolicyTemplatesByCategory(categoryId: number): Promise<PolicyTemplate[]> {
+    return await db.select()
+      .from(policyTemplates)
+      .where(eq(policyTemplates.categoryId, categoryId))
+      .orderBy(asc(policyTemplates.templateName));
+  }
+  
+  async updatePolicyTemplateStatus(id: number, isActive: boolean): Promise<PolicyTemplate> {
+    const [updated] = await db.update(policyTemplates)
+      .set({ isActive })
+      .where(eq(policyTemplates.id, id))
+      .returning();
+    return updated;
+  }
+  
+  // Generated Policies methods
+  async saveGeneratedPolicy(policy: InsertGeneratedPolicy): Promise<GeneratedPolicy> {
+    if ('id' in policy && policy.id) {
+      // Update existing policy
+      const [existingPolicy] = await db.select().from(generatedPolicies).where(eq(generatedPolicies.id, policy.id));
+      
+      if (existingPolicy) {
+        const [updated] = await db.update(generatedPolicies)
+          .set({
+            templateId: policy.templateId,
+            companyId: policy.companyId,
+            generatedFileId: policy.generatedFileId,
+            version: policy.version,
+            approvalStatus: policy.approvalStatus,
+            replacementData: policy.replacementData,
+            notes: policy.notes
+          })
+          .where(eq(generatedPolicies.id, policy.id))
+          .returning();
+        return updated;
+      }
+    }
+    
+    // Create new generated policy
+    const [newPolicy] = await db.insert(generatedPolicies).values({
+      templateId: policy.templateId,
+      companyId: policy.companyId,
+      generatedFileId: policy.generatedFileId,
+      version: policy.version || '1.0',
+      generationDate: new Date().toISOString(),
+      approvalStatus: policy.approvalStatus || 'pending',
+      replacementData: policy.replacementData,
+      notes: policy.notes
+    }).returning();
+    return newPolicy;
+  }
+  
+  async getGeneratedPolicies(companyId: number): Promise<GeneratedPolicy[]> {
+    return await db.select()
+      .from(generatedPolicies)
+      .where(eq(generatedPolicies.companyId, companyId))
+      .orderBy(desc(generatedPolicies.generationDate));
+  }
+  
+  async getGeneratedPolicyById(id: number): Promise<GeneratedPolicy | undefined> {
+    const [policy] = await db.select().from(generatedPolicies).where(eq(generatedPolicies.id, id));
+    return policy;
+  }
+  
+  async updateGeneratedPolicyApprovalStatus(id: number, status: string, approvedBy?: number): Promise<GeneratedPolicy> {
+    const updateData: Partial<GeneratedPolicy> = {
+      approvalStatus: status
+    };
+    
+    if (status === 'approved' && approvedBy) {
+      updateData.approvedBy = approvedBy;
+      updateData.approvedDate = new Date().toISOString();
+    }
+    
+    const [updated] = await db.update(generatedPolicies)
+      .set(updateData)
+      .where(eq(generatedPolicies.id, id))
       .returning();
     
     return updated;

@@ -216,3 +216,67 @@ export type InsertReportShareLink = z.infer<typeof insertReportShareLinkSchema>;
 export type InsertAssessment = z.infer<typeof insertAssessmentSchema>;
 export type InsertAssessmentResult = z.infer<typeof insertAssessmentResultSchema>;
 export type InsertRemediationTask = z.infer<typeof insertRemediationTaskSchema>;
+
+// Policy Management System
+export const policyCategories = pgTable("policy_categories", {
+  id: serial("id").primaryKey(),
+  categoryName: text("category_name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+});
+
+export const policyTemplates = pgTable("policy_templates", {
+  id: serial("id").primaryKey(),
+  templateName: text("template_name").notNull(),
+  templateType: text("template_type").notNull(), // Word/PDF
+  fileId: integer("file_id").notNull(),
+  categoryId: integer("category_id").notNull(),
+  dateUploaded: timestamp("date_uploaded", { mode: 'string' }).defaultNow().notNull(),
+  uploadedBy: integer("uploaded_by").notNull(),
+  version: text("version").default("1.0").notNull(),
+  placeholders: jsonb("placeholders"), // Extracted placeholders
+  isActive: boolean("is_active").default(true).notNull(),
+});
+
+export const generatedPolicies = pgTable("generated_policies", {
+  id: serial("id").primaryKey(),
+  templateId: integer("template_id").notNull(),
+  companyId: integer("company_id").notNull(),
+  generatedFileId: integer("generated_file_id").notNull(),
+  version: text("version").default("1.0").notNull(),
+  generationDate: timestamp("generation_date", { mode: 'string' }).defaultNow().notNull(),
+  approvalStatus: text("approval_status").default("pending").notNull(), // pending, approved, rejected
+  approvedBy: integer("approved_by"),
+  approvedDate: timestamp("approved_date", { mode: 'string' }),
+  replacementData: jsonb("replacement_data").notNull(), // Stored values used for placeholders
+  notes: text("notes"),
+});
+
+// Create insert schemas for policy management
+export const insertPolicyCategorySchema = createInsertSchema(policyCategories).omit({ 
+  id: true, 
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPolicyTemplateSchema = createInsertSchema(policyTemplates).omit({ 
+  id: true, 
+  dateUploaded: true
+});
+
+export const insertGeneratedPolicySchema = createInsertSchema(generatedPolicies).omit({ 
+  id: true, 
+  generationDate: true, 
+  approvedBy: true,
+  approvedDate: true
+});
+
+// Define policy management types
+export type PolicyCategory = typeof policyCategories.$inferSelect;
+export type PolicyTemplate = typeof policyTemplates.$inferSelect;
+export type GeneratedPolicy = typeof generatedPolicies.$inferSelect;
+
+export type InsertPolicyCategory = z.infer<typeof insertPolicyCategorySchema>;
+export type InsertPolicyTemplate = z.infer<typeof insertPolicyTemplateSchema>;
+export type InsertGeneratedPolicy = z.infer<typeof insertGeneratedPolicySchema>;
