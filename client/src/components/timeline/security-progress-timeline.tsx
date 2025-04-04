@@ -63,6 +63,7 @@ export function SecurityProgressTimeline({
     : sortedEvents.slice(0, maxVisible);
   
   useEffect(() => {
+    // Initialize animation only when needed
     if (animate && !animationComplete) {
       // Start with no events
       setVisibleEvents([]);
@@ -80,7 +81,15 @@ export function SecurityProgressTimeline({
       }, 600); // Adjust timing as needed
       
       return () => clearInterval(interval);
-    } else {
+    } else if (!animate) {
+      // If animation is disabled, just show all events immediately
+      setVisibleEvents(displayEvents);
+    }
+  }, [animate, animationComplete, expanded]); // Only depend on animation controls and expanded state
+  
+  // Update visible events when displayEvents changes but only if not animating
+  useEffect(() => {
+    if (!animate || animationComplete) {
       setVisibleEvents(displayEvents);
     }
   }, [displayEvents, animate, animationComplete]);
