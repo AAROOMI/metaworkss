@@ -94,13 +94,14 @@ export const domains = pgTable("domains", {
 export const controls = pgTable("controls", {
   id: serial("id").primaryKey(),
   domainId: integer("domain_id").notNull(),
-  controlId: text("control_id").notNull(), // e.g., "ECC-1.2.3"
+  controlId: text("control_id").notNull(), // e.g., "ECC-1.2.3" or "SAMA-2.4"
   name: text("name").notNull(),
   description: text("description").notNull(),
   guidance: text("guidance"),
   maturityLevel: integer("maturity_level").default(1),
   referenceLinks: text("reference_links"),
   implementationGuide: text("implementation_guide"),
+  frameworkSpecific: jsonb("framework_specific"), // Stores framework-specific properties
 });
 
 export const assessments = pgTable("assessments", {
@@ -126,8 +127,11 @@ export const assessmentResults = pgTable("assessment_results", {
   evidence: text("evidence"),
   comments: text("comments"),
   attachments: jsonb("attachments"),
+  maturityLevel: text("maturity_level"), // SAMA: baseline, evolving, established, predictable, leading
+  maturityScore: integer("maturity_score"), // Numeric representation of maturity (1-5)
   updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
   updatedBy: integer("updated_by").notNull(),
+  frameworkSpecificData: jsonb("framework_specific_data"), // Stores framework-specific assessment data
 });
 
 export const remediationTasks = pgTable("remediation_tasks", {
