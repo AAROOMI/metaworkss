@@ -14,6 +14,7 @@ import frameworksRouter from "./api/frameworks";
 import domainsRouter from "./api/domains";
 import controlsRouter from "./api/controls";
 import policyManagementRouter from "./api/policy-management";
+import companyInfoRouter from "./api/company-info";
 import { registerReportsRoutes } from "./api/reports";
 
 
@@ -303,6 +304,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use(assessmentsRouter);
   app.use(assessmentResultsRouter);
   app.use("/api/policy-management", policyManagementRouter);
+  app.use("/api/company", companyInfoRouter);
   
   // Register reports API routes
   registerReportsRoutes(app);

@@ -20,6 +20,7 @@ import SecurityTimelineDemo from "@/pages/security-timeline-demo";
 import RiskManagementPage from "@/pages/risk-management-page";
 import RiskAssessmentPage from "@/pages/risk-assessment-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
+import CompanyDashboardPage from "@/pages/company-dashboard-page";
 import ClerkAuthPage from "@/pages/clerk-auth-page";
 import ClerkAdminPage from "@/pages/clerk-admin-page";
 import UserDashboard from "@/pages/user-dashboard";
@@ -58,6 +59,7 @@ function Router() {
       <ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
       <ProtectedRoute path="/policies" component={PolicyManagementPage} />
       <ProtectedRoute path="/security-timeline" component={SecurityTimelineDemo} />
+      <ProtectedRoute path="/company" component={CompanyDashboardPage} />
       
       {/* Public Routes */}
       <Route path="/did-agent" component={DIDAgentPage} />

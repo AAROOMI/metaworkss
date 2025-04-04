@@ -15,11 +15,27 @@ export const users = pgTable("users", {
 export const companyInfo = pgTable("company_info", {
   id: serial("id").primaryKey(),
   companyName: text("company_name").notNull(),
+  sector: text("sector"),
+  size: text("size"),
+  website: text("website"),
+  address: text("address"),
+  city: text("city"),
+  country: text("country"),
+  postalCode: text("postal_code"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
   ceoName: text("ceo_name"),
   cioName: text("cio_name"),
   ctoName: text("cto_name"),
   cisoName: text("ciso_name"),
-  logoId: integer("logo_id"),
+  businessDescription: text("business_description"),
+  foundedYear: integer("founded_year"),
+  employeeCount: integer("employee_count"),
+  annualRevenue: text("annual_revenue"),
+  logoId: integer("logo_id").references(() => files.id),
+  documentsFileIds: jsonb("documents_file_ids").default([]),
+  updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
+  updatedBy: integer("updated_by"),
 });
 
 export const cybersecurityStaff = pgTable("cybersecurity_staff", {
