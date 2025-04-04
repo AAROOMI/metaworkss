@@ -9,15 +9,15 @@ neonConfig.webSocketConstructor = ws;
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  console.error("Database URL not found. Please ensure the database is provisioned in your Replit.");
-  process.exit(1);
+  console.warn("Database URL not found. Running in limited mode.");
 }
 
-// Use connection pooling for better performance
-export const pool = new Pool({ 
+// Use connection pooling with fallback
+export const pool = DATABASE_URL ? new Pool({ 
   connectionString: DATABASE_URL,
-  max: 10 
-});
+  max: 10,
+  connectionTimeoutMillis: 5000
+}) : null;
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle database client', err);
