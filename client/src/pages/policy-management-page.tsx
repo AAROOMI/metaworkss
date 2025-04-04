@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -11,136 +12,286 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, FileText, Plus, Download, Filter, Settings, Calendar, Clock, Check, X, Pencil, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, FileText, Plus, Download, Filter, Settings, Calendar, Clock, Check, X, Pencil, Trash2, Upload, Loader2, AlertCircle } from "lucide-react";
+import { Policy } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
-// Mock data for policies
-const policies = [
-  {
-    id: 1,
-    name: "Information Security Policy",
-    description: "This policy establishes guidelines for information security management within the organization.",
-    category: "Security",
-    version: "1.2",
-    status: "Active",
-    lastUpdated: "2025-01-15",
-    reviewDate: "2025-07-15",
-    author: "John Smith",
-    approver: "Sarah Johnson"
-  },
-  {
-    id: 2,
-    name: "Data Protection Policy",
-    description: "Guidelines for handling and protecting sensitive data in compliance with regulations.",
-    category: "Data",
-    version: "2.1",
-    status: "Active",
-    lastUpdated: "2025-02-20",
-    reviewDate: "2025-08-20",
-    author: "Emma Davis",
-    approver: "Michael Brown"
-  },
-  {
-    id: 3,
-    name: "Access Control Policy",
-    description: "Rules and procedures for granting, controlling, and monitoring access to systems and data.",
-    category: "Security",
-    version: "1.3",
-    status: "Under Review",
-    lastUpdated: "2025-03-05",
-    reviewDate: "2025-03-30",
-    author: "Robert Wilson",
-    approver: "Pending"
-  },
-  {
-    id: 4,
-    name: "Incident Response Policy",
-    description: "Procedures for responding to and reporting security incidents.",
-    category: "Security",
-    version: "1.0",
-    status: "Draft",
-    lastUpdated: "2025-03-15",
-    reviewDate: "N/A",
-    author: "Lisa Taylor",
-    approver: "Pending"
-  },
-  {
-    id: 5,
-    name: "Acceptable Use Policy",
-    description: "Guidelines for appropriate use of the organization's IT resources.",
-    category: "Compliance",
-    version: "2.0",
-    status: "Active",
-    lastUpdated: "2024-12-10",
-    reviewDate: "2025-06-10",
-    author: "David Clark",
-    approver: "James Miller"
-  }
-];
+// Define policy type for the component
+interface PolicyWithDetails extends Policy {
+  // Add fields that are used in the UI but might not be in the schema
+  category?: string;
+  version?: string;
+  status?: string;
+  author?: string;
+  approver?: string;
+  reviewDate?: string;
+}
+
+// Status mapping for display
+const statusMap: Record<string, string> = {
+  active: "Active",
+  draft: "Draft",
+  review: "Under Review",
+  archived: "Archived"
+};
 
 // PolicyForm component for adding/editing policies
 function PolicyForm({ onCancel }: { onCancel: () => void }) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [file, setFile] = useState<File | null>(null);
+  
+  // Status options for the dropdown
+  const statusOptions = [
+    { value: "draft", label: "Draft" },
+    { value: "active", label: "Active" },
+    { value: "review", label: "Under Review" },
+  ];
+  
+  // Category options
+  const categoryOptions = [
+    { value: "security", label: "Security" },
+    { value: "data", label: "Data" },
+    { value: "compliance", label: "Compliance" },
+    { value: "general", label: "General" },
+  ];
+
+  // Form state
+  const [formState, setFormState] = useState({
+    title: "",
+    type: categoryOptions[0].value,
+    content: "",
+    version: "1.0",
+    author: user?.username || "",
+    approver: "",
+    status: statusOptions[0].value,
+    reviewDate: "",
+  });
+  
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormState(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+  
+  // File change handler
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+  
+  // Create policy mutation
+  const createPolicyMutation = useMutation({
+    mutationFn: async (policyData: Partial<PolicyWithDetails>) => {
+      const res = await apiRequest("POST", "/api/policies", policyData);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Policy created",
+        description: "Your policy has been created successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/policies'] });
+      onCancel();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to create policy",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formState.title) {
+      toast({
+        title: "Missing information",
+        description: "Please enter a policy name.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Upload file first if available
+    if (file) {
+      const formData = new FormData();
+      formData.append("document", file);
+      
+      // Create form data for file upload
+      fetch("/api/upload/document", {
+        method: "POST",
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Now create the policy with the file ID
+          createPolicyMutation.mutate({ 
+            ...formState,
+            fileId: data.fileId 
+          });
+        })
+        .catch(err => {
+          toast({
+            title: "File upload failed",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    } else {
+      // Create policy without file
+      createPolicyMutation.mutate(formState);
+    }
+  };
+  
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Policy Name</Label>
-          <Input id="name" placeholder="Enter policy name" />
+          <Label htmlFor="title">Policy Name</Label>
+          <Input 
+            id="title" 
+            placeholder="Enter policy name" 
+            value={formState.title}
+            onChange={handleInputChange}
+          />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
-          <Input id="category" placeholder="e.g., Security, Data, Compliance" />
+          <Label htmlFor="type">Category</Label>
+          <select
+            id="type"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            value={formState.type}
+            onChange={handleInputChange}
+          >
+            {categoryOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea id="description" placeholder="Enter policy description" rows={4} />
+        <Label htmlFor="content">Description</Label>
+        <Textarea 
+          id="content" 
+          placeholder="Enter policy description" 
+          rows={4} 
+          value={formState.content}
+          onChange={handleInputChange}
+        />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="version">Version</Label>
-          <Input id="version" placeholder="e.g., 1.0" />
+          <Input 
+            id="version" 
+            placeholder="e.g., 1.0" 
+            value={formState.version}
+            onChange={handleInputChange}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="author">Author</Label>
-          <Input id="author" placeholder="Enter author name" />
+          <Input 
+            id="author" 
+            placeholder="Enter author name" 
+            value={formState.author}
+            onChange={handleInputChange}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="approver">Approver</Label>
-          <Input id="approver" placeholder="Enter approver name" />
+          <Input 
+            id="approver" 
+            placeholder="Enter approver name" 
+            value={formState.approver}
+            onChange={handleInputChange}
+          />
         </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="status">Status</Label>
-          <Input id="status" placeholder="e.g., Draft, Active, Under Review" />
+          <select
+            id="status"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            value={formState.status}
+            onChange={handleInputChange}
+          >
+            {statusOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="space-y-2">
           <Label htmlFor="reviewDate">Next Review Date</Label>
-          <Input id="reviewDate" type="date" />
+          <Input 
+            id="reviewDate" 
+            type="date" 
+            value={formState.reviewDate}
+            onChange={handleInputChange}
+          />
         </div>
       </div>
       
       <div className="space-y-2">
         <Label htmlFor="document">Upload Policy Document</Label>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" className="w-full">
-            <Upload className="h-4 w-4 mr-2" />
-            Choose File
-          </Button>
-        </div>
+        <Input 
+          id="document" 
+          type="file" 
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+          onChange={handleFileChange}
+          className="cursor-pointer"
+        />
         <p className="text-xs text-muted-foreground mt-1">
-          Supported file types: PDF, DOCX, XLSX (Max size: 10MB)
+          Supported file types: PDF, DOCX (Max size: 10MB)
         </p>
       </div>
       
+      {file && (
+        <div className="flex items-center gap-2 p-2 border rounded">
+          <FileText className="h-5 w-5 text-primary" />
+          <span className="text-sm truncate">{file.name}</span>
+          <span className="text-xs text-muted-foreground ml-auto">
+            {(file.size / 1024 / 1024).toFixed(2)} MB
+          </span>
+        </div>
+      )}
+      
       <div className="flex justify-end space-x-2 pt-4">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button>Save Policy</Button>
+        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button 
+          type="submit" 
+          disabled={createPolicyMutation.isPending}
+        >
+          {createPolicyMutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Policy'
+          )}
+        </Button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -149,14 +300,96 @@ export default function PolicyManagementPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [showAddPolicy, setShowAddPolicy] = useState(false);
   
+  // Fetch policies from the API
+  const { data: policiesData, isLoading, error } = useQuery<PolicyWithDetails[]>({
+    queryKey: ['/api/policies'],
+  });
+  
+  // Convert policies to the needed format with proper date formatting
+  const policies = policiesData?.map(policy => ({
+    ...policy,
+    name: policy.title || 'Untitled Policy',
+    category: policy.type || 'General',
+    version: policy.version || '1.0',
+    status: policy.status || 'Draft',
+    lastUpdated: new Date(policy.updatedAt).toLocaleDateString(),
+    reviewDate: policy.reviewDate || 'N/A',
+    description: policy.content || 'No description provided.',
+  })) || [];
+  
   // Filter policies based on active tab
   const filteredPolicies = activeTab === "all" 
     ? policies 
     : activeTab === "active" 
-      ? policies.filter(p => p.status === "Active")
+      ? policies.filter(p => p.status.toLowerCase() === "active")
       : activeTab === "draft" 
-        ? policies.filter(p => p.status === "Draft")
-        : policies.filter(p => p.status === "Under Review");
+        ? policies.filter(p => p.status.toLowerCase() === "draft")
+        : policies.filter(p => p.status.toLowerCase() === "under review");
+        
+  // Loading state
+  if (isLoading) {
+    return (
+      <>
+        <Helmet>
+          <title>Policy Management | MetaWorks</title>
+        </Helmet>
+        <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="mb-6">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold text-primary mb-8">Policy Management</h1>
+            
+            <Card className="backdrop-blur-sm bg-card/50 border-primary/10">
+              <CardContent className="flex justify-center items-center py-16">
+                <div className="text-center">
+                  <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-primary" />
+                  <h3 className="text-lg font-medium mb-2">Loading Policies</h3>
+                  <p className="text-muted-foreground">Please wait while we fetch your policy documents...</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </>
+    );
+  }
+  
+  // Error state
+  if (error) {
+    return (
+      <>
+        <Helmet>
+          <title>Policy Management | MetaWorks</title>
+        </Helmet>
+        <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="mb-6">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold text-primary mb-8">Policy Management</h1>
+            
+            <Card className="backdrop-blur-sm bg-card/50 border-primary/10">
+              <CardContent className="flex justify-center items-center py-16">
+                <div className="text-center">
+                  <AlertCircle className="h-10 w-10 mx-auto mb-4 text-destructive" />
+                  <h3 className="text-lg font-medium mb-2">Error Loading Policies</h3>
+                  <p className="text-muted-foreground mb-4">There was a problem loading your policy documents.</p>
+                  <Button onClick={() => window.location.reload()}>Try Again</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </>
+    );
+  }
   
   return (
     <>
@@ -326,25 +559,25 @@ export default function PolicyManagementPage() {
                   <div className="flex justify-between items-center">
                     <span>Active Policies</span>
                     <Badge className="bg-green-500/20 text-green-500 border-green-500/20 border">
-                      3 / 5
+                      {policies.filter(p => p.status.toLowerCase() === "active").length} / {policies.length}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Up-to-date Policies</span>
-                    <Badge className="bg-green-500/20 text-green-500 border-green-500/20 border">
-                      4 / 5
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Review Required</span>
-                    <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/20 border">
-                      1
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Pending Approval</span>
+                    <span>Draft Policies</span>
                     <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 border">
-                      2
+                      {policies.filter(p => p.status.toLowerCase() === "draft").length}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Under Review</span>
+                    <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/20 border">
+                      {policies.filter(p => p.status.toLowerCase() === "review").length}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Total Policies</span>
+                    <Badge className="bg-primary/20 text-primary border-primary/20 border">
+                      {policies.length}
                     </Badge>
                   </div>
                 </div>
