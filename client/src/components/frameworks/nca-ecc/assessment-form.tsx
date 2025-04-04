@@ -126,14 +126,46 @@ export default function NcaEccAssessmentForm() {
   const progressPercentage = Math.round((completedControls / domain1Controls.length) * 100);
 
   // Handle form submission
-  const onSubmit = (data: AssessmentFormValues) => {
+  const onSubmit = async (data: AssessmentFormValues) => {
     console.log("Assessment data:", data);
     
-    // This would typically be sent to the server
-    toast({
-      title: "Assessment Saved",
-      description: "Your domain assessment has been saved successfully.",
-    });
+    try {
+      // Send assessment data to the server
+      const response = await fetch('/api/assessment-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assessmentId: 1, // This would normally come from the current assessment context
+          results: data.controls.map(control => ({
+            controlId: parseInt(control.controlId.split('-').pop() || '1'),
+            status: control.status === 'partially-implemented' ? 'partially_implemented' : control.status,
+            evidence: control.evidence || null,
+            comments: control.notes || null,
+            updatedBy: 1 // This would normally come from the current user context
+          }))
+        }),
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Assessment Saved",
+          description: "Your domain assessment has been saved successfully.",
+        });
+      } else {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to save assessment');
+      }
+    } catch (error) {
+      console.error('Error saving assessment:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save assessment",
+        variant: "destructive"
+      });
+    }
   };
 
   // Navigation functions

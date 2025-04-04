@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import RiskHeatmap from "@/components/risks/risk-heatmap";
+import RiskHeatmap, { RiskHeatmapComponent } from "@/components/risks/risk-heatmap";
 import { RiskStatusChart } from "@/components/risks/risk-status-chart";
 import { FileText, AlertTriangle, CheckCircle } from "lucide-react";
 
@@ -14,12 +14,12 @@ export default function RiskDashboard({ assessmentId }: RiskDashboardProps) {
   const [view, setView] = useState<string>("summary");
 
   // Fetch assessment data
-  const { data: assessment } = useQuery({
+  const { data: assessment } = useQuery<any>({
     queryKey: ["/api/assessments", assessmentId],
   });
 
   // Fetch assessment results
-  const { data: assessmentResults, isLoading: resultsLoading } = useQuery({
+  const { data: assessmentResults, isLoading: resultsLoading } = useQuery<any[]>({
     queryKey: ["/api/assessment-results", assessmentId],
     queryFn: async () => {
       const response = await fetch(`/api/assessment-results?assessmentId=${assessmentId}`);
@@ -190,7 +190,7 @@ export default function RiskDashboard({ assessmentId }: RiskDashboardProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-2">
-              <RiskHeatmap />
+              <RiskHeatmapComponent domains={domainResults()} />
             </CardContent>
           </Card>
         </div>
