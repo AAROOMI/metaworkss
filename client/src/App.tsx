@@ -16,6 +16,7 @@ import SamaPage from "@/pages/frameworks/sama-page";
 import PdplPage from "@/pages/frameworks/pdpl-page";
 import Iso27001Page from "@/pages/frameworks/iso-27001-page";
 import RiskManagementPage from "@/pages/risk-management-page";
+import RiskAssessmentPage from "@/pages/risk-assessment-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
 import ClerkAuthPage from "@/pages/clerk-auth-page";
 import ClerkAdminPage from "@/pages/clerk-admin-page";
@@ -51,6 +52,7 @@ function Router() {
       <ProtectedRoute path="/admin" component={AdminPage} />
       <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
       <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
+      <ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
       <ProtectedRoute path="/policies" component={PolicyManagementPage} />
       
       {/* Public Routes */}

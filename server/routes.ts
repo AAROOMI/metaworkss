@@ -7,6 +7,13 @@ import { logoUpload, documentUpload, saveFileToDatabase, getFileById, deleteFile
 import dotenv from "dotenv";
 import express from 'express';
 
+// Import API routes
+import assessmentsRouter from "./api/assessments";
+import assessmentResultsRouter from "./api/assessment-results";
+import frameworksRouter from "./api/frameworks";
+import domainsRouter from "./api/domains";
+import controlsRouter from "./api/controls";
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Load environment variables
@@ -287,198 +294,14 @@ app.get("/api/dashboard-access", async (req, res) => {
     }
   });
 
-  // Framework management endpoints
-  app.post("/api/frameworks", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
+  // Register modular API routers
+  app.use("/api/frameworks", frameworksRouter);
+  app.use("/api/domains", domainsRouter);
+  app.use("/api/controls", controlsRouter);
+  app.use("/api/assessments", assessmentsRouter);
+  app.use("/api/assessment-results", assessmentResultsRouter);
 
-      // Verify user is admin (in a real app, check user.role === 'admin')
-      const framework = await storage.saveFramework(req.body);
-      res.status(201).json(framework);
-    } catch (error) {
-      next(error);
-    }
-  });
 
-  app.get("/api/frameworks", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const frameworks = await storage.getFrameworks();
-      res.json(frameworks);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.get("/api/frameworks/:id", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const { id } = req.params;
-      const framework = await storage.getFrameworkById(parseInt(id));
-
-      if (!framework) {
-        return res.status(404).json({ error: "Framework not found" });
-      }
-
-      res.json(framework);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Domain management endpoints
-  app.post("/api/domains", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      // Verify user is admin (in a real app, check user.role === 'admin')
-      const domain = await storage.saveDomain(req.body);
-      res.status(201).json(domain);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.get("/api/frameworks/:frameworkId/domains", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const { frameworkId } = req.params;
-      const domains = await storage.getDomainsByFrameworkId(parseInt(frameworkId));
-      res.json(domains);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Control management endpoints
-  app.post("/api/controls", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      // Verify user is admin (in a real app, check user.role === 'admin')
-      const control = await storage.saveControl(req.body);
-      res.status(201).json(control);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.get("/api/domains/:domainId/controls", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const { domainId } = req.params;
-      const controls = await storage.getControlsByDomainId(parseInt(domainId));
-      res.json(controls);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Assessment management endpoints
-  app.post("/api/assessments", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      if (!req.user?.id) {
-        return res.status(401).json({ error: "User ID not found" });
-      }
-
-      const assessment = await storage.createAssessment({
-        ...req.body,
-        createdBy: req.user.id
-      });
-
-      res.status(201).json(assessment);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.get("/api/assessments", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      // In a real app, you would get the company ID from the user's profile
-      // or use the user's ID to filter assessments
-      const companyId = parseInt(req.query.companyId as string) || 1;
-
-      const assessments = await storage.getAssessmentsByCompanyId(companyId);
-      res.json(assessments);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.get("/api/assessments/:id", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const { id } = req.params;
-      const assessment = await storage.getAssessmentById(parseInt(id));
-
-      if (!assessment) {
-        return res.status(404).json({ error: "Assessment not found" });
-      }
-
-      res.json(assessment);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.put("/api/assessments/:id/status", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const { id } = req.params;
-      const { status, score } = req.body;
-
-      if (!status) {
-        return res.status(400).json({ error: "Status is required" });
-      }
-
-      const assessment = await storage.updateAssessmentStatus(parseInt(id), status, score);
-      res.json(assessment);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Assessment Results endpoints
-  app.post("/api/assessment-results", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      if (!req.user?.id) {
-        return res.status(401).json({ error: "User ID not found" });
-      }
-
-      const result = await storage.saveAssessmentResult({
-        ...req.body,
-        updatedBy: req.user.id
-      });
-
-      res.status(201).json(result);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.get("/api/assessments/:assessmentId/results", async (req, res, next) => {
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-
-      const { assessmentId } = req.params;
-      const results = await storage.getAssessmentResultsByAssessmentId(parseInt(assessmentId));
-      res.json(results);
-    } catch (error) {
-      next(error);
-    }
-  });
 
   // Remediation Tasks endpoints
   app.post("/api/remediation-tasks", async (req, res, next) => {
