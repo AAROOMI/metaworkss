@@ -8,7 +8,7 @@ import ComplianceLogos from "@/components/landing/compliance-logos";
 import Footer from "@/components/landing/footer";
 import { Button } from "@/components/ui/button";
 import { Shield, Lock } from "lucide-react";
-import backgroundImage from "/attached_assets/metawork background.png";
+import backgroundImage from "@assets/metawork background.png";
 
 export default function HomePage() {
   const handleClerkAdminAccess = () => {
