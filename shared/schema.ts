@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, real, date } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, real, date, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -163,6 +164,51 @@ export type RemediationTask = typeof remediationTasks.$inferSelect;
 export type InsertFramework = z.infer<typeof insertFrameworkSchema>;
 export type InsertDomain = z.infer<typeof insertDomainSchema>;
 export type InsertControl = z.infer<typeof insertControlSchema>;
+// Compliance reports and shareable links
+export const complianceReports = pgTable("compliance_reports", {
+  id: serial("id").primaryKey(),
+  assessmentId: integer("assessment_id").notNull(),
+  companyId: integer("company_id").notNull(),
+  createdBy: integer("created_by").notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+  title: text("title").notNull(),
+  summary: text("summary"),
+  reportData: jsonb("report_data").notNull(),
+  format: text("format").default("pdf").notNull(), // pdf, html, json, etc.
+  status: text("status").default("generated").notNull(), // generating, generated, error
+  isPublic: boolean("is_public").default(false).notNull(),
+});
+
+export const reportShareLinks = pgTable("report_share_links", {
+  id: serial("id").primaryKey(),
+  reportId: integer("report_id").notNull(),
+  shareToken: uuid("share_token").defaultRandom().notNull().unique(),
+  createdBy: integer("created_by").notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+  expiresAt: timestamp("expires_at", { mode: 'string' }),
+  password: text("password"),
+  viewCount: integer("view_count").default(0).notNull(),
+  maxViews: integer("max_views"),
+  isActive: boolean("is_active").default(true).notNull(),
+});
+
+export const insertComplianceReportSchema = createInsertSchema(complianceReports).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export const insertReportShareLinkSchema = createInsertSchema(reportShareLinks).omit({ 
+  id: true, 
+  createdAt: true, 
+  shareToken: true,
+  viewCount: true
+});
+
+export type ComplianceReport = typeof complianceReports.$inferSelect;
+export type ReportShareLink = typeof reportShareLinks.$inferSelect;
+export type InsertComplianceReport = z.infer<typeof insertComplianceReportSchema>;
+export type InsertReportShareLink = z.infer<typeof insertReportShareLinkSchema>;
+
 export type InsertAssessment = z.infer<typeof insertAssessmentSchema>;
 export type InsertAssessmentResult = z.infer<typeof insertAssessmentResultSchema>;
 export type InsertRemediationTask = z.infer<typeof insertRemediationTaskSchema>;

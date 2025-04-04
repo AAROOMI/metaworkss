@@ -13,6 +13,7 @@ import assessmentResultsRouter from "./api/assessment-results";
 import frameworksRouter from "./api/frameworks";
 import domainsRouter from "./api/domains";
 import controlsRouter from "./api/controls";
+import { registerReportsRoutes } from "./api/reports";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -295,11 +296,14 @@ app.get("/api/dashboard-access", async (req, res) => {
   });
 
   // Register modular API routers
-  app.use("/api/frameworks", frameworksRouter);
-  app.use("/api/domains", domainsRouter);
-  app.use("/api/controls", controlsRouter);
-  app.use("/api/assessments", assessmentsRouter);
-  app.use("/api/assessment-results", assessmentResultsRouter);
+  app.use(frameworksRouter);
+  app.use(domainsRouter);
+  app.use(controlsRouter);
+  app.use(assessmentsRouter);
+  app.use(assessmentResultsRouter);
+  
+  // Register reports API routes
+  registerReportsRoutes(app);
 
 
 

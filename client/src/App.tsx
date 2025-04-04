@@ -22,6 +22,7 @@ import ClerkAuthPage from "@/pages/clerk-auth-page";
 import ClerkAdminPage from "@/pages/clerk-admin-page";
 import UserDashboard from "@/pages/user-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
+import SharedReportPage from "@/pages/shared-report-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ClerkProtectedRoute } from "@/lib/clerk-protected-route";
@@ -63,6 +64,11 @@ function Router() {
       <Route path="/frameworks/sama" component={SamaPage} />
       <Route path="/frameworks/pdpl" component={PdplPage} />
       <Route path="/frameworks/iso-27001" component={Iso27001Page} />
+      
+      {/* Report Routes */}
+      <Route path="/shared-report/:token" component={SharedReportPage} />
+      <ProtectedRoute path="/reports/:id" component={NotFound} />
+      
       <Route component={NotFound} />
     </Switch>
   );

@@ -10,6 +10,8 @@ import {
   assessmentResults,
   remediationTasks,
   files,
+  complianceReports,
+  reportShareLinks,
   type User,
   type InsertUser,
   type CompanyInfo,
@@ -27,7 +29,11 @@ import {
   type InsertAssessment,
   type InsertAssessmentResult,
   type InsertRemediationTask,
-  type File
+  type File,
+  type ComplianceReport,
+  type InsertComplianceReport,
+  type ReportShareLink,
+  type InsertReportShareLink
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -89,6 +95,20 @@ export interface IStorage {
   getRemediationTasksByAssessmentId(assessmentId: number): Promise<RemediationTask[]>;
   getRemediationTaskById(id: number): Promise<RemediationTask | undefined>;
   updateRemediationTaskStatus(id: number, status: string): Promise<RemediationTask>;
+  
+  // Compliance Reports management
+  createComplianceReport(report: InsertComplianceReport): Promise<ComplianceReport>;
+  getComplianceReportById(id: number): Promise<ComplianceReport | undefined>;
+  getComplianceReportsByCompanyId(companyId: number): Promise<ComplianceReport[]>;
+  getComplianceReportsByAssessmentId(assessmentId: number): Promise<ComplianceReport[]>;
+  updateComplianceReportStatus(id: number, status: string): Promise<ComplianceReport>;
+  
+  // Report Share Links management
+  createReportShareLink(shareLink: InsertReportShareLink): Promise<ReportShareLink>;
+  getReportShareLinkByToken(token: string): Promise<ReportShareLink | undefined>;
+  getReportShareLinksByReportId(reportId: number): Promise<ReportShareLink[]>;
+  incrementShareLinkViewCount(id: number): Promise<ReportShareLink>;
+  deactivateShareLink(id: number): Promise<ReportShareLink>;
   
   // Session storage
   sessionStore: session.Store;
@@ -513,6 +533,87 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date().toISOString()
       })
       .where(eq(remediationTasks.id, id))
+      .returning();
+    
+    return updated;
+  }
+  
+  // Compliance Reports methods
+  async createComplianceReport(report: InsertComplianceReport): Promise<ComplianceReport> {
+    const [newReport] = await db.insert(complianceReports).values(report).returning();
+    return newReport;
+  }
+  
+  async getComplianceReportById(id: number): Promise<ComplianceReport | undefined> {
+    const [report] = await db.select().from(complianceReports).where(eq(complianceReports.id, id));
+    return report;
+  }
+  
+  async getComplianceReportsByCompanyId(companyId: number): Promise<ComplianceReport[]> {
+    return await db.select()
+      .from(complianceReports)
+      .where(eq(complianceReports.companyId, companyId))
+      .orderBy(desc(complianceReports.createdAt));
+  }
+  
+  async getComplianceReportsByAssessmentId(assessmentId: number): Promise<ComplianceReport[]> {
+    return await db.select()
+      .from(complianceReports)
+      .where(eq(complianceReports.assessmentId, assessmentId))
+      .orderBy(desc(complianceReports.createdAt));
+  }
+  
+  async updateComplianceReportStatus(id: number, status: string): Promise<ComplianceReport> {
+    const [updated] = await db.update(complianceReports)
+      .set({
+        status
+      })
+      .where(eq(complianceReports.id, id))
+      .returning();
+    
+    return updated;
+  }
+  
+  // Report Share Links methods
+  async createReportShareLink(shareLink: InsertReportShareLink): Promise<ReportShareLink> {
+    const [newShareLink] = await db.insert(reportShareLinks).values(shareLink).returning();
+    return newShareLink;
+  }
+  
+  async getReportShareLinkByToken(token: string): Promise<ReportShareLink | undefined> {
+    const [shareLink] = await db.select().from(reportShareLinks).where(eq(reportShareLinks.shareToken, token));
+    return shareLink;
+  }
+  
+  async getReportShareLinksByReportId(reportId: number): Promise<ReportShareLink[]> {
+    return await db.select().from(reportShareLinks)
+      .where(eq(reportShareLinks.reportId, reportId))
+      .orderBy(desc(reportShareLinks.createdAt));
+  }
+  
+  async incrementShareLinkViewCount(id: number): Promise<ReportShareLink> {
+    const [shareLink] = await db.select().from(reportShareLinks).where(eq(reportShareLinks.id, id));
+    
+    if (!shareLink) {
+      throw new Error(`Share link with id ${id} not found`);
+    }
+    
+    const [updated] = await db.update(reportShareLinks)
+      .set({
+        viewCount: shareLink.viewCount + 1
+      })
+      .where(eq(reportShareLinks.id, id))
+      .returning();
+    
+    return updated;
+  }
+  
+  async deactivateShareLink(id: number): Promise<ReportShareLink> {
+    const [updated] = await db.update(reportShareLinks)
+      .set({
+        isActive: false
+      })
+      .where(eq(reportShareLinks.id, id))
       .returning();
     
     return updated;

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
-import { Json } from "drizzle-orm/pg-core";
+import { json } from "drizzle-orm/pg-core";
 
 const router = Router();
 
