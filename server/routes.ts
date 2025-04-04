@@ -5,21 +5,23 @@ import { setupAuth, hashPassword } from "./auth";
 import path from "path";
 import { logoUpload, documentUpload, saveFileToDatabase, getFileById, deleteFile } from "./file-service";
 import dotenv from "dotenv";
+import express from 'express';
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Load environment variables
   dotenv.config();
-  
+
   // Setup authentication endpoints
   setupAuth(app);
-  
+
   // Clerk authentication API key endpoint
   app.get("/api/clerk-key", (req, res) => {
     const publishableKey = process.env.CLERK_PUBLISHABLE_KEY;
     console.log("Sending Clerk publishable key:", publishableKey);
     res.json({ publishableKey });
   });
-  
+
   // D-ID API keys endpoint
   app.get("/api/did-keys", (req, res) => {
     const clientKey = process.env.DID_CLIENT_KEY;
@@ -28,16 +30,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("Sending D-ID keys - Client Key: (masked), Agent ID:", agentId);
     res.json({ clientKey, agentId, apiKey });
   });
-  
+
   // D-ID API proxy endpoint for secure communication
   app.post("/api/did-agent", async (req, res, next) => {
     try {
       const apiKey = process.env.DID_API_KEY;
-      
+
       if (!apiKey) {
         return res.status(500).json({ error: "D-ID API key is not configured" });
       }
-      
+
       // Here we would typically make a request to the D-ID API
       // using the apiKey for authentication
       // This is a placeholder for the actual implementation
@@ -54,18 +56,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/company-info", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const companyInfo = await storage.saveCompanyInfo(req.body);
-      
+
       // Handle cybersecurity staff
       if (req.body.cybersecurityStaff && Array.isArray(req.body.cybersecurityStaff)) {
         const staffMembers = req.body.cybersecurityStaff.filter((name: string) => name.trim() !== '');
-        
+
         if (staffMembers.length > 0) {
           await storage.saveCybersecurityStaff(companyInfo.id, staffMembers);
         }
       }
-      
+
       res.status(201).json(companyInfo);
     } catch (error) {
       next(error);
@@ -75,10 +77,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/company-info", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const companyInfo = await storage.getCompanyInfo();
       const staffMembers = await storage.getCybersecurityStaff(companyInfo?.id || 0);
-      
+
       // If company has a logo, get the file info
       let logoUrl = null;
       if (companyInfo?.logoId) {
@@ -87,7 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           logoUrl = `/uploads/logos/${path.basename(logoFile.path)}`;
         }
       }
-      
+
       res.json({
         ...companyInfo,
         logoUrl,
@@ -103,10 +105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      
+
       const userId = req.user?.id;
       const fileId = await saveFileToDatabase(req.file, "logo", userId);
-      
+
       // Update company info with the logo file ID
       const companyInfo = await storage.getCompanyInfo();
       if (companyInfo) {
@@ -114,13 +116,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (companyInfo.logoId) {
           await deleteFile(companyInfo.logoId);
         }
-        
+
         await storage.saveCompanyInfo({
           ...companyInfo,
           logoId: fileId
         });
       }
-      
+
       res.status(201).json({ 
         fileId,
         filename: req.file.filename,
@@ -135,10 +137,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
       if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-      
+
       const userId = req.user?.id;
       const fileId = await saveFileToDatabase(req.file, "document", userId);
-      
+
       res.status(201).json({ 
         fileId,
         filename: req.file.filename,
@@ -158,18 +160,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(path.join(process.cwd(), "uploads", "documents", req.params.filename));
   });
 
+  // Serve static files from attached_assets
+  app.use('/attached_assets', express.static(path.join(process.cwd(), 'public', 'attached_assets')));
+
   // Policy management endpoints
   app.post("/api/policies", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const now = new Date().toISOString();
       const policy = await storage.savePolicy({
         ...req.body,
         createdAt: now,
         updatedAt: now
       });
-      
+
       res.status(201).json(policy);
     } catch (error) {
       next(error);
@@ -179,26 +184,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/policies/:policyId/attach-document", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { policyId } = req.params;
       const { fileId } = req.body;
-      
+
       if (!fileId) {
         return res.status(400).json({ error: "File ID is required" });
       }
-      
+
       // Update policy with file ID
       const policy = await storage.getPolicyById(parseInt(policyId));
       if (!policy) {
         return res.status(404).json({ error: "Policy not found" });
       }
-      
+
       const updatedPolicy = await storage.savePolicy({
         ...policy,
         fileId,
         updatedAt: new Date().toISOString()
       });
-      
+
       res.json(updatedPolicy);
     } catch (error) {
       next(error);
@@ -208,9 +213,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/policies", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const policies = await storage.getPolicies();
-      
+
       // Add file URLs to policies that have documents
       const policiesWithUrls = await Promise.all(policies.map(async (policy) => {
         let documentUrl = null;
@@ -225,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentUrl
         };
       }));
-      
+
       res.json(policiesWithUrls);
     } catch (error) {
       next(error);
@@ -236,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/users", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       // Verify user is admin (in a real app, check user.role === 'admin')
       const users = await storage.getUsers();
       res.json(users);
@@ -248,15 +253,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/users", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       // Verify user is admin (in a real app, check user.role === 'admin')
       const { username, password, role, accessLevel, isActive } = req.body;
-      
+
       const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
         return res.status(400).send("Username already exists");
       }
-      
+
       // Hash password and create user
       const user = await storage.createUser({
         username,
@@ -265,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         accessLevel,
         isActive
       });
-      
+
       res.status(201).json(user);
     } catch (error) {
       next(error);
@@ -276,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/frameworks", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       // Verify user is admin (in a real app, check user.role === 'admin')
       const framework = await storage.saveFramework(req.body);
       res.status(201).json(framework);
@@ -288,7 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/frameworks", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const frameworks = await storage.getFrameworks();
       res.json(frameworks);
     } catch (error) {
@@ -299,14 +304,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/frameworks/:id", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { id } = req.params;
       const framework = await storage.getFrameworkById(parseInt(id));
-      
+
       if (!framework) {
         return res.status(404).json({ error: "Framework not found" });
       }
-      
+
       res.json(framework);
     } catch (error) {
       next(error);
@@ -317,7 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/domains", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       // Verify user is admin (in a real app, check user.role === 'admin')
       const domain = await storage.saveDomain(req.body);
       res.status(201).json(domain);
@@ -329,7 +334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/frameworks/:frameworkId/domains", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { frameworkId } = req.params;
       const domains = await storage.getDomainsByFrameworkId(parseInt(frameworkId));
       res.json(domains);
@@ -342,7 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/controls", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       // Verify user is admin (in a real app, check user.role === 'admin')
       const control = await storage.saveControl(req.body);
       res.status(201).json(control);
@@ -354,7 +359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/domains/:domainId/controls", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { domainId } = req.params;
       const controls = await storage.getControlsByDomainId(parseInt(domainId));
       res.json(controls);
@@ -367,16 +372,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/assessments", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       if (!req.user?.id) {
         return res.status(401).json({ error: "User ID not found" });
       }
-      
+
       const assessment = await storage.createAssessment({
         ...req.body,
         createdBy: req.user.id
       });
-      
+
       res.status(201).json(assessment);
     } catch (error) {
       next(error);
@@ -386,11 +391,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/assessments", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       // In a real app, you would get the company ID from the user's profile
       // or use the user's ID to filter assessments
       const companyId = parseInt(req.query.companyId as string) || 1;
-      
+
       const assessments = await storage.getAssessmentsByCompanyId(companyId);
       res.json(assessments);
     } catch (error) {
@@ -401,14 +406,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/assessments/:id", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { id } = req.params;
       const assessment = await storage.getAssessmentById(parseInt(id));
-      
+
       if (!assessment) {
         return res.status(404).json({ error: "Assessment not found" });
       }
-      
+
       res.json(assessment);
     } catch (error) {
       next(error);
@@ -418,14 +423,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/assessments/:id/status", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { id } = req.params;
       const { status, score } = req.body;
-      
+
       if (!status) {
         return res.status(400).json({ error: "Status is required" });
       }
-      
+
       const assessment = await storage.updateAssessmentStatus(parseInt(id), status, score);
       res.json(assessment);
     } catch (error) {
@@ -437,16 +442,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/assessment-results", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       if (!req.user?.id) {
         return res.status(401).json({ error: "User ID not found" });
       }
-      
+
       const result = await storage.saveAssessmentResult({
         ...req.body,
         updatedBy: req.user.id
       });
-      
+
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -456,7 +461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/assessments/:assessmentId/results", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { assessmentId } = req.params;
       const results = await storage.getAssessmentResultsByAssessmentId(parseInt(assessmentId));
       res.json(results);
@@ -469,7 +474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/remediation-tasks", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const task = await storage.saveRemediationTask(req.body);
       res.status(201).json(task);
     } catch (error) {
@@ -480,7 +485,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/assessments/:assessmentId/remediation-tasks", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { assessmentId } = req.params;
       const tasks = await storage.getRemediationTasksByAssessmentId(parseInt(assessmentId));
       res.json(tasks);
@@ -492,14 +497,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/remediation-tasks/:id/status", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);
-      
+
       const { id } = req.params;
       const { status } = req.body;
-      
+
       if (!status) {
         return res.status(400).json({ error: "Status is required" });
       }
-      
+
       const task = await storage.updateRemediationTaskStatus(parseInt(id), status);
       res.json(task);
     } catch (error) {
