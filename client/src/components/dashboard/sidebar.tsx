@@ -14,6 +14,7 @@ import {
   Presentation,
   BarChart4,
   AlertTriangle,
+  History,
 } from "lucide-react";
 
 const menuItems = [
@@ -38,9 +39,19 @@ const menuItems = [
     path: "/risk-management",
   },
   {
+    name: "Security Timeline",
+    icon: History,
+    path: "/security-timeline",
+  },
+  {
     name: "NCA ECC Assessment",
     icon: Star,
     path: "/frameworks/nca-ecc-assessment",
+  },
+  {
+    name: "SAMA Assessment",
+    icon: Shield,
+    path: "/frameworks/sama-assessment",
   },
   {
     name: "Compliance Tasks",
@@ -87,7 +98,13 @@ export default function Sidebar() {
     if (path === "/policies" && location === "/policies") {
       return true;
     }
+    if (path === "/security-timeline" && location === "/security-timeline") {
+      return true;
+    }
     if (path === "/frameworks/nca-ecc-assessment" && location === "/frameworks/nca-ecc-assessment") {
+      return true;
+    }
+    if (path === "/frameworks/sama-assessment" && location === "/frameworks/sama-assessment") {
       return true;
     }
     return location === path;
