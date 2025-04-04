@@ -237,7 +237,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User management for admin
+  // Dashboard access check
+app.get("/api/dashboard-access", async (req, res) => {
+  if (!req.isAuthenticated()) return res.status(401).json({ error: "Not authenticated" });
+  const user = req.user;
+  res.json({ 
+    hasAdminAccess: user.role === 'admin',
+    hasUserAccess: true
+  });
+});
+
+// User management for admin
   app.get("/api/users", async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.sendStatus(401);

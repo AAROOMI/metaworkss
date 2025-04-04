@@ -2,7 +2,7 @@ import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Shield } from "lucide-react";
-import metaLogo from "/attached_assets/metawork keylogo.webp";
+import metaLogo from "../../assets/metawork-keylogo.webp";
 
 export default function HeroSection() {
   const [_, navigate] = useLocation();
