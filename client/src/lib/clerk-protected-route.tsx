@@ -9,7 +9,7 @@ export function ClerkProtectedRoute({
   component: Component,
 }: {
   path: string;
-  component: () => React.JSX.Element;
+  component: () => React.JSX.Element | null;
 }) {
   const { isSignedIn, user } = useClerkUser();
   // Use a simpler check since isLoaded isn't available 
@@ -49,5 +49,5 @@ export function ClerkProtectedRoute({
     );
   }
 
-  return <Route path={path} component={Component} />;
+  return <Route path={path}><Component /></Route>;
 }

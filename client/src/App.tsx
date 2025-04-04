@@ -19,9 +19,12 @@ import RiskManagementPage from "@/pages/risk-management-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
 import ClerkAuthPage from "@/pages/clerk-auth-page";
 import ClerkAdminPage from "@/pages/clerk-admin-page";
+import UserDashboard from "@/pages/user-dashboard";
+import AdminDashboard from "@/pages/admin-dashboard";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ClerkProtectedRoute } from "@/lib/clerk-protected-route";
+import { AdminProtectedRoute, UserProtectedRoute } from "@/lib/role-protected-routes";
 import ThemeProvider from "@/components/layout/theme-switch";
 import CustomClerkProvider from "@/components/clerk/custom-clerk-provider";
 
@@ -38,6 +41,10 @@ function Router() {
       <Route path="/clerk-auth" component={ClerkAuthPage} />
       <Route path="/clerk-login" component={ClerkAuthPage} />
       <ClerkProtectedRoute path="/clerk-admin" component={ClerkAdminPage} />
+      
+      {/* New Role-Protected Routes */}
+      <AdminProtectedRoute path="/admin-dashboard" component={AdminDashboard} />
+      <UserProtectedRoute path="/user-dashboard" component={UserDashboard} />
       
       {/* Protected Routes - accessible through either auth system */}
       <ProtectedRoute path="/dashboard" component={DashboardPage} />

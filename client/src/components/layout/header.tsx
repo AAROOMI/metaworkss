@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Shield, Menu, X, Presentation } from "lucide-react";
-import ThemeSwitch from "./theme-switch";
+import { ThemeSwitch } from "./theme-switch";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -81,10 +81,17 @@ export default function Header() {
               <>
                 <Button
                   variant="ghost"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/user-dashboard")}
                   className="hidden md:inline-flex"
                 >
-                  Dashboard
+                  User Dashboard
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/admin-dashboard")}
+                  className="hidden md:inline-flex"
+                >
+                  Admin Dashboard
                 </Button>
                 <Button onClick={handleLogout}>Logout</Button>
               </>
@@ -133,12 +140,20 @@ export default function Header() {
               <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">About</a>
               
               {user ? (
-                <a 
-                  onClick={() => { navigate('/dashboard'); setIsMenuOpen(false); }}
-                  className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-                >
-                  Dashboard
-                </a>
+                <>
+                  <a 
+                    onClick={() => { navigate('/user-dashboard'); setIsMenuOpen(false); }}
+                    className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+                  >
+                    User Dashboard
+                  </a>
+                  <a 
+                    onClick={() => { navigate('/admin-dashboard'); setIsMenuOpen(false); }}
+                    className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+                  >
+                    Admin Dashboard
+                  </a>
+                </>
               ) : (
                 <>
                   <a 
