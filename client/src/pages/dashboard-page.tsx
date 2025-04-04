@@ -12,6 +12,83 @@ import { Shield, AlertTriangle, CheckCircle, Clock, FileText, Download, BarChart
 import { useQuery } from "@tanstack/react-query";
 import { Assessment, AssessmentResult, Control, Domain, Framework } from "@shared/schema";
 
+// Component to display controls for a domain with their compliance status
+interface DomainControlsProps {
+  domainId: number;
+  allResults: AssessmentResult[] | undefined;
+}
+
+function DomainControls({ domainId, allResults }: DomainControlsProps) {
+  // Fetch controls for this domain
+  const { data: controls, isLoading } = useQuery<Control[]>({
+    queryKey: ['/api/controls', domainId],
+    enabled: !!domainId,
+    queryFn: async () => {
+      const res = await fetch(`/api/controls?domainId=${domainId}`);
+      return await res.json();
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-6">
+        <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+        <p className="text-sm text-muted-foreground">Loading controls...</p>
+      </div>
+    );
+  }
+
+  if (!controls || controls.length === 0) {
+    return (
+      <div className="p-4 text-center text-muted-foreground">
+        No controls found for this domain.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {controls.map(control => {
+        // Find the assessment result for this control
+        const result = allResults?.find(r => r.controlId === control.id);
+        
+        // Map status to display status
+        const status = 
+          !result ? "Not Assessed" :
+          result.status === "implemented" ? "Compliant" :
+          result.status === "partially_implemented" ? "Partially Compliant" :
+          "Non-Compliant";
+        
+        return (
+          <div 
+            key={control.id} 
+            className="rounded-lg border p-3 flex items-center justify-between bg-background/60"
+          >
+            <div className="flex items-center">
+              <div className={`w-3 h-3 rounded-full mr-3 ${
+                status === "Compliant" ? "bg-green-500" : 
+                status === "Partially Compliant" ? "bg-amber-500" : 
+                status === "Not Assessed" ? "bg-gray-400" : "bg-red-500"
+              }`}></div>
+              <div>
+                <div className="text-xs text-muted-foreground">
+                  {control.controlId || `ECC ${control.id}`}
+                </div>
+                <div className="font-medium">{control.name}</div>
+              </div>
+            </div>
+            <Link href={`/control/${control.id}`}>
+              <Button variant="ghost" size="icon">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </Link>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const [activeSecurityDomain, setActiveSecurityDomain] = useState("governance");
@@ -283,87 +360,40 @@ export default function DashboardPage() {
           <Card className="backdrop-blur-sm bg-card/50 border-primary/10">
             <CardHeader>
               <CardTitle>NCA ECC Framework</CardTitle>
+              <CardDescription>
+                {ncaEccFramework?.description || "Essential Cybersecurity Controls"}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="domain1">
-                <TabsList className="w-full grid grid-cols-5">
-                  <TabsTrigger value="domain1">Governance</TabsTrigger>
-                  <TabsTrigger value="domain2">Defense</TabsTrigger>
-                  <TabsTrigger value="domain3">Resilience</TabsTrigger>
-                  <TabsTrigger value="domain4">Risk</TabsTrigger>
-                  <TabsTrigger value="domain5">Compliance</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="domain1">
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      {
-                        control: "1-1",
-                        name: "Cybersecurity Strategy",
-                        status: "Compliant"
-                      },
-                      {
-                        control: "1-2",
-                        name: "Policies & Procedures",
-                        status: "Partially Compliant"
-                      },
-                      {
-                        control: "1-3",
-                        name: "Security Roles",
-                        status: "Compliant"
-                      },
-                      {
-                        control: "1-4",
-                        name: "Training & Awareness",
-                        status: "Non-Compliant"
-                      },
-                      {
-                        control: "1-5",
-                        name: "Review & Updates",
-                        status: "Partially Compliant"
-                      }
-                    ].map(item => (
-                      <div key={item.control} className="rounded-lg border p-3 flex items-center justify-between bg-background/60">
-                        <div className="flex items-center">
-                          <div className={`w-3 h-3 rounded-full mr-3 ${
-                            item.status === "Compliant" ? "bg-green-500" : 
-                            item.status === "Partially Compliant" ? "bg-amber-500" : "bg-red-500"
-                          }`}></div>
-                          <div>
-                            <div className="text-xs text-muted-foreground">ECC {item.control}</div>
-                            <div className="font-medium">{item.name}</div>
-                          </div>
-                        </div>
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                      </div>
+              {domainsLoading ? (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                  <p className="text-sm text-muted-foreground">Loading NCA ECC domains...</p>
+                </div>
+              ) : domains && domains.length > 0 ? (
+                <Tabs defaultValue={domains[0]?.id?.toString()}>
+                  <TabsList className="w-full grid" style={{ gridTemplateColumns: `repeat(${domains.length}, 1fr)` }}>
+                    {domains.map(domain => (
+                      <TabsTrigger key={domain.id} value={domain.id.toString()}>
+                        {domain.name}
+                      </TabsTrigger>
                     ))}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="domain2">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Defense domain controls for network security, access management, and encryption
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="domain3">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Resilience domain controls for backup, incident response, and business continuity
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="domain4">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Risk domain controls for assessment, management, and third-party security
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="domain5">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Compliance domain controls for monitoring, auditing, and reporting
-                  </div>
-                </TabsContent>
-              </Tabs>
+                  </TabsList>
+                  
+                  {domains.map(domain => (
+                    <TabsContent key={domain.id} value={domain.id.toString()}>
+                      <div className="mt-4">
+                        {/* Get controls for this domain */}
+                        <DomainControls domainId={domain.id} allResults={allResults} />
+                      </div>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              ) : (
+                <div className="p-4 text-center text-muted-foreground">
+                  No domains found for NCA ECC framework. Please add domains and controls to get started.
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
