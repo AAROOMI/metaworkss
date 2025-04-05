@@ -1,129 +1,115 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { RefreshCcw } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Helmet } from "react-helmet-async";
+import { Sparkles, BookOpen, Shield, FileCheck } from "lucide-react";
+import AgentIframe from "@/components/did-agent/agent-iframe";
 
 export default function DIDAgentPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [agentReady, setAgentReady] = useState(false);
-  const didAgentContainerRef = useRef<HTMLDivElement>(null);
-
-  // Load DID agent script on component mount
-  useEffect(() => {
-    setIsLoading(true);
-    setAgentReady(false);
-    
-    const loadDIDAgent = () => {
-      try {
-        // If using iframe method (keeping as fallback option)
-        if (window.location.hostname === 'localhost' || process.env.NODE_ENV === 'development') {
-          setAgentReady(true);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Load D-ID agent directly
-        const didScript = document.createElement('script');
-        didScript.type = 'module';
-        didScript.src = 'https://agent.d-id.com/v1/index.js';
-        didScript.dataset.name = 'did-agent';
-        didScript.dataset.mode = 'fabio';
-        didScript.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
-        didScript.dataset.agentId = 'agt_YjpQXzSG';
-        didScript.dataset.monitor = 'true';
-        
-        // Set up event handlers
-        didScript.onload = () => {
-          console.log('D-ID Agent script loaded successfully');
-          setIsLoading(false);
-          setAgentReady(true);
-        };
-        
-        didScript.onerror = (error) => {
-          console.error('Error loading D-ID Agent script:', error);
-          setError('Failed to load virtual consultant. Please try again later.');
-          setIsLoading(false);
-        };
-        
-        // Add script to container
-        if (didAgentContainerRef.current) {
-          // Clear any previous content
-          didAgentContainerRef.current.innerHTML = '';
-          didAgentContainerRef.current.appendChild(didScript);
-        }
-      } catch (error) {
-        console.error('Error initializing D-ID agent:', error);
-        setError('Failed to initialize virtual consultant. Please try again later.');
-        setIsLoading(false);
-      }
-    };
-    
-    loadDIDAgent();
-    
-    // Cleanup function
-    return () => {
-      if (didAgentContainerRef.current) {
-        didAgentContainerRef.current.innerHTML = '';
-      }
-    };
-  }, []);
-
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center">MetaWorks Virtual Cybersecurity Consultant</CardTitle>
-          <CardDescription className="text-center">
-            Ask questions about cybersecurity compliance, risk management, and security policies
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertTitle>Virtual Consultant Error</AlertTitle>
-              <AlertDescription>
-                {error}
-                <div className="mt-4">
-                  <Button onClick={handleRefresh} variant="outline" size="sm">
-                    <RefreshCcw className="h-4 w-4 mr-2" />
-                    Try Again
-                  </Button>
-                </div>
-              </AlertDescription>
-            </Alert>
-          )}
+    <>
+      <Helmet>
+        <title>MetaWorks | Virtual Security Assistant</title>
+      </Helmet>
+      
+      <div className="container py-8 max-w-7xl mx-auto">
+        <div className="space-y-8">
+          {/* Page Header */}
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-2">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold">Virtual Security Assistant</h1>
+            <p className="text-muted-foreground max-w-3xl mx-auto">
+              Your AI-powered cybersecurity consultant helps you understand compliance frameworks,
+              security best practices, and provides guidance tailored to your organization.
+            </p>
+          </div>
           
-          <div className="flex items-center justify-center p-2 relative">
-            <div 
-              ref={didAgentContainerRef}
-              className="w-full h-[600px] border rounded-lg overflow-hidden bg-black"
-              style={{ opacity: agentReady ? 1 : 0.3 }}
-            >
-              {/* DID Agent script will be loaded here */}
-              <div id="did-agent" style={{ width: '100%', height: '100%' }}></div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Agent Column */}
+            <div className="lg:col-span-2">
+              <AgentIframe 
+                title="Security Advisor"
+                shareLink="https://studio.d-id.com/agents/share?id=agt_YjpQXzSG&utm_source=copy&key=WjI5dloyeGxMVzloZFhSb01ud3hNRGM1TWpNME5qWTNORFkxTURVeU1UTTJPVEU2V0hKdlJGRlNZbkJITW5nMlNYSkdSRGxJY2paRA=="
+                height="600px"
+              />
             </div>
             
-            {isLoading && (
-              <div className="absolute flex flex-col items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
-                <p className="text-center text-muted-foreground">Loading your virtual consultant...</p>
-              </div>
-            )}
+            {/* Information Column */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>How To Use</CardTitle>
+                  <CardDescription>
+                    Tips for interacting with your virtual security assistant
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-primary" />
+                      Ask About Frameworks
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      "Can you explain the NCA ECC framework domains?"
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary" />
+                      Get Security Advice
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      "What are the best practices for password policies?"
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <FileCheck className="h-4 w-4 text-primary" />
+                      Policy Guidance
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      "What should I include in an acceptable use policy?"
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Supported Frameworks</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      <span>NCA ECC (Essential Cybersecurity Controls)</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      <span>SAMA Cyber Security Framework</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      <span>ISO 27001 Information Security</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      <span>PDPL (Personal Data Protection Law)</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      <span>IT General Controls (ITGC)</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-          
-          <div className="text-center text-sm text-muted-foreground mt-4">
-            <p>Virtual consultant powered by D-ID AI technology.</p>
-            <p>Your conversation is private and used only to provide assistance.</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
