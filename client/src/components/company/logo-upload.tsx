@@ -16,7 +16,7 @@ export default function LogoUpload() {
   
   const uploadMutation = useMutation({
     mutationFn: async (fileData: FormData) => {
-      const res = await apiRequest("POST", "/api/upload/logo", fileData, {
+      const res = await apiRequest("POST", "/api/company/logo", fileData, {
         isFormData: true,
       });
       return res.json();

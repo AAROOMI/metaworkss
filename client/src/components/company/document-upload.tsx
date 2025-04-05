@@ -23,7 +23,7 @@ export default function DocumentUpload({
   
   const uploadMutation = useMutation({
     mutationFn: async (fileData: FormData) => {
-      const res = await apiRequest("POST", "/api/upload/document", fileData, {
+      const res = await apiRequest("POST", "/api/company/documents", fileData, {
         isFormData: true,
       });
       return res.json();

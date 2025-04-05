@@ -154,8 +154,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!req.isAuthenticated()) return res.sendStatus(401);
 
       const now = new Date().toISOString();
+      const { fileId, ...policyData } = req.body;
+      
+      // Create policy with file ID if provided
       const policy = await storage.savePolicy({
-        ...req.body,
+        ...policyData,
+        fileId: fileId || null, // Ensure fileId is null if not provided
         createdAt: now,
         updatedAt: now
       });

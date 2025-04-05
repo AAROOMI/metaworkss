@@ -103,31 +103,18 @@ export default function PolicyUpload() {
   // Create policy mutation
   const policyMutation = useMutation({
     mutationFn: async (data: PolicyUploadValues) => {
-      const res = await apiRequest("POST", "/api/policies", data);
+      // Include fileId with policy data if a document was uploaded
+      const policyData = fileId ? { ...data, fileId } : data;
+      const res = await apiRequest("POST", "/api/policies", policyData);
       return res.json();
     },
     onSuccess: async (policy) => {
       toast({
         title: "Policy created",
-        description: "Your policy has been created successfully.",
+        description: fileId 
+          ? "Your policy has been created successfully with the attached document." 
+          : "Your policy has been created successfully.",
       });
-      
-      // If a file was uploaded, attach it to the policy
-      if (fileId) {
-        try {
-          await apiRequest("POST", `/api/policies/${policy.id}/attach-document`, { fileId });
-          toast({
-            title: "Document attached",
-            description: "The document was attached to the policy.",
-          });
-        } catch (error) {
-          toast({
-            title: "Error attaching document",
-            description: "The policy was created but we couldn't attach the document.",
-            variant: "destructive",
-          });
-        }
-      }
       
       // Reset the form
       form.reset();
