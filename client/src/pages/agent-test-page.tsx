@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import AgentIframe from "@/components/did-agent/agent-iframe";
+import AgentScript from "@/components/did-agent/agent-script";
 
 export default function AgentTestPage() {
   const { toast } = useToast();
@@ -102,10 +102,9 @@ export default function AgentTestPage() {
         </div>
         
         <div className="md:col-span-2">
-          <AgentIframe 
-            title="Security Advisor" 
-            shareLink="https://studio.d-id.com/agents/share?id=agt_YjpQXzSG&utm_source=copy&key=WjI5dloyeGxMVzloZFhSb01ud3hNRGM1TWpNME5qWTNORFkxTURVeU1UTTJPVEU2V0hKdlJGRlNZbkJITW5nMlNYSkdSRGxJY2paRA=="
+          <AgentScript 
             height="600px"
+            containerClassName="rounded-lg overflow-hidden shadow-lg"
           />
         </div>
       </div>

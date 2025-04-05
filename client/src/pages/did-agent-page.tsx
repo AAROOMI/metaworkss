@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Helmet } from "react-helmet-async";
 import { Sparkles, BookOpen, Shield, FileCheck } from "lucide-react";
-import AgentIframe from "@/components/did-agent/agent-iframe";
+import AgentScript from "@/components/did-agent/agent-script";
 
 export default function DIDAgentPage() {
   return (
@@ -28,10 +28,9 @@ export default function DIDAgentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Agent Column */}
             <div className="lg:col-span-2">
-              <AgentIframe 
-                title="Security Advisor"
-                shareLink="https://studio.d-id.com/agents/share?id=agt_YjpQXzSG&utm_source=copy&key=WjI5dloyeGxMVzloZFhSb01ud3hNRGM1TWpNME5qWTNORFkxTURVeU1UTTJPVEU2V0hKdlJGRlNZbkJITW5nMlNYSkdSRGxJY2paRA=="
+              <AgentScript 
                 height="600px"
+                containerClassName="rounded-lg overflow-hidden shadow-lg"
               />
             </div>
             
