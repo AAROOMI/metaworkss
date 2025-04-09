@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import DashboardLayout from "@/components/layouts/dashboard-layout";
+import DashboardLayout from "@/components/layout/dashboard-layout";
 import RadarChart from "@/components/charts/radar-chart";
 import HeatMap from "@/components/charts/heat-map";
 

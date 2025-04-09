@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ArrowLeft, FileText, Plus, Download, Filter, Settings, Calendar, Clock, Check, X, Pencil, Trash2, Upload, Loader2, AlertCircle } from "lucide-react";
 import { Policy } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -585,6 +586,30 @@ export default function PolicyManagementPage() {
     documentUrl: policy.documentUrl || undefined
   })) || [];
   
+  // Delete policy mutation
+  const deletePolicyMutation = useMutation({
+    mutationFn: async (policyId: number) => {
+      const res = await apiRequest("DELETE", `/api/policies/${policyId}`);
+      return res.ok;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Policy deleted",
+        description: "Policy has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/policies'] });
+      setShowDeleteConfirmation(false);
+      setDeletingPolicy(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to delete policy",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
   // Filter policies based on active tab
   const filteredPolicies = activeTab === "all" 
     ? policies 
@@ -658,30 +683,6 @@ export default function PolicyManagementPage() {
       </>
     );
   }
-  
-  // Delete policy mutation
-  const deletePolicyMutation = useMutation({
-    mutationFn: async (policyId: number) => {
-      const res = await apiRequest("DELETE", `/api/policies/${policyId}`);
-      return res.ok;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Policy deleted",
-        description: "Policy has been deleted successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/policies'] });
-      setShowDeleteConfirmation(false);
-      setDeletingPolicy(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to delete policy",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  });
 
   return (
     <>
@@ -717,7 +718,7 @@ export default function PolicyManagementPage() {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the policy
-              {deletingPolicy?.name && <span className="font-medium"> "{deletingPolicy.name}"</span>}
+              {deletingPolicy?.title && <span className="font-medium"> "{deletingPolicy.title}"</span>}
               {deletingPolicy?.fileId && " and any associated document files"}.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -826,7 +827,7 @@ export default function PolicyManagementPage() {
                         <TableCell className="font-medium">
                           <div className="flex items-center">
                             <FileText className="h-4 w-4 mr-2 text-primary" />
-                            {policy.name}
+                            {policy.title || policy.name}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
                             {policy.description.length > 80 
@@ -943,7 +944,7 @@ export default function PolicyManagementPage() {
                     const csvData = [
                       headers.join(","),
                       ...policies.map(policy => [
-                        `"${policy.name}"`,
+                        `"${policy.title || policy.name}"`,
                         `"${policy.category}"`,
                         `"${policy.version}"`,
                         `"${policy.status}"`,
