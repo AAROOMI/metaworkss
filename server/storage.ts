@@ -5,6 +5,7 @@ import {
   policies,
   frameworks,
   domains,
+  subdomains,
   controls,
   assessments,
   assessmentResults,
@@ -27,12 +28,14 @@ import {
   type Policy,
   type Framework,
   type Domain,
+  type Subdomain,
   type Control,
   type Assessment,
   type AssessmentResult,
   type RemediationTask,
   type InsertFramework,
   type InsertDomain,
+  type InsertSubdomain,
   type InsertControl,
   type InsertAssessment,
   type InsertAssessmentResult,
@@ -99,9 +102,14 @@ export interface IStorage {
   getDomainsByFrameworkId(frameworkId: number): Promise<Domain[]>;
   getDomainById(id: number): Promise<Domain | undefined>;
   
+  // Subdomain management
+  saveSubdomain(subdomain: InsertSubdomain): Promise<Subdomain>;
+  getSubdomainsByDomainId(domainId: number): Promise<Subdomain[]>;
+  getSubdomainById(id: number): Promise<Subdomain | undefined>;
+  
   // Control management
   saveControl(control: InsertControl): Promise<Control>;
-  getControlsByDomainId(domainId: number): Promise<Control[]>;
+  getControlsBySubdomainId(subdomainId: number): Promise<Control[]>;
   getControlById(id: number): Promise<Control | undefined>;
   
   // Assessment management
@@ -418,6 +426,48 @@ export class DatabaseStorage implements IStorage {
     return domain;
   }
   
+  // Subdomain methods
+  async saveSubdomain(subdomain: any): Promise<Subdomain> {
+    // Check if subdomain exists
+    const [existingSubdomain] = await db!.select()
+      .from(subdomains)
+      .where(
+        and(
+          eq(subdomains.domainId, subdomain.domainId),
+          eq(subdomains.name, subdomain.name)
+        )
+      );
+    
+    if (existingSubdomain) {
+      // Update existing subdomain
+      const [updated] = await db!.update(subdomains)
+        .set({
+          displayName: subdomain.displayName,
+          description: subdomain.description,
+          order: subdomain.order
+        })
+        .where(eq(subdomains.id, existingSubdomain.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new subdomain
+      const [newSubdomain] = await db!.insert(subdomains).values(subdomain).returning();
+      return newSubdomain;
+    }
+  }
+  
+  async getSubdomainsByDomainId(domainId: number): Promise<Subdomain[]> {
+    return await db!.select()
+      .from(subdomains)
+      .where(eq(subdomains.domainId, domainId))
+      .orderBy(asc(subdomains.order));
+  }
+  
+  async getSubdomainById(id: number): Promise<Subdomain | undefined> {
+    const [subdomain] = await db!.select().from(subdomains).where(eq(subdomains.id, id));
+    return subdomain;
+  }
+  
   // Control methods
   async saveControl(control: InsertControl): Promise<Control> {
     // Check if control exists
@@ -425,7 +475,7 @@ export class DatabaseStorage implements IStorage {
       .from(controls)
       .where(
         and(
-          eq(controls.domainId, control.domainId),
+          eq(controls.subdomainId, control.subdomainId),
           eq(controls.controlId, control.controlId)
         )
       );
@@ -451,11 +501,30 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  async getControlsByDomainId(domainId: number): Promise<Control[]> {
-    return await db.select()
+  async getControlsBySubdomainId(subdomainId: number): Promise<Control[]> {
+    return await db!.select()
       .from(controls)
-      .where(eq(controls.domainId, domainId))
+      .where(eq(controls.subdomainId, subdomainId))
       .orderBy(asc(controls.controlId));
+  }
+  
+  // Backward compatibility method
+  async getControlsByDomainId(domainId: number): Promise<Control[]> {
+    // First get all subdomains for this domain
+    const subdoms = await this.getSubdomainsByDomainId(domainId);
+    
+    if (subdoms.length === 0) {
+      return [];
+    }
+    
+    // Then get all controls for each subdomain
+    const controls = [];
+    for (const subdomain of subdoms) {
+      const subdomainControls = await this.getControlsBySubdomainId(subdomain.id);
+      controls.push(...subdomainControls);
+    }
+    
+    return controls.sort((a, b) => a.controlId.localeCompare(b.controlId));
   }
   
   async getControlById(id: number): Promise<Control | undefined> {

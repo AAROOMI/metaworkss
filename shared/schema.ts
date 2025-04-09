@@ -107,9 +107,18 @@ export const domains = pgTable("domains", {
   order: integer("order").notNull(),
 });
 
-export const controls = pgTable("controls", {
+export const subdomains = pgTable("subdomains", {
   id: serial("id").primaryKey(),
   domainId: integer("domain_id").notNull(),
+  name: text("name").notNull(),
+  displayName: text("display_name").notNull(),
+  description: text("description"),
+  order: integer("order").notNull(),
+});
+
+export const controls = pgTable("controls", {
+  id: serial("id").primaryKey(),
+  subdomainId: integer("subdomain_id").notNull(),
   controlId: text("control_id").notNull(), // e.g., "ECC-1.2.3" or "SAMA-2.4"
   name: text("name").notNull(),
   description: text("description").notNull(),
@@ -168,6 +177,7 @@ export const remediationTasks = pgTable("remediation_tasks", {
 // Create insert schemas for assessment tables
 export const insertFrameworkSchema = createInsertSchema(frameworks).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDomainSchema = createInsertSchema(domains).omit({ id: true });
+export const insertSubdomainSchema = createInsertSchema(subdomains).omit({ id: true });
 export const insertControlSchema = createInsertSchema(controls).omit({ id: true });
 export const insertAssessmentSchema = createInsertSchema(assessments).omit({ id: true, updatedAt: true });
 export const insertAssessmentResultSchema = createInsertSchema(assessmentResults).omit({ id: true, updatedAt: true });
@@ -176,6 +186,7 @@ export const insertRemediationTaskSchema = createInsertSchema(remediationTasks).
 // Define assessment-related types
 export type Framework = typeof frameworks.$inferSelect;
 export type Domain = typeof domains.$inferSelect;
+export type Subdomain = typeof subdomains.$inferSelect;
 export type Control = typeof controls.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
 export type AssessmentResult = typeof assessmentResults.$inferSelect;
@@ -183,6 +194,7 @@ export type RemediationTask = typeof remediationTasks.$inferSelect;
 
 export type InsertFramework = z.infer<typeof insertFrameworkSchema>;
 export type InsertDomain = z.infer<typeof insertDomainSchema>;
+export type InsertSubdomain = z.infer<typeof insertSubdomainSchema>;
 export type InsertControl = z.infer<typeof insertControlSchema>;
 // Compliance reports and shareable links
 export const complianceReports = pgTable("compliance_reports", {
@@ -355,7 +367,7 @@ export const userGameStats = pgTable('user_game_stats', {
   streakDays: integer('streak_days').notNull().default(0),
   lastActivity: timestamp('last_activity', { mode: 'string' }).notNull().defaultNow(),
   completedSteps: integer('completed_steps').notNull().default(0),
-  quizAverage: real('quiz_average').default('0'),
+  quizAverage: real('quiz_average'),
   fastestCompletionTime: integer('fastest_completion_time'), // in seconds
   updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow()
 });

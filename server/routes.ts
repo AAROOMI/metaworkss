@@ -12,6 +12,7 @@ import assessmentsRouter from "./api/assessments";
 import assessmentResultsRouter from "./api/assessment-results";
 import frameworksRouter from "./api/frameworks";
 import domainsRouter from "./api/domains";
+import subdomainsRouter from "./api/subdomains";
 import controlsRouter from "./api/controls";
 import policyManagementRouter from "./api/policy-management";
 import companyInfoRouter from "./api/company-info";
@@ -279,6 +280,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   // Register modular API routers
   app.use(frameworksRouter);
   app.use(domainsRouter);
+  app.use(subdomainsRouter);
   app.use(controlsRouter);
   app.use(assessmentsRouter);
   app.use(assessmentResultsRouter);
