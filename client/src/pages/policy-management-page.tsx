@@ -316,6 +316,8 @@ export default function PolicyManagementPage() {
     lastUpdated: new Date(policy.updatedAt).toLocaleDateString(),
     reviewDate: policy.reviewDate || 'N/A',
     description: policy.content || 'No description provided.',
+    // Use the documentUrl property provided by the API
+    documentUrl: policy.documentUrl || undefined
   })) || [];
   
   // Filter policies based on active tab
@@ -566,9 +568,38 @@ export default function PolicyManagementPage() {
                 Showing {filteredPolicies.length} of {policies.length} policies
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    // Generate CSV data
+                    const headers = ["Policy Name", "Category", "Version", "Status", "Last Updated", "Review Date"];
+                    const csvData = [
+                      headers.join(","),
+                      ...policies.map(policy => [
+                        `"${policy.name}"`,
+                        `"${policy.category}"`,
+                        `"${policy.version}"`,
+                        `"${policy.status}"`,
+                        `"${policy.lastUpdated}"`,
+                        `"${policy.reviewDate}"`
+                      ].join(","))
+                    ].join("\n");
+                    
+                    // Create a blob and download link
+                    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "policy_export.csv");
+                    link.style.visibility = "hidden";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
                   <Download className="h-4 w-4 mr-2" />
-                  Export
+                  Export CSV
                 </Button>
               </div>
             </CardFooter>
