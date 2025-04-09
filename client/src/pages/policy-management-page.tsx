@@ -26,6 +26,7 @@ interface PolicyWithDetails extends Policy {
   author?: string;
   approver?: string;
   reviewDate?: string;
+  documentUrl?: string; // URL to download the attached document
 }
 
 // Status mapping for display
@@ -512,9 +513,33 @@ export default function PolicyManagementPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end space-x-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Download className="h-4 w-4" />
-                            </Button>
+                            {policy.documentUrl ? (
+                              <>
+                                <a 
+                                  href={policy.documentUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  title="View document"
+                                >
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                </a>
+                                <a 
+                                  href={policy.documentUrl} 
+                                  download={`${policy.title.replace(/\s+/g, '_')}.pdf`}
+                                  title="Download document"
+                                >
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Download className="h-4 w-4" />
+                                  </Button>
+                                </a>
+                              </>
+                            ) : (
+                              <Button variant="ghost" size="icon" className="h-8 w-8" disabled title="No document attached">
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            )}
                             <Button variant="ghost" size="icon" className="h-8 w-8">
                               <Pencil className="h-4 w-4" />
                             </Button>
