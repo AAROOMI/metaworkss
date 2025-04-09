@@ -21,6 +21,7 @@ import SecurityTimelineDemo from "@/pages/security-timeline-demo";
 import SecurityProgressPage from "@/pages/security-progress-page";
 import RiskManagementPage from "@/pages/risk-management-page";
 import RiskAssessmentPage from "@/pages/risk-assessment-page";
+import RiskPredictionPage from "@/pages/risk-prediction-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
 import CompanyDashboardPage from "@/pages/company-dashboard-page";
 import OnboardingPage from "@/pages/onboarding-page";
@@ -60,6 +61,7 @@ function Router() {
       <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
       <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
       <ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
+      <ProtectedRoute path="/risk-prediction" component={RiskPredictionPage} />
       <ProtectedRoute path="/policies" component={PolicyManagementPage} />
       <ProtectedRoute path="/security-timeline" component={SecurityTimelineDemo} />
       <ProtectedRoute path="/security-progress" component={SecurityProgressPage} />
