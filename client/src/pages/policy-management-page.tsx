@@ -296,10 +296,275 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
   );
 }
 
+// PolicyEditForm component for editing policies
+function PolicyEditForm({ policy, onCancel }: { policy: PolicyWithDetails; onCancel: () => void }) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [file, setFile] = useState<File | null>(null);
+  
+  // Status options for the dropdown
+  const statusOptions = [
+    { value: "draft", label: "Draft" },
+    { value: "active", label: "Active" },
+    { value: "review", label: "Under Review" },
+  ];
+  
+  // Category options
+  const categoryOptions = [
+    { value: "security", label: "Security" },
+    { value: "data", label: "Data" },
+    { value: "compliance", label: "Compliance" },
+    { value: "general", label: "General" },
+  ];
+
+  // Form state
+  const [formState, setFormState] = useState({
+    title: policy.title || "",
+    type: policy.type || categoryOptions[0].value,
+    content: policy.content || "",
+    version: policy.version || "1.0",
+    author: policy.author || user?.username || "",
+    approver: policy.approver || "",
+    status: policy.status?.toLowerCase() || statusOptions[0].value,
+    reviewDate: policy.reviewDate ? new Date(policy.reviewDate).toISOString().split('T')[0] : "",
+  });
+  
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormState(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+  
+  // File change handler
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+  
+  // Update policy mutation
+  const updatePolicyMutation = useMutation({
+    mutationFn: async (policyData: Partial<PolicyWithDetails>) => {
+      const res = await apiRequest("PUT", `/api/policies/${policy.id}`, policyData);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Policy updated",
+        description: "Your policy has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/policies'] });
+      onCancel();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update policy",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formState.title) {
+      toast({
+        title: "Missing information",
+        description: "Please enter a policy name.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Upload file first if available
+    if (file) {
+      const formData = new FormData();
+      formData.append("document", file);
+      
+      // Create form data for file upload
+      fetch("/api/upload/document", {
+        method: "POST",
+        body: formData,
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Now update the policy with the file ID
+          updatePolicyMutation.mutate({ 
+            ...formState,
+            fileId: data.fileId 
+          });
+        })
+        .catch(err => {
+          toast({
+            title: "File upload failed",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    } else {
+      // Update policy without file
+      updatePolicyMutation.mutate(formState);
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="title">Policy Name</Label>
+          <Input 
+            id="title" 
+            placeholder="Enter policy name" 
+            value={formState.title}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="type">Category</Label>
+          <select
+            id="type"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            value={formState.type}
+            onChange={handleInputChange}
+          >
+            {categoryOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="content">Description</Label>
+        <Textarea 
+          id="content" 
+          placeholder="Enter policy description" 
+          rows={4} 
+          value={formState.content}
+          onChange={handleInputChange}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="version">Version</Label>
+          <Input 
+            id="version" 
+            placeholder="e.g., 1.0" 
+            value={formState.version}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="author">Author</Label>
+          <Input 
+            id="author" 
+            placeholder="Enter author name" 
+            value={formState.author}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="approver">Approver</Label>
+          <Input 
+            id="approver" 
+            placeholder="Enter approver name" 
+            value={formState.approver}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <select
+            id="status"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            value={formState.status}
+            onChange={handleInputChange}
+          >
+            {statusOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="reviewDate">Next Review Date</Label>
+          <Input 
+            id="reviewDate" 
+            type="date" 
+            value={formState.reviewDate}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="document">Upload New Document</Label>
+        <Input 
+          id="document" 
+          type="file" 
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+          onChange={handleFileChange}
+          className="cursor-pointer"
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Supported file types: PDF, DOCX (Max size: 10MB)
+        </p>
+      </div>
+      
+      {file && (
+        <div className="flex items-center gap-2 p-2 border rounded">
+          <FileText className="h-5 w-5 text-primary" />
+          <span className="text-sm truncate">{file.name}</span>
+          <span className="text-xs text-muted-foreground ml-auto">
+            {(file.size / 1024 / 1024).toFixed(2)} MB
+          </span>
+        </div>
+      )}
+      
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button 
+          type="submit" 
+          disabled={updatePolicyMutation.isPending}
+        >
+          {updatePolicyMutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Updating...
+            </>
+          ) : (
+            'Update Policy'
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export default function PolicyManagementPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("all");
   const [showAddPolicy, setShowAddPolicy] = useState(false);
+  const [showEditPolicy, setShowEditPolicy] = useState(false);
+  const [editingPolicy, setEditingPolicy] = useState<PolicyWithDetails | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deletingPolicy, setDeletingPolicy] = useState<PolicyWithDetails | null>(null);
   
   // Fetch policies from the API
   const { data: policiesData, isLoading, error } = useQuery<PolicyWithDetails[]>({
@@ -394,11 +659,92 @@ export default function PolicyManagementPage() {
     );
   }
   
+  // Delete policy mutation
+  const deletePolicyMutation = useMutation({
+    mutationFn: async (policyId: number) => {
+      const res = await apiRequest("DELETE", `/api/policies/${policyId}`);
+      return res.ok;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Policy deleted",
+        description: "Policy has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/policies'] });
+      setShowDeleteConfirmation(false);
+      setDeletingPolicy(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to delete policy",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   return (
     <>
       <Helmet>
         <title>Policy Management | MetaWorks</title>
       </Helmet>
+      
+      {/* Edit Policy Dialog */}
+      <Dialog open={showEditPolicy} onOpenChange={setShowEditPolicy}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Edit Policy</DialogTitle>
+            <DialogDescription>
+              Update the policy details
+            </DialogDescription>
+          </DialogHeader>
+          {editingPolicy && (
+            <PolicyEditForm 
+              policy={editingPolicy} 
+              onCancel={() => {
+                setShowEditPolicy(false);
+                setEditingPolicy(null);
+              }} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the policy
+              {deletingPolicy?.name && <span className="font-medium"> "{deletingPolicy.name}"</span>}
+              {deletingPolicy?.fileId && " and any associated document files"}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingPolicy(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                if (deletingPolicy) {
+                  deletePolicyMutation.mutate(deletingPolicy.id);
+                }
+              }}
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={deletePolicyMutation.isPending}
+            >
+              {deletePolicyMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
       <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -542,10 +888,30 @@ export default function PolicyManagementPage() {
                                 <Download className="h-4 w-4" />
                               </Button>
                             )}
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => {
+                                // Pre-fill form with policy data
+                                setEditingPolicy(policy);
+                                setShowEditPolicy(true);
+                              }}
+                              title="Edit policy"
+                            >
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-destructive"
+                              onClick={() => {
+                                // Show delete confirmation
+                                setDeletingPolicy(policy);
+                                setShowDeleteConfirmation(true);
+                              }}
+                              title="Delete policy"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

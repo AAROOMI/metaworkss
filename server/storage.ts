@@ -90,6 +90,7 @@ export interface IStorage {
   savePolicy(policy: Partial<Policy>): Promise<Policy>;
   getPolicies(): Promise<Policy[]>;
   getPolicyById(id: number): Promise<Policy | undefined>;
+  deletePolicy(id: number): Promise<void>;
   
   // Framework management
   saveFramework(framework: InsertFramework): Promise<Framework>;
@@ -339,6 +340,10 @@ export class DatabaseStorage implements IStorage {
   async getPolicyById(id: number): Promise<Policy | undefined> {
     const [policy] = await db.select().from(policies).where(eq(policies.id, id));
     return policy;
+  }
+  
+  async deletePolicy(id: number): Promise<void> {
+    await db.delete(policies).where(eq(policies.id, id));
   }
 
   // Framework methods

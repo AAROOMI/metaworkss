@@ -227,6 +227,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Update policy endpoint
+  app.put("/api/policies/:id", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const policyId = parseInt(req.params.id);
+      const existingPolicy = await storage.getPolicyById(policyId);
+      
+      if (!existingPolicy) {
+        return res.status(404).json({ error: "Policy not found" });
+      }
+      
+      const updatedPolicy = await storage.savePolicy({
+        ...existingPolicy,
+        ...req.body,
+        id: policyId, // Ensure ID doesn't change
+        updatedAt: new Date().toISOString()
+      });
+      
+      res.json(updatedPolicy);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Delete policy endpoint
+  app.delete("/api/policies/:id", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const policyId = parseInt(req.params.id);
+      const policy = await storage.getPolicyById(policyId);
+      
+      if (!policy) {
+        return res.status(404).json({ error: "Policy not found" });
+      }
+      
+      // If policy has a file, delete it first
+      if (policy.fileId) {
+        await deleteFile(policy.fileId);
+      }
+      
+      await storage.deletePolicy(policyId);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Dashboard access check
 app.get("/api/dashboard-access", async (req, res) => {
