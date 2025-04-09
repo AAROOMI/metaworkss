@@ -20,6 +20,7 @@ import { registerReportsRoutes } from "./api/reports";
 import { onboardingRouter } from "./api/onboarding";
 import { gamificationRouter } from "./api/gamification";
 import didAgentRouter from "./api/did-agent";
+import progressRouter from "./api/progress";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -289,6 +290,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/gamification", gamificationRouter);
   app.use("/api/did-agent", didAgentRouter);
+  app.use(progressRouter);
   
   // Register reports API routes
   registerReportsRoutes(app);

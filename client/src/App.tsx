@@ -18,6 +18,7 @@ import SAMAFrameworkPage from "@/pages/sama-framework-page";
 import PdplPage from "@/pages/frameworks/pdpl-page";
 import Iso27001Page from "@/pages/frameworks/iso-27001-page";
 import SecurityTimelineDemo from "@/pages/security-timeline-demo";
+import SecurityProgressPage from "@/pages/security-progress-page";
 import RiskManagementPage from "@/pages/risk-management-page";
 import RiskAssessmentPage from "@/pages/risk-assessment-page";
 import PolicyManagementPage from "@/pages/policy-management-page";
@@ -61,6 +62,7 @@ function Router() {
       <ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
       <ProtectedRoute path="/policies" component={PolicyManagementPage} />
       <ProtectedRoute path="/security-timeline" component={SecurityTimelineDemo} />
+      <ProtectedRoute path="/security-progress" component={SecurityProgressPage} />
       <ProtectedRoute path="/company" component={CompanyDashboardPage} />
       <ProtectedRoute path="/onboarding" component={OnboardingPage} />
       

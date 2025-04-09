@@ -66,7 +66,7 @@ import {
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, and, desc, asc, sql, or, isNull } from "drizzle-orm";
+import { eq, and, desc, asc, sql, or, isNull, inArray } from "drizzle-orm";
 
 const PostgresSessionStore = connectPg(session);
 
