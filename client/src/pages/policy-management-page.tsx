@@ -126,13 +126,9 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
       return;
     }
     
-    // Since file uploads are now handled by DirectFileUploader which triggers the mutation,
-    // we only need to handle when there's no file.
-    if (!file) {
-      // Create policy without file
-      createPolicyMutation.mutate(formState);
-    }
-    // Otherwise the DirectFileUploader will handle the upload and call the mutation
+    // Always update with current form state
+    // The fileId and documentUrl are already in formState if a file was uploaded
+    createPolicyMutation.mutate(formState);
   };
   
   return (
@@ -240,13 +236,15 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           buttonText="Upload Policy Document"
           onFileUploaded={(fileId, filename, url) => {
-            // Store file info to be submitted with form
-            setFile(null);
-            // Update policy with file information
-            createPolicyMutation.mutate({ 
-              ...formState,
-              fileId: fileId,
+            // Store file info to be submitted with form later
+            setFormState(prev => ({
+              ...prev,
+              fileId,
               documentUrl: url
+            }));
+            toast({
+              title: "Document uploaded",
+              description: "Document has been attached and will be saved when you click 'Save Policy'",
             });
           }}
         />
@@ -372,13 +370,9 @@ function PolicyEditForm({ policy, onCancel }: { policy: PolicyWithDetails; onCan
       return;
     }
     
-    // Since file uploads are now handled by DirectFileUploader which triggers the mutation,
-    // we only need to handle when there's no file.
-    if (!file) {
-      // Update policy without file
-      updatePolicyMutation.mutate(formState);
-    }
-    // Otherwise the DirectFileUploader will handle the upload and call the mutation
+    // Always update with current form state
+    // The fileId and documentUrl are already in formState if a file was uploaded
+    updatePolicyMutation.mutate(formState);
   };
   
   return (
@@ -486,13 +480,15 @@ function PolicyEditForm({ policy, onCancel }: { policy: PolicyWithDetails; onCan
           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           buttonText="Upload New Document"
           onFileUploaded={(fileId, filename, url) => {
-            // Store file info to be submitted with form
-            setFile(null);
-            // Update policy with file information
-            updatePolicyMutation.mutate({ 
-              ...formState,
-              fileId: fileId,
+            // Store file info to be submitted with form later
+            setFormState(prev => ({
+              ...prev,
+              fileId,
               documentUrl: url
+            }));
+            toast({
+              title: "Document uploaded",
+              description: "Document has been attached and will be saved when you click 'Update Policy'",
             });
           }}
         />
