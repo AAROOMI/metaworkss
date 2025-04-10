@@ -48,7 +48,7 @@ export default function Header() {
           
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
-            <a href="#solutions" className="text-sm font-medium hover:text-primary transition-colors">Solutions</a>
+            <a href="#solution" className="text-sm font-medium hover:text-primary transition-colors">Solution</a>
             <a href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</a>
             <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">About</a>
             
@@ -86,13 +86,6 @@ export default function Header() {
                 >
                   User Dashboard
                 </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/admin-dashboard")}
-                  className="hidden md:inline-flex"
-                >
-                  Admin Dashboard
-                </Button>
                 <Button onClick={handleLogout}>Logout</Button>
               </>
             ) : (
@@ -103,13 +96,6 @@ export default function Header() {
                   className="hidden md:inline-flex"
                 >
                   Login
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleClerkAuth}
-                  className="hidden md:inline-flex"
-                >
-                  Clerk Auth
                 </Button>
                 <Button onClick={handleSignup}>Get Started</Button>
               </>
@@ -135,7 +121,7 @@ export default function Header() {
           <div className="md:hidden backdrop-blur-sm bg-background/90 absolute top-full left-0 w-full border-b border-primary/10">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Features</a>
-              <a href="#solutions" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Solutions</a>
+              <a href="#solution" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Solution</a>
               <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Pricing</a>
               <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">About</a>
               
@@ -147,12 +133,6 @@ export default function Header() {
                   >
                     User Dashboard
                   </a>
-                  <a 
-                    onClick={() => { navigate('/admin-dashboard'); setIsMenuOpen(false); }}
-                    className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-                  >
-                    Admin Dashboard
-                  </a>
                 </>
               ) : (
                 <>
@@ -161,12 +141,6 @@ export default function Header() {
                     className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
                   >
                     Login
-                  </a>
-                  <a 
-                    onClick={() => { navigate('/clerk-auth'); setIsMenuOpen(false); }}
-                    className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-                  >
-                    Clerk Auth
                   </a>
                 </>
               )}
