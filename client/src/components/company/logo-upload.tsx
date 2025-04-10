@@ -16,7 +16,7 @@ export default function LogoUpload() {
   
   const uploadMutation = useMutation({
     mutationFn: async (fileData: FormData) => {
-      const res = await apiRequest("POST", "/api/company/logo", fileData, {
+      const res = await apiRequest("POST", "/api/upload/logo", fileData, {
         isFormData: true,
       });
       return res.json();
@@ -26,7 +26,7 @@ export default function LogoUpload() {
         title: "Logo uploaded",
         description: "Your company logo has been uploaded successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/company-info"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/company"] });
     },
     onError: (error: Error) => {
       toast({

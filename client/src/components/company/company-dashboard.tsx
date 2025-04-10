@@ -146,7 +146,8 @@ export default function CompanyDashboard() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('logo', file);
-      const res = await apiRequest('POST', '/api/company/logo', formData, false);
+      const res = await apiRequest('POST', '/api/upload/logo', formData, 
+        { isFormData: true });
       return await res.json();
     },
     onSuccess: () => {
