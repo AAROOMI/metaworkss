@@ -526,37 +526,45 @@ export default function RiskEntryForm({ onSuccess, initialData, companyId }: Ris
         {/* Progress Steps */}
         <div className="w-full mb-8">
           <div className="flex justify-between mb-2">
-            <div 
-              className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full border border-primary text-sm font-medium", 
-                step === 1 ? "bg-primary text-primary-foreground" : "text-primary"
-              )}
-            >
-              1
-            </div>
-            <div className={cn("flex-1 h-0.5 mx-2", step >= 2 ? "bg-primary" : "bg-muted")} />
-            <div 
-              className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full border border-primary text-sm font-medium", 
-                step === 2 ? "bg-primary text-primary-foreground" : step > 2 ? "text-primary" : "text-muted-foreground border-muted"
-              )}
-            >
-              2
-            </div>
-            <div className={cn("flex-1 h-0.5 mx-2", step >= 3 ? "bg-primary" : "bg-muted")} />
-            <div 
-              className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full border text-sm font-medium", 
-                step === 3 ? "bg-primary text-primary-foreground border-primary" : "text-muted-foreground border-muted"
-              )}
-            >
-              3
-            </div>
+            {[1, 2, 3].map((stepNumber) => (
+              <div key={stepNumber} className="text-center flex flex-col items-center">
+                <div 
+                  className={cn(
+                    "w-10 h-10 mx-auto rounded-full flex items-center justify-center border-2 font-medium",
+                    step === stepNumber 
+                      ? "bg-primary text-white border-primary" 
+                      : step > stepNumber 
+                        ? "bg-green-600 text-white border-green-600" 
+                        : "bg-gray-800/40 text-muted-foreground border-gray-700"
+                  )}
+                >
+                  {step > stepNumber ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    stepNumber
+                  )}
+                </div>
+                <div className={cn(
+                  "mt-2 text-sm font-medium", 
+                  step === stepNumber 
+                    ? "text-primary" 
+                    : step > stepNumber 
+                      ? "text-green-500" 
+                      : "text-muted-foreground"
+                )}>
+                  {stepNumber === 1 ? "Identification" : stepNumber === 2 ? "Assessment" : "Mitigation"}
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex justify-between text-xs">
-            <span className={step === 1 ? "text-primary font-medium" : "text-muted-foreground"}>Risk Identification</span>
-            <span className={step === 2 ? "text-primary font-medium" : "text-muted-foreground"}>Risk Assessment</span>
-            <span className={step === 3 ? "text-primary font-medium" : "text-muted-foreground"}>Risk Mitigation</span>
+          
+          <div className="relative mt-4 h-2 bg-gray-800/40 rounded-full overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 h-2 bg-primary rounded-full transition-all duration-300 ease-in-out"
+              style={{ width: `${((step-1)/2) * 100}%` }}
+            ></div>
           </div>
         </div>
         
