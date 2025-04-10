@@ -134,13 +134,20 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
       fetch("/api/upload/document", {
         method: "POST",
         body: formData,
+        credentials: 'include' // Include cookies for authentication
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
-          // Now create the policy with the file ID
+          // Now create the policy with the file ID and document URL
           createPolicyMutation.mutate({ 
             ...formState,
-            fileId: data.fileId 
+            fileId: data.fileId,
+            documentUrl: `/uploads/documents/${data.filename}` // Store the correct document URL path
           });
         })
         .catch(err => {
@@ -393,13 +400,20 @@ function PolicyEditForm({ policy, onCancel }: { policy: PolicyWithDetails; onCan
       fetch("/api/upload/document", {
         method: "POST",
         body: formData,
+        credentials: 'include' // Include cookies for authentication
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
-          // Now update the policy with the file ID
+          // Now update the policy with the file ID and document URL
           updatePolicyMutation.mutate({ 
             ...formState,
-            fileId: data.fileId 
+            fileId: data.fileId,
+            documentUrl: `/uploads/documents/${data.filename}` // Store the correct document URL path
           });
         })
         .catch(err => {
