@@ -72,7 +72,7 @@ import {
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, and, desc, asc, sql, or, isNull, inArray } from "drizzle-orm";
+import { eq, and, desc, asc, sql, or, isNull, inArray, count } from "drizzle-orm";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -206,6 +206,7 @@ export interface IStorage {
   getRisks(companyId?: number): Promise<Risk[]>;
   getRiskById(id: number): Promise<Risk | undefined>;
   deleteRisk(id: number): Promise<void>;
+  countRisks(companyId?: number): Promise<number>;
   
   // Assessment Risk Management
   saveAssessmentRisk(assessmentRisk: Partial<AssessmentRisk>): Promise<AssessmentRisk>;
@@ -1330,6 +1331,23 @@ export class DatabaseStorage implements IStorage {
 
   async deleteRisk(id: number): Promise<void> {
     await db.delete(risks).where(eq(risks.id, id));
+  }
+  
+  async countRisks(companyId?: number): Promise<number> {
+    // Import count function from drizzle-orm
+    const { count } = await import('drizzle-orm');
+    
+    // Query to count risks, optionally filtered by companyId
+    let query = db.select({ count: count() }).from(risks);
+    
+    // Add companyId filter if provided
+    if (companyId !== undefined) {
+      query = query.where(eq(risks.companyId, companyId));
+    }
+    
+    // Execute count query
+    const result = await query;
+    return result[0]?.count || 0;
   }
 
   async saveAssessmentRisk(assessmentRisk: Partial<AssessmentRisk>): Promise<AssessmentRisk> {
