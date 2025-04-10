@@ -248,6 +248,15 @@ export class DatabaseStorage implements IStorage {
       const [updated] = await db.update(companyInfo)
         .set({
           companyName: info.companyName || existingCompany.companyName,
+          sector: info.sector !== undefined ? info.sector : existingCompany.sector,
+          size: info.size !== undefined ? info.size : existingCompany.size,
+          website: info.website !== undefined ? info.website : existingCompany.website,
+          address: info.address !== undefined ? info.address : existingCompany.address,
+          city: info.city !== undefined ? info.city : existingCompany.city,
+          country: info.country !== undefined ? info.country : existingCompany.country,
+          postalCode: info.postalCode !== undefined ? info.postalCode : existingCompany.postalCode,
+          contactEmail: info.contactEmail !== undefined ? info.contactEmail : existingCompany.contactEmail,
+          contactPhone: info.contactPhone !== undefined ? info.contactPhone : existingCompany.contactPhone,
           ceoName: info.ceoName !== undefined ? info.ceoName : existingCompany.ceoName,
           cioName: info.cioName !== undefined ? info.cioName : existingCompany.cioName,
           ctoName: info.ctoName !== undefined ? info.ctoName : existingCompany.ctoName,
@@ -261,6 +270,15 @@ export class DatabaseStorage implements IStorage {
       // Create new company
       const [company] = await db.insert(companyInfo).values({
         companyName: info.companyName || '',
+        sector: info.sector,
+        size: info.size,
+        website: info.website,
+        address: info.address,
+        city: info.city,
+        country: info.country,
+        postalCode: info.postalCode,
+        contactEmail: info.contactEmail,
+        contactPhone: info.contactPhone,
         ceoName: info.ceoName,
         cioName: info.cioName,
         ctoName: info.ctoName,
