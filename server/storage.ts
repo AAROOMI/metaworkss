@@ -1334,11 +1334,8 @@ export class DatabaseStorage implements IStorage {
   }
   
   async countRisks(companyId?: number): Promise<number> {
-    // Import count function from drizzle-orm
-    const { count } = await import('drizzle-orm');
-    
     // Query to count risks, optionally filtered by companyId
-    let query = db.select({ count: count() }).from(risks);
+    let query = db.select({ count: sql`count(*)` }).from(risks);
     
     // Add companyId filter if provided
     if (companyId !== undefined) {
@@ -1347,7 +1344,7 @@ export class DatabaseStorage implements IStorage {
     
     // Execute count query
     const result = await query;
-    return result[0]?.count || 0;
+    return Number(result[0]?.count) || 0;
   }
 
   async saveAssessmentRisk(assessmentRisk: Partial<AssessmentRisk>): Promise<AssessmentRisk> {

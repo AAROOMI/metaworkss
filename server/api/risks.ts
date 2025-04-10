@@ -22,6 +22,21 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Get risk count
+router.get('/count', async (req: Request, res: Response) => {
+  try {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
+    const count = await storage.countRisks(companyId);
+    
+    res.json({ count });
+  } catch (error: any) {
+    console.error('Error counting risks:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get risk by ID
 router.get('/:id', async (req: Request, res: Response) => {
   try {

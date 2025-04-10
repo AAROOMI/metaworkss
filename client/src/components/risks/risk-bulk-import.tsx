@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, ChevronDownCircle, Database, FileText, Loader2, ShieldAlert, Upload } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface RiskBulkImportProps {
   companyId?: number;
@@ -33,6 +34,15 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Query to get current risk count
+  const { data: riskCountData } = useQuery({
+    queryKey: ['/api/risks/count', companyId],
+    queryFn: async () => {
+      const response = await fetch(`/api/risks/count${companyId ? `?companyId=${companyId}` : ''}`);
+      return response.json();
+    }
+  });
+  
   const importRisksMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/risks/import", {
@@ -48,6 +58,7 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
       });
       setImportResult(data);
       queryClient.invalidateQueries({ queryKey: ['/api/risks'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/risks/count'] });
       if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {
@@ -149,6 +160,7 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
         description: `Successfully imported ${data.count} IT and security risks.`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/risks'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/risks/count'] });
       if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {
@@ -220,10 +232,19 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Bulk Import Risks</CardTitle>
-        <CardDescription>
-          Import multiple risks at once using JSON format or a file upload
-        </CardDescription>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle>Bulk Import Risks</CardTitle>
+            <CardDescription>
+              Import multiple risks at once using JSON format or a file upload
+            </CardDescription>
+          </div>
+          {riskCountData && (
+            <Badge variant="outline" className="text-sm py-2">
+              Current Risks: {riskCountData.count}
+            </Badge>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {importResult ? (
