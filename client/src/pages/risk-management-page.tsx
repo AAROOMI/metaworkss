@@ -6,9 +6,13 @@ import {
   ChevronDown, 
   Clock, 
   Filter, 
+  HelpCircle,
+  Info,
   Plus, 
   RefreshCw, 
-  Upload
+  Search,
+  Upload,
+  XCircle
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/use-auth";
@@ -20,6 +24,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -46,6 +51,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -213,45 +224,87 @@ export default function RiskManagementPage() {
                 <CardDescription>View and manage all identified risks</CardDescription>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Input 
-                  placeholder="Search risks..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-xs"
-                />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Filter className="h-4 w-4" />
+                <div className="relative flex-1 max-w-xs">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search risks..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                  {searchTerm && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="absolute right-0 top-0 h-full px-3"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      <XCircle className="h-4 w-4" />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Filter By</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem onClick={() => setActiveTab("all")}>
-                        All Risks
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setActiveTab("high")}>
-                        <span className="text-destructive font-medium mr-2">●</span>
-                        High Risks
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setActiveTab("medium")}>
-                        <span className="text-amber-500 font-medium mr-2">●</span>
-                        Medium Risks
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setActiveTab("low")}>
-                        <span className="text-green-500 font-medium mr-2">●</span>
-                        Low Risks
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setActiveTab("accepted")}>
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Accepted Risks
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  )}
+                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Filter className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Filter By</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem onClick={() => setActiveTab("all")}>
+                              All Risks
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setActiveTab("high")}>
+                              <span className="text-destructive font-medium mr-2">●</span>
+                              High Risks
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setActiveTab("medium")}>
+                              <span className="text-amber-500 font-medium mr-2">●</span>
+                              Medium Risks
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setActiveTab("low")}>
+                              <span className="text-green-500 font-medium mr-2">●</span>
+                              Low Risks
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => setActiveTab("accepted")}>
+                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                              Accepted Risks
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Filter risks by category</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          setSearchTerm("");
+                          setActiveTab("all");
+                          refetch();
+                        }}
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Reset filters and refresh</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
           </CardHeader>
@@ -314,38 +367,134 @@ export default function RiskManagementPage() {
                             onClick={() => handleRiskClick(risk)}
                           >
                             <TableCell>
-                              <div className="font-medium">{risk.title}</div>
-                              <div className="text-sm text-muted-foreground truncate max-w-[250px]">
-                                {risk.description}
-                              </div>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="cursor-help">
+                                      <div className="font-medium">{risk.title}</div>
+                                      <div className="text-sm text-muted-foreground truncate max-w-[250px]">
+                                        {risk.description}
+                                      </div>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-md">
+                                    <div className="space-y-2">
+                                      <p className="font-bold">{risk.title}</p>
+                                      <p>{risk.description}</p>
+                                      {risk.cause && (
+                                        <div>
+                                          <span className="font-semibold">Cause: </span>
+                                          <span>{risk.cause}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </TableCell>
                             <TableCell>
-                              <Badge variant="outline">{risk.category}</Badge>
-                            </TableCell>
-                            <TableCell>{risk.likelihood}</TableCell>
-                            <TableCell>{risk.impact}</TableCell>
-                            <TableCell>
-                              <span className={cn("font-semibold", riskLevelColor(risk.inherentRiskLevel))}>
-                                {risk.inherentRiskLevel}
-                              </span>
+                              <Badge variant="outline" className="whitespace-nowrap">{risk.category}</Badge>
                             </TableCell>
                             <TableCell>
-                              <span className={cn("font-semibold", riskLevelColor(risk.residualRiskLevel))}>
-                                {risk.residualRiskLevel || 'Not assessed'}
-                              </span>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger className="cursor-help">
+                                    {risk.likelihood}
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Likelihood of this risk occurring</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </TableCell>
                             <TableCell>
-                              {risk.isAccepted ? (
-                                <Badge variant="outline" className="border-green-500 text-green-500">
-                                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                                  Accepted
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  Open
-                                </Badge>
-                              )}
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger className="cursor-help">
+                                    {risk.impact}
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Potential impact if this risk materializes</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                            <TableCell>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger className="cursor-help">
+                                    <span className={cn("font-semibold rounded-full px-2 py-1", {
+                                      "bg-red-100 dark:bg-red-950 text-destructive": risk.inherentRiskLevel === "High",
+                                      "bg-amber-100 dark:bg-amber-950 text-amber-500": risk.inherentRiskLevel === "Medium",
+                                      "bg-green-100 dark:bg-green-950 text-green-500": risk.inherentRiskLevel === "Low"
+                                    })}>
+                                      {risk.inherentRiskLevel}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Inherent risk before controls are applied</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                            <TableCell>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger className="cursor-help">
+                                    <span className={cn("font-semibold rounded-full px-2 py-1", {
+                                      "bg-red-100 dark:bg-red-950 text-destructive": risk.residualRiskLevel === "High",
+                                      "bg-amber-100 dark:bg-amber-950 text-amber-500": risk.residualRiskLevel === "Medium",
+                                      "bg-green-100 dark:bg-green-950 text-green-500": risk.residualRiskLevel === "Low",
+                                      "bg-gray-100 dark:bg-gray-800 text-gray-500": !risk.residualRiskLevel
+                                    })}>
+                                      {risk.residualRiskLevel || 'Not assessed'}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Remaining risk after controls are applied</p>
+                                    {risk.existingControls && (
+                                      <div className="mt-2">
+                                        <span className="font-semibold">Controls: </span>
+                                        <span>{risk.existingControls}</span>
+                                      </div>
+                                    )}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                            <TableCell>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    {risk.isAccepted ? (
+                                      <Badge variant="outline" className="border-green-500 text-green-500">
+                                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                                        Accepted
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline">
+                                        <Clock className="h-3 w-3 mr-1" />
+                                        Open
+                                      </Badge>
+                                    )}
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {risk.isAccepted ? (
+                                      <p>Risk has been officially accepted by management</p>
+                                    ) : (
+                                      <>
+                                        <p>Risk requires mitigation action</p>
+                                        {risk.mitigationActions && (
+                                          <div className="mt-2">
+                                            <span className="font-semibold">Action plan: </span>
+                                            <span>{risk.mitigationActions}</span>
+                                          </div>
+                                        )}
+                                      </>
+                                    )}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </TableCell>
                           </TableRow>
                         ))
