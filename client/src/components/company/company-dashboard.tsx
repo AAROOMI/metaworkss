@@ -144,11 +144,23 @@ export default function CompanyDashboard() {
   // Upload company logo mutation
   const uploadLogoMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Create formData properly
       const formData = new FormData();
       formData.append('logo', file);
-      const res = await apiRequest('POST', '/api/upload/logo', formData, 
-        { isFormData: true });
-      return await res.json();
+      
+      // Manual fetch implementation for FormData upload instead of using apiRequest
+      const response = await fetch('/api/upload/logo', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || 'Failed to upload logo');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/company'] });
@@ -169,10 +181,23 @@ export default function CompanyDashboard() {
   // Upload company document mutation
   const uploadDocumentMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Create formData properly
       const formData = new FormData();
       formData.append('document', file);
-      const res = await apiRequest('POST', '/api/company/documents', formData, { isFormData: true });
-      return await res.json();
+      
+      // Manual fetch implementation for FormData upload
+      const response = await fetch('/api/upload/document', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || 'Failed to upload document');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/company/documents'] });
