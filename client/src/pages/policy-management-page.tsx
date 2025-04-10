@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ArrowLeft, FileText, Plus, Download, Filter, Settings, Calendar, Clock, Check, X, Pencil, Trash2, Upload, Loader2, AlertCircle } from "lucide-react";
+import { DirectFileUploader } from "@/components/common/direct-file-uploader";
 import { Policy } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -262,12 +263,21 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
       
       <div className="space-y-2">
         <Label htmlFor="document">Upload Policy Document</Label>
-        <Input 
-          id="document" 
-          type="file" 
-          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
-          onChange={handleFileChange}
-          className="cursor-pointer"
+        <DirectFileUploader
+          endpoint="/api/upload/document"
+          fieldName="document"
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          buttonText="Upload Policy Document"
+          onFileUploaded={(fileId, filename, url) => {
+            // Store file info to be submitted with form
+            setFile(null);
+            // Update policy with file information
+            createPolicyMutation.mutate({ 
+              ...formState,
+              fileId: fileId,
+              documentUrl: url
+            });
+          }}
         />
         <p className="text-xs text-muted-foreground mt-1">
           Supported file types: PDF, DOCX (Max size: 10MB)

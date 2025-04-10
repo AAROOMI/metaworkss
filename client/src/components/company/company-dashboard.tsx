@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { FileUploader } from '@/components/upload/file-uploader';
+import { DirectFileUploader } from '@/components/common/direct-file-uploader';
 import { Building2, FileText, Upload, Image, Download, FileIcon, Trash2, Save, Edit, X, Check } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -332,11 +333,19 @@ export default function CompanyDashboard() {
                     </div>
                   )}
                   
-                  <FileUploader 
-                    onFileSelect={handleLogoUpload}
+                  <DirectFileUploader
+                    endpoint="/api/upload/logo"
+                    fieldName="logo"
                     accept="image/*"
                     buttonText="Upload Logo"
-                    isLoading={uploadLogoMutation.isPending}
+                    onFileUploaded={(fileId, filename, url) => {
+                      // Update company info with the uploaded logo info
+                      queryClient.invalidateQueries({ queryKey: ['/api/company'] });
+                      toast({
+                        title: "Logo uploaded",
+                        description: "Your company logo has been uploaded successfully."
+                      });
+                    }}
                   />
                   
                   {companyInfo?.logoId && (
@@ -586,11 +595,19 @@ export default function CompanyDashboard() {
                     Upload important documents related to your company for compliance purposes.
                   </p>
                   
-                  <FileUploader 
-                    onFileSelect={handleDocumentUpload}
+                  <DirectFileUploader
+                    endpoint="/api/upload/document"
+                    fieldName="document"
                     accept=".pdf,.doc,.docx"
                     buttonText="Upload Document"
-                    isLoading={uploadDocumentMutation.isPending}
+                    onFileUploaded={(fileId, filename, url) => {
+                      // Update documents list
+                      queryClient.invalidateQueries({ queryKey: ['/api/company/documents'] });
+                      toast({
+                        title: "Document uploaded",
+                        description: "Your document has been uploaded successfully."
+                      });
+                    }}
                   />
                 </div>
                 
