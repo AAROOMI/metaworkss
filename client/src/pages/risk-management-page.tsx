@@ -63,10 +63,12 @@ export default function RiskManagementPage() {
                 <Settings className="h-4 w-4" />
                 <span>Configure</span>
               </Button>
-              <Button size="sm" className="flex items-center gap-1">
-                <Plus className="h-4 w-4" />
-                <span>New Assessment</span>
-              </Button>
+              <Link href="/risk-assessment">
+                <Button size="sm" className="flex items-center gap-1">
+                  <Plus className="h-4 w-4" />
+                  <span>New Assessment</span>
+                </Button>
+              </Link>
             </div>
           </div>
           
