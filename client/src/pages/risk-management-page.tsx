@@ -170,50 +170,174 @@ export default function RiskManagementPage() {
           }
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-card/50 backdrop-blur">
-            <CardHeader className="py-4">
-              <CardTitle className="text-xl">Total Risks</CardTitle>
+            <CardHeader className="py-3">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full">
+                  <AlertCircle className="h-5 w-5 text-muted-foreground" />
+                </div>
+                Total Risks
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-3">
               <div className="text-4xl font-bold">
                 {isLoading ? <Skeleton className="h-10 w-16" /> : totalRisks}
               </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {totalRisks === 0 ? "No risks identified yet" : 
+                `${acceptedRisks} accepted, ${totalRisks - acceptedRisks} open`}
+              </p>
             </CardContent>
+            {!isLoading && (
+              <CardFooter className="pt-0 pb-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-sm px-0 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsCreateDialogOpen(true)}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Add new risk
+                </Button>
+              </CardFooter>
+            )}
           </Card>
           
-          <Card className="bg-card/50 backdrop-blur">
-            <CardHeader className="py-4">
-              <CardTitle className="text-xl text-destructive">High Risks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-destructive">
-                {isLoading ? <Skeleton className="h-10 w-16" /> : highRisks}
-              </div>
-            </CardContent>
-          </Card>
+          <TooltipProvider>
+            <Card className={cn("bg-card/50 backdrop-blur border", {
+              "border-red-200 dark:border-red-800": highRisks > 0,
+              "border": highRisks === 0
+            })}>
+              <CardHeader className="py-3">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <div className="p-2 bg-red-100 dark:bg-red-950 rounded-full">
+                    <AlertCircle className="h-5 w-5 text-destructive" />
+                  </div>
+                  High Risks
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pb-3">
+                <div className="text-4xl font-bold text-destructive">
+                  {isLoading ? <Skeleton className="h-10 w-16" /> : highRisks}
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-sm text-muted-foreground mt-1 cursor-help">
+                      {highRisks === 0 ? "No high risks identified" : 
+                      `${highRisks} high risk ${highRisks === 1 ? 'item requires' : 'items require'} immediate attention`}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="start">
+                    <p>High risks may cause severe impact to the organization and require immediate mitigation</p>
+                  </TooltipContent>
+                </Tooltip>
+              </CardContent>
+              {!isLoading && highRisks > 0 && (
+                <CardFooter className="pt-0 pb-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-sm px-0 text-destructive hover:text-destructive"
+                    onClick={() => setActiveTab("high")}
+                  >
+                    <Filter className="h-3.5 w-3.5 mr-1" />
+                    View high risks
+                  </Button>
+                </CardFooter>
+              )}
+            </Card>
+          </TooltipProvider>
           
-          <Card className="bg-card/50 backdrop-blur">
-            <CardHeader className="py-4">
-              <CardTitle className="text-xl text-amber-500">Medium Risks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-amber-500">
-                {isLoading ? <Skeleton className="h-10 w-16" /> : mediumRisks}
-              </div>
-            </CardContent>
-          </Card>
+          <TooltipProvider>
+            <Card className={cn("bg-card/50 backdrop-blur border", {
+              "border-amber-200 dark:border-amber-800": mediumRisks > 0,
+              "border": mediumRisks === 0
+            })}>
+              <CardHeader className="py-3">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <div className="p-2 bg-amber-100 dark:bg-amber-950 rounded-full">
+                    <AlertCircle className="h-5 w-5 text-amber-500" />
+                  </div>
+                  Medium Risks
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pb-3">
+                <div className="text-4xl font-bold text-amber-500">
+                  {isLoading ? <Skeleton className="h-10 w-16" /> : mediumRisks}
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-sm text-muted-foreground mt-1 cursor-help">
+                      {mediumRisks === 0 ? "No medium risks identified" : 
+                      `${mediumRisks} medium risk ${mediumRisks === 1 ? 'item needs' : 'items need'} attention`}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="start">
+                    <p>Medium risks have moderate impact and should be addressed with planned controls</p>
+                  </TooltipContent>
+                </Tooltip>
+              </CardContent>
+              {!isLoading && mediumRisks > 0 && (
+                <CardFooter className="pt-0 pb-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-sm px-0 text-amber-500 hover:text-amber-600"
+                    onClick={() => setActiveTab("medium")}
+                  >
+                    <Filter className="h-3.5 w-3.5 mr-1" />
+                    View medium risks
+                  </Button>
+                </CardFooter>
+              )}
+            </Card>
+          </TooltipProvider>
           
-          <Card className="bg-card/50 backdrop-blur">
-            <CardHeader className="py-4">
-              <CardTitle className="text-xl text-green-500">Low Risks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-green-500">
-                {isLoading ? <Skeleton className="h-10 w-16" /> : lowRisks}
-              </div>
-            </CardContent>
-          </Card>
+          <TooltipProvider>
+            <Card className={cn("bg-card/50 backdrop-blur border", {
+              "border-green-200 dark:border-green-800": lowRisks > 0,
+              "border": lowRisks === 0
+            })}>
+              <CardHeader className="py-3">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <div className="p-2 bg-green-100 dark:bg-green-950 rounded-full">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  </div>
+                  Low Risks
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pb-3">
+                <div className="text-4xl font-bold text-green-500">
+                  {isLoading ? <Skeleton className="h-10 w-16" /> : lowRisks}
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-sm text-muted-foreground mt-1 cursor-help">
+                      {lowRisks === 0 ? "No low risks identified" : 
+                      `${lowRisks} low risk ${lowRisks === 1 ? 'item' : 'items'} with minimal impact`}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="start">
+                    <p>Low risks have minimal impact and can be addressed through routine procedures</p>
+                  </TooltipContent>
+                </Tooltip>
+              </CardContent>
+              {!isLoading && lowRisks > 0 && (
+                <CardFooter className="pt-0 pb-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-sm px-0 text-green-500 hover:text-green-600"
+                    onClick={() => setActiveTab("low")}
+                  >
+                    <Filter className="h-3.5 w-3.5 mr-1" />
+                    View low risks
+                  </Button>
+                </CardFooter>
+              )}
+            </Card>
+          </TooltipProvider>
         </div>
         
         <Card className="flex-1 bg-card/50 backdrop-blur">
@@ -355,8 +479,62 @@ export default function RiskManagementPage() {
                         </TableRow>
                       ) : filteredRisks?.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={7} className="text-center py-8">
-                            <p className="text-muted-foreground">No risks found.</p>
+                          <TableCell colSpan={7} className="text-center py-12">
+                            <div className="max-w-md mx-auto space-y-4">
+                              {risks?.length === 0 ? (
+                                <>
+                                  <div className="flex justify-center">
+                                    <div className="p-4 bg-muted rounded-full">
+                                      <AlertCircle className="h-10 w-10 text-muted-foreground" />
+                                    </div>
+                                  </div>
+                                  <h3 className="text-lg font-medium">No risks in your register yet</h3>
+                                  <p className="text-muted-foreground">
+                                    Begin by adding risks to your register to track and manage your cybersecurity risk exposure.
+                                  </p>
+                                  <div className="flex justify-center pt-4">
+                                    <Button onClick={() => setIsCreateDialogOpen(true)}>
+                                      <Plus className="h-4 w-4 mr-2" />
+                                      Add Your First Risk
+                                    </Button>
+                                  </div>
+                                  <div className="pt-2">
+                                    <Button 
+                                      variant="outline" 
+                                      onClick={() => setIsImportDialogOpen(true)}
+                                      className="text-sm"
+                                    >
+                                      <Upload className="h-4 w-4 mr-2" />
+                                      Or Import Risks in Bulk
+                                    </Button>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="flex justify-center">
+                                    <div className="p-4 bg-muted rounded-full">
+                                      <Search className="h-8 w-8 text-muted-foreground" />
+                                    </div>
+                                  </div>
+                                  <h3 className="text-lg font-medium">No matching risks found</h3>
+                                  <p className="text-muted-foreground">
+                                    Try adjusting your search or filter criteria to find what you're looking for.
+                                  </p>
+                                  <div className="flex justify-center pt-2">
+                                    <Button 
+                                      variant="outline"
+                                      onClick={() => {
+                                        setSearchTerm("");
+                                        setActiveTab("all");
+                                      }}
+                                    >
+                                      <RefreshCw className="h-4 w-4 mr-2" />
+                                      Reset Filters
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ) : (
