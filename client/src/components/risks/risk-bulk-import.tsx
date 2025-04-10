@@ -137,6 +137,33 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
     setImportResult(null);
   };
   
+  // Mutation for running the server-side import script
+  const importSaudiCeramicsRisksMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/risks/import-saudi-ceramics", { companyId });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Saudi Ceramics Risks Imported",
+        description: `Successfully imported ${data.count} IT and security risks.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/risks'] });
+      if (onSuccess) onSuccess();
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Import Failed",
+        description: error.message || "Failed to import Saudi Ceramics risks.",
+      });
+    },
+  });
+  
+  const handleSaudiCeramicsImport = () => {
+    importSaudiCeramicsRisksMutation.mutate();
+  };
+  
   const preloadSampleData = () => {
     // Sample data structure for the first few risks from the dataset
     const sampleData = [
@@ -232,26 +259,117 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
             </Button>
           </div>
         ) : (
-          <Tabs defaultValue="json">
-            <TabsList className="w-full mb-4">
-              <TabsTrigger value="json" className="flex-1">JSON Input</TabsTrigger>
-              <TabsTrigger value="file" className="flex-1">File Upload</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="json" className="space-y-4">
-              <Textarea 
-                value={jsonData}
-                onChange={(e) => setJsonData(e.target.value)}
-                placeholder="Paste JSON array of risk objects here..."
-                className="min-h-[300px] font-mono text-xs"
-              />
-              <div className="flex justify-between">
-                <Button onClick={preloadSampleData} variant="outline" size="sm">
-                  Load Sample Data
-                </Button>
+          <>
+            {/* Saudi Ceramics Risk Register Import Card */}
+            <div className="mb-6 p-4 border rounded-lg bg-black/5 dark:bg-white/5 backdrop-blur-sm">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/10 text-primary">
+                  <Database className="h-7 w-7" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-medium">Saudi Ceramics IT Risk Register</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Import a comprehensive set of 47 IT &amp; security risks pre-categorized and assessed
+                  </p>
+                </div>
                 <Button 
-                  onClick={handleJsonImport}
-                  disabled={!jsonData || importRisksMutation.isPending}
+                  className="bg-primary" 
+                  onClick={handleSaudiCeramicsImport} 
+                  disabled={importSaudiCeramicsRisksMutation.isPending}
+                >
+                  {importSaudiCeramicsRisksMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Importing...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldAlert className="mr-2 h-4 w-4" />
+                      Import All Risks
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              <div className="mt-3 pl-14">
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                    <span>Strategic: 12</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                    <span>Operational: 32</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span>Compliance: 3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <Separator className="my-6" />
+            
+            <p className="text-sm text-muted-foreground mb-4">
+              Alternatively, you can manually import risks using one of the following methods:
+            </p>
+          
+            <Tabs defaultValue="json">
+              <TabsList className="w-full mb-4">
+                <TabsTrigger value="json" className="flex-1">JSON Input</TabsTrigger>
+                <TabsTrigger value="file" className="flex-1">File Upload</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="json" className="space-y-4">
+                <Textarea 
+                  value={jsonData}
+                  onChange={(e) => setJsonData(e.target.value)}
+                  placeholder="Paste JSON array of risk objects here..."
+                  className="min-h-[300px] font-mono text-xs"
+                />
+                <div className="flex justify-between">
+                  <Button onClick={preloadSampleData} variant="outline" size="sm">
+                    Load Sample Data
+                  </Button>
+                  <Button 
+                    onClick={handleJsonImport}
+                    disabled={!jsonData || importRisksMutation.isPending}
+                  >
+                    {importRisksMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Importing...
+                      </>
+                    ) : (
+                      'Import Risks'
+                    )}
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="file" className="space-y-4">
+                <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center min-h-[200px]">
+                  <Upload className="h-10 w-10 text-muted-foreground mb-4" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Upload a JSON file containing an array of risk objects
+                  </p>
+                  <input 
+                    type="file" 
+                    accept=".json"
+                    onChange={handleFileChange}
+                    className="text-sm"
+                  />
+                  {fileData && (
+                    <p className="text-sm mt-2">
+                      Selected file: {fileData.name}
+                    </p>
+                  )}
+                </div>
+                <Button 
+                  onClick={handleFileUpload} 
+                  disabled={!fileData || importRisksMutation.isPending}
+                  className="w-full"
                 >
                   {importRisksMutation.isPending ? (
                     <>
@@ -259,46 +377,12 @@ export default function RiskBulkImport({ companyId, onSuccess }: RiskBulkImportP
                       Importing...
                     </>
                   ) : (
-                    'Import Risks'
+                    'Upload and Import'
                   )}
                 </Button>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="file" className="space-y-4">
-              <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center min-h-[200px]">
-                <Upload className="h-10 w-10 text-muted-foreground mb-4" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Upload a JSON file containing an array of risk objects
-                </p>
-                <input 
-                  type="file" 
-                  accept=".json"
-                  onChange={handleFileChange}
-                  className="text-sm"
-                />
-                {fileData && (
-                  <p className="text-sm mt-2">
-                    Selected file: {fileData.name}
-                  </p>
-                )}
-              </div>
-              <Button 
-                onClick={handleFileUpload} 
-                disabled={!fileData || importRisksMutation.isPending}
-                className="w-full"
-              >
-                {importRisksMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Importing...
-                  </>
-                ) : (
-                  'Upload and Import'
-                )}
-              </Button>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </>
         )}
       </CardContent>
       <CardFooter className="flex flex-col items-start">
