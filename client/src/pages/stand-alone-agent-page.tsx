@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Helmet } from "react-helmet-async";
 import { Sparkles, BookOpen, Shield, FileCheck } from "lucide-react";
 
-export default function DIDAgentPage() {
+export default function StandAloneAgentPage() {
   return (
     <>
       <Helmet>
@@ -28,12 +28,18 @@ export default function DIDAgentPage() {
             {/* Agent Column */}
             <div className="lg:col-span-2 space-y-4">
               <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border p-8 h-[600px] flex flex-col items-center justify-center text-center">
-                <iframe
-                  src="/clickable-agent.html" 
-                  className="w-full h-full rounded-lg overflow-hidden"
-                  title="MetaWorks Virtual Security Assistant"
-                  frameBorder="0"
-                />
+                <a 
+                  href="/luxeria-approach.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-md font-medium flex items-center gap-2"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Launch Virtual Assistant
+                </a>
+                <p className="text-xs text-muted-foreground mt-4">
+                  Opens in a dedicated window for optimal performance
+                </p>
               </div>
             </div>
             
