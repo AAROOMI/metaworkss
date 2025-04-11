@@ -162,9 +162,25 @@ const DynamicAgent = ({ height = '500px', width = '100%', className = '' }: Dyna
             <AlertTitle>Failed to load virtual consultant</AlertTitle>
             <AlertDescription>{errorMessage || 'An unknown error occurred'}</AlertDescription>
           </Alert>
-          <Button onClick={handleRetry}>Retry</Button>
-          <p className="text-xs text-muted-foreground mt-4">
-            Alternatively, try the <a href="/frame-agent-page" className="underline">other agent implementations</a>
+          <div className="flex gap-2 mb-4">
+            <Button onClick={handleRetry} variant="default">Retry</Button>
+            <Button onClick={() => window.location.href = '/integrated-agent'} variant="outline">
+              Try Integrated Version
+            </Button>
+          </div>
+          <Alert className="mb-4 max-w-md">
+            <AlertTitle className="text-sm font-medium">Troubleshooting Tips</AlertTitle>
+            <AlertDescription className="text-xs">
+              <ul className="list-disc pl-4 space-y-1 mt-2">
+                <li>Check if your browser supports modern JavaScript features</li>
+                <li>Ensure you have a stable internet connection</li>
+                <li>Try disabling browser extensions that might block scripts</li>
+                <li>Try a different browser (Chrome or Edge recommended)</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+          <p className="text-xs text-muted-foreground mt-2">
+            Still having issues? Try our <a href="/frame-agent" className="underline">alternative implementations</a>
           </p>
         </div>
       )}
