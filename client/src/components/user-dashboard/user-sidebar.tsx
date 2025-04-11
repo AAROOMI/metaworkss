@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   HelpCircle,
   Settings,
-  GraduationCap
+  GraduationCap,
+  Headphones
 } from "lucide-react";
 
 // Type for sidebar items
@@ -171,12 +172,25 @@ export default function UserSidebar() {
             </div>
           </div>
           
-          {/* Virtual Assistant Link */}
-          <div className="px-2 mt-6">
+          {/* AI Assistance Section */}
+          <div className="mt-6 px-2 space-y-3">
+            <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              AI Assistance
+            </h3>
+            
+            {/* Virtual Assistant Link */}
             <Link href="/did-agent">
-              <Button variant="default" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start">
                 <Shield className="mr-2 h-4 w-4" />
                 Virtual Assistant
+              </Button>
+            </Link>
+            
+            {/* MetaWorks Consultant - Full screen D-ID agent */}
+            <Link href="/consultant">
+              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
+                <Headphones className="mr-2 h-4 w-4" />
+                MetaWorks Consultant
               </Button>
             </Link>
           </div>
