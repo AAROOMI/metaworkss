@@ -35,31 +35,42 @@ export default function DIDAgentPage() {
               
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                 <a 
-                  href="/standalone-agent.html" 
+                  href="/exact-agent.html" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-1 px-3 py-2 bg-primary/10 rounded-md"
+                  className="text-primary hover:underline flex items-center gap-1 px-3 py-2 font-semibold border border-primary rounded-md"
                 >
                   <Sparkles className="h-4 w-4" />
-                  Minimal agent (recommended)
+                  Launch Virtual Assistant
                 </a>
-                <a 
-                  href="/direct-agent.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-1 px-3 py-2 bg-primary/10 rounded-md"
-                >
-                  <Shield className="h-4 w-4" />
-                  Styled agent
-                </a>
-                <a 
-                  href="/did-agent.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary hover:underline flex items-center gap-1"
-                >
-                  Advanced iframe version
-                </a>
+                <div className="w-full flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground mt-2">
+                  <a 
+                    href="/standalone-agent.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-primary hover:underline"
+                  >
+                    Alternative version 1
+                  </a>
+                  <span>•</span>
+                  <a 
+                    href="/direct-agent.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-primary hover:underline"
+                  >
+                    Alternative version 2
+                  </a>
+                  <span>•</span>
+                  <a 
+                    href="/did-agent.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-primary hover:underline"
+                  >
+                    Advanced version
+                  </a>
+                </div>
               </div>
             </div>
             
