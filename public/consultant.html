@@ -5,52 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MetaWorks Security Consultant</title>
     <style>
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            background-color: #121212;
-        }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 8px 16px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-        }
-        .back-button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        iframe {
-            border: none;
-            width: 100%;
             height: 100%;
+            width: 100%;
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .title {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .subtitle {
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .agent-container {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+        
+        .loading {
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(15, 23, 42, 0.7);
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .back-button {
+            margin-top: 20px;
+            background: #4338ca;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-button:hover {
+            background: #4f46e5;
         }
     </style>
 </head>
 <body>
-    <button class="back-button" onclick="window.history.back()">
-        ← Back to Dashboard
-    </button>
-
-    <!-- D-ID Agent Share Link - embedded as iframe -->
-    <iframe 
-        src="https://studio.d-id.com/agents/share?id=agt_YjpQXzSG&utm_source=copy&key=WjI5dloyeGxMVzloZFhSb01ud3hNRGM1TWpNME5qWTNORFkxTURVeU1UTTJPVEU2V0hKdlJGRlNZbkJITW5nMlNYSkdSRGxJY2paRA==" 
-        allowfullscreen>
-    </iframe>
+    <div class="container">
+        <div class="title">MetaWorks Virtual Security Consultant</div>
+        <div class="subtitle">Ask me anything about cybersecurity compliance, risk management, or policy questions.</div>
+        
+        <div class="agent-container" id="did-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+            
+            <div class="overlay">Powered by MetaWorks AI</div>
+        </div>
+        
+        <a href="/" class="back-button">Back to Dashboard</a>
+    </div>
+    
+    <!-- D-ID Agent Script with your provided key -->
+    <script
+        type="module"
+        src="https://agent.d-id.com/v1/index.js"
+        data-name="did-agent"
+        data-mode="fabio"
+        data-client-key="YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw=="
+        data-agent-id="agt_mNHiVcSw"
+        data-monitor="true">
+    </script>
+    
+    <script>
+        console.log("D-ID Agent page loaded");
+        
+        // Hide loading spinner after agent loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Give D-ID agent some time to initialize
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 5000);
+        });
+    </script>
 </body>
 </html>

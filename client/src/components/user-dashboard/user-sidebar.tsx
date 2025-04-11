@@ -180,10 +180,12 @@ export default function UserSidebar() {
             </h3>
             
             {/* Single Consultant Button */}
-            <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
-              <User className="mr-2 h-4 w-4" />
-              Consultant
-            </Button>
+            <a href="/consultant.html" target="_blank" rel="noopener noreferrer">
+              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
+                <User className="mr-2 h-4 w-4" />
+                Consultant
+              </Button>
+            </a>
           </div>
         </div>
       </ScrollArea>
