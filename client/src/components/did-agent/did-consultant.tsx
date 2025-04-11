@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Headphones, RefreshCw } from 'lucide-react';
+import { Shield, RefreshCw } from 'lucide-react';
 
 interface DIDConsultantProps {
   className?: string;
@@ -14,9 +14,9 @@ interface DIDConsultantProps {
 /**
  * DID Consultant Component
  * 
- * This component provides a direct integration with D-ID's agent system
- * without using iframes or redirects - it loads the D-ID agent directly
- * in the DOM using their official client-side script.
+ * This component provides integration with D-ID's agent system
+ * using our backend proxy to avoid CORS issues when accessing
+ * their API directly.
  */
 const DIDConsultant: React.FC<DIDConsultantProps> = ({
   className = '',
@@ -26,9 +26,11 @@ const DIDConsultant: React.FC<DIDConsultantProps> = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [agentConfig, setAgentConfig] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const didAgentRef = useRef<HTMLDivElement>(null);
   const scriptRef = useRef<HTMLScriptElement | null>(null);
+  const agentLoadedRef = useRef<boolean>(false);
 
   // Clean up function - remove any D-ID scripts when component unmounts
   useEffect(() => {
@@ -40,51 +42,77 @@ const DIDConsultant: React.FC<DIDConsultantProps> = ({
     };
   }, []);
 
-  const loadDIDAgent = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fetch the configuration from our secure API
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/did/config');
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const config = await response.json();
+        if (!config.scriptUrl || !config.agentConfig) {
+          throw new Error('Invalid configuration received from server');
+        }
+        
+        setAgentConfig(config);
+        loadScript(config.scriptUrl, config.agentConfig);
+      } catch (err: any) {
+        console.error('Error getting D-ID config:', err);
+        setError(err.message || 'Failed to get configuration');
+        setLoading(false);
+        toast({
+          title: 'Configuration Error',
+          description: 'Failed to get D-ID configuration. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    }
+    
+    fetchConfig();
+  }, []);
 
+  // Load the D-ID script with the configuration
+  const loadScript = (scriptUrl: string, config: any) => {
+    try {
       // Remove any existing script
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
         document.body.removeChild(scriptRef.current);
         scriptRef.current = null;
       }
 
-      // Fetch the credentials from our secure API
-      const response = await fetch('/api/did/credentials');
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const { agentId, clientKey } = await response.json();
-      if (!agentId || !clientKey) {
-        throw new Error('Missing D-ID credentials');
-      }
-
-      // Create the script element with proper attributes
+      // Create the script element
       const script = document.createElement('script');
       script.type = 'module';
-      script.src = 'https://agent.d-id.com/v1/index.js';
+      script.src = scriptUrl;
       
-      // Set required attributes
+      // Set all configuration attributes
       script.setAttribute('data-name', 'did-agent');
       script.setAttribute('data-target', '#did-agent-container');
-      script.setAttribute('data-mode', 'fabio');
-      script.setAttribute('data-client-key', clientKey);
-      script.setAttribute('data-agent-id', agentId);
-      script.setAttribute('data-monitor', 'true');
       
-      // Handle success
+      // Apply all config properties from the server
+      Object.entries(config).forEach(([key, value]) => {
+        if (typeof value === 'boolean') {
+          script.setAttribute(`data-${key}`, value ? 'true' : 'false');
+        } else {
+          script.setAttribute(`data-${key}`, String(value));
+        }
+      });
+      
+      // Handle script events
       script.onload = () => {
         console.log('D-ID Agent script loaded successfully');
+        agentLoadedRef.current = true;
         setLoading(false);
       };
       
-      // Handle errors
       script.onerror = (e) => {
         console.error('Error loading D-ID Agent script:', e);
-        setError('Failed to load the virtual consultant. Please try again.');
+        setError('Failed to load the virtual consultant script. Please try again.');
         setLoading(false);
       };
 
@@ -92,24 +120,22 @@ const DIDConsultant: React.FC<DIDConsultantProps> = ({
       scriptRef.current = script;
       document.body.appendChild(script);
     } catch (err: any) {
-      console.error('Error initializing D-ID agent:', err);
-      setError(err.message || 'Failed to load the virtual consultant');
+      console.error('Error setting up D-ID agent:', err);
+      setError(err.message || 'Failed to initialize the virtual consultant');
       setLoading(false);
-      toast({
-        title: 'Error',
-        description: 'Failed to load the virtual consultant. Please try again.',
-        variant: 'destructive',
-      });
     }
   };
 
-  // Initial load
-  useEffect(() => {
-    loadDIDAgent();
-  }, []);
-
+  // Handle retry button click
   const handleRetry = () => {
-    loadDIDAgent();
+    if (agentConfig) {
+      setError(null);
+      setLoading(true);
+      loadScript(agentConfig.scriptUrl, agentConfig.agentConfig);
+    } else {
+      // If we don't have config yet, reload the page
+      window.location.reload();
+    }
   };
 
   return (
@@ -155,7 +181,7 @@ const DIDConsultant: React.FC<DIDConsultantProps> = ({
         <div 
           id="did-agent-container" 
           ref={didAgentRef}
-          className="w-full h-full"
+          className="w-full h-full bg-black/10"
         ></div>
       </CardContent>
     </Card>

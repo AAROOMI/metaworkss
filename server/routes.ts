@@ -44,13 +44,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Use our dedicated DID Agent router
   app.use(didAgentRouter);
   
-  // D-ID credentials endpoint
-  app.get("/api/did/credentials", (req, res) => {
-    res.json({
-      agentId: process.env.DID_AGENT_ID,
-      clientKey: process.env.DID_CLIENT_KEY
-    });
-  });
+  // Make sure our D-ID API endpoints are public
+  // We removed the direct credentials endpoint in favor of the proxy approach
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {

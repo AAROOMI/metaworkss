@@ -8,75 +8,110 @@ const DIDAgentFullscreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [agentConfig, setAgentConfig] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const agentContainerRef = useRef<HTMLDivElement>(null);
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
 
+  // Fetch configuration
   useEffect(() => {
-    const initializeAgent = async () => {
+    const fetchConfig = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch credentials from API
-        const response = await fetch('/api/did/credentials');
+        // Fetch configuration from API
+        const response = await fetch('/api/did/config');
         if (!response.ok) {
           throw new Error(`Server error: ${response.status}`);
         }
 
-        const data = await response.json();
-        if (!data.clientKey || !data.agentId) {
-          throw new Error('Missing D-ID credentials');
+        const config = await response.json();
+        if (!config.scriptUrl || !config.agentConfig) {
+          throw new Error('Invalid D-ID configuration');
         }
 
-        // Create script element with proper attributes
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        
-        // Set required attributes
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-target', '#agent-container');
-        script.setAttribute('data-mode', 'fabio');
-        script.setAttribute('data-client-key', data.clientKey);
-        script.setAttribute('data-agent-id', data.agentId);
-        script.setAttribute('data-monitor', 'true');
-        
-        // Handle success
-        script.onload = () => {
-          console.log('D-ID Agent script loaded successfully');
-          setLoading(false);
-        };
-        
-        // Handle errors
-        script.onerror = (e) => {
-          console.error('Error loading D-ID Agent script:', e);
-          setError('Failed to load the virtual consultant. Please try again.');
-          setLoading(false);
-        };
-
-        // Add script to document
-        document.body.appendChild(script);
-
-        // Clean up on unmount
-        return () => {
-          if (document.body.contains(script)) {
-            document.body.removeChild(script);
-          }
-        };
+        setAgentConfig(config);
+        loadScript(config.scriptUrl, config.agentConfig);
       } catch (err: any) {
-        console.error('Error initializing D-ID agent:', err);
-        setError(err.message || 'Failed to load the virtual consultant');
+        console.error('Error getting D-ID config:', err);
+        setError(err.message || 'Failed to get configuration');
         setLoading(false);
       }
     };
 
-    initializeAgent();
+    fetchConfig();
+    
+    // Clean up on unmount
+    return () => {
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
+        scriptRef.current = null;
+      }
+    };
   }, []);
 
-  const handleRetry = () => {
-    window.location.reload();
+  // Load script with configuration
+  const loadScript = (scriptUrl: string, config: any) => {
+    try {
+      // Remove any existing script
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
+        scriptRef.current = null;
+      }
+
+      // Create script element
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = scriptUrl;
+      
+      // Set target
+      script.setAttribute('data-name', 'did-agent');
+      script.setAttribute('data-target', '#agent-container');
+      
+      // Apply all config properties
+      Object.entries(config).forEach(([key, value]) => {
+        if (typeof value === 'boolean') {
+          script.setAttribute(`data-${key}`, value ? 'true' : 'false');
+        } else {
+          script.setAttribute(`data-${key}`, String(value));
+        }
+      });
+      
+      // Handle events
+      script.onload = () => {
+        console.log('D-ID Agent script loaded successfully');
+        setLoading(false);
+      };
+      
+      script.onerror = (e) => {
+        console.error('Error loading D-ID Agent script:', e);
+        setError('Failed to load the virtual consultant. Please try again.');
+        setLoading(false);
+      };
+
+      // Add to document
+      scriptRef.current = script;
+      document.body.appendChild(script);
+    } catch (err: any) {
+      console.error('Error setting up D-ID agent:', err);
+      setError(err.message || 'Failed to initialize the virtual consultant');
+      setLoading(false);
+    }
   };
 
+  // Handle retry button
+  const handleRetry = () => {
+    if (agentConfig) {
+      setError(null);
+      setLoading(true);
+      loadScript(agentConfig.scriptUrl, agentConfig.agentConfig);
+    } else {
+      window.location.reload();
+    }
+  };
+
+  // Fullscreen handling
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       containerRef.current?.requestFullscreen().catch(err => {
@@ -167,7 +202,7 @@ const DIDAgentFullscreen = () => {
         <div 
           id="agent-container" 
           ref={agentContainerRef}
-          className="w-full h-full"
+          className="w-full h-full bg-black/10"
         ></div>
       </div>
     </div>
