@@ -75,6 +75,7 @@ function Router() {
       <Route path="/agent" component={DIDAgentPage} />
       <Route path="/agent-test" component={AgentTestPage} />
       <Route path="/consultant" component={DIDAgentFullscreen} />
+      <Route path="/fullscreen-consultant" component={DIDAgentFullscreen} />
       <UserProtectedRoute path="/virtual-agent" component={VirtualAgentPage} />
       <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
       <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />

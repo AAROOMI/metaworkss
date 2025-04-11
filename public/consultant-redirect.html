@@ -3,23 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting to MetaWorks Consultant</title>
+  <title>MetaWorks Security Consultant</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #0f172a;
       color: white;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #loading-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      margin: 0;
-      padding: 20px;
       text-align: center;
-    }
-    .container {
-      max-width: 600px;
+      padding: 20px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100;
+      background-color: #0f172a;
+      transition: opacity 0.5s ease;
     }
     .spinner {
       width: 40px;
@@ -38,6 +48,7 @@
       font-size: 1.1rem;
       margin-bottom: 20px;
       opacity: 0.8;
+      max-width: 600px;
     }
     .link {
       display: inline-block;
@@ -54,48 +65,128 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
+    #agent-container {
+      width: 100%;
+      height: 100vh;
+      display: none;
+    }
+    .error-message {
+      color: #ff4d4d;
+      background-color: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 20px;
+      text-align: center;
+    }
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+    .fade-out {
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Launching MetaWorks Security Consultant</h1>
+  <div id="loading-container">
+    <h1>MetaWorks Security Consultant</h1>
     <div class="spinner"></div>
-    <p>You'll be redirected to our AI Security Consultant in a moment...</p>
-    
-    <p>If you're not redirected automatically, please click the button below:</p>
-    
-    <a class="link" href="#" id="manual-link">Launch Consultant</a>
+    <p>Loading your AI Security Consultant...</p>
+    <div id="error-box" style="display: none;"></div>
+    <a class="link" href="#" id="manual-link" style="display: none;">Open in New Window</a>
   </div>
 
+  <div id="agent-container"></div>
+
   <script>
-    // Fetch the D-ID share URL from our secure proxy
-    fetch('/api/did/share-url')
-      .then(response => response.json())
-      .then(data => {
-        console.log('Got share URL from proxy API');
-        const { shareUrl } = data;
-        
-        if (!shareUrl) {
-          document.querySelector('.container').innerHTML += '<p style="color: #ff4d4d;">Error: Missing D-ID share URL. Please contact administrator.</p>';
-          return;
-        }
-        
-        // Update the manual link
-        const manualLink = document.getElementById('manual-link');
-        manualLink.href = shareUrl;
-        
-        // Automatically redirect after a short delay
-        setTimeout(function() {
-          window.location.href = shareUrl;
-        }, 2000);
-      })
-      .catch(error => {
-        console.error('Error fetching D-ID share URL:', error);
-        document.querySelector('.container').innerHTML += '<p style="color: #ff4d4d;">Error connecting to server. Please try again later.</p>';
-      });
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingContainer = document.getElementById('loading-container');
+      const agentContainer = document.getElementById('agent-container');
+      const errorBox = document.getElementById('error-box');
+      const manualLink = document.getElementById('manual-link');
+
+      // Function to handle errors
+      function showError(message) {
+        errorBox.innerHTML = `
+          <div class="error-message">
+            ${message}
+            <br><br>
+            <button onclick="window.location.reload()" style="padding: 8px 16px; cursor: pointer; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 4px;">
+              Try Again
+            </button>
+          </div>
+        `;
+        errorBox.style.display = 'block';
+      }
+
+      // Get D-ID credentials from our secure API
+      fetch('/api/did/credentials')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server responded with error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (!data.clientKey || !data.agentId) {
+            throw new Error('Missing D-ID credentials from server');
+          }
+
+          // Also fetch the share URL as fallback
+          fetch('/api/did/share-url')
+            .then(res => res.json())
+            .then(urlData => {
+              if (urlData.shareUrl) {
+                manualLink.href = urlData.shareUrl;
+                manualLink.style.display = 'inline-block';
+              }
+            })
+            .catch(err => console.error('Error fetching share URL:', err));
+
+          // Create the D-ID agent script
+          const script = document.createElement('script');
+          script.type = 'module';
+          script.src = 'https://agent.d-id.com/v1/index.js';
+          script.setAttribute('data-name', 'did-agent');
+          script.setAttribute('data-target', '#agent-container');
+          script.setAttribute('data-mode', 'fabio');
+          script.setAttribute('data-client-key', data.clientKey);
+          script.setAttribute('data-agent-id', data.agentId);
+          script.setAttribute('data-monitor', 'true');
+          
+          // Handle successful load
+          script.onload = function() {
+            console.log('D-ID Agent script loaded successfully');
+            
+            // Show the agent container
+            agentContainer.style.display = 'block';
+            
+            // Hide the loading container with animation
+            setTimeout(() => {
+              loadingContainer.classList.add('fade-out');
+              
+              // Remove it from DOM after animation completes
+              setTimeout(() => {
+                loadingContainer.style.display = 'none';
+              }, 500);
+            }, 1000);
+          };
+          
+          // Handle errors
+          script.onerror = function(error) {
+            console.error('Error loading D-ID Agent script:', error);
+            showError('Failed to load the virtual consultant. Please try again or use the link below to open in a new window.');
+          };
+          
+          // Add the script to the document
+          document.body.appendChild(script);
+        })
+        .catch(error => {
+          console.error('Error initializing virtual consultant:', error);
+          showError(error.message || 'Failed to initialize the virtual consultant. Please try again later.');
+        });
+    });
   </script>
 </body>
 </html>

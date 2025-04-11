@@ -187,7 +187,7 @@ export default function UserSidebar() {
               </Button>
             </Link>
             
-            {/* MetaWorks Consultant - Redirect Page */}
+            {/* Direct D-ID Integration - External window */}
             <a href="/consultant-redirect.html" target="_blank" rel="noopener noreferrer">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
                 <Headphones className="mr-2 h-4 w-4" />
@@ -195,11 +195,19 @@ export default function UserSidebar() {
               </Button>
             </a>
             
-            {/* Embedded Virtual Agent */}
-            <Link href="/virtual-agent">
+            {/* Direct D-ID Integration - Embedded */}
+            <Link href="/did-agent">
+              <Button variant="secondary" className="w-full justify-start">
+                <User className="mr-2 h-4 w-4" />
+                Security Assistant
+              </Button>
+            </Link>
+            
+            {/* Full Screen D-ID Integration */}
+            <Link href="/fullscreen-consultant">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-blue-500 to-primary">
                 <User className="mr-2 h-4 w-4" />
-                Embedded Consultant
+                Fullscreen Consultant
               </Button>
             </Link>
           </div>

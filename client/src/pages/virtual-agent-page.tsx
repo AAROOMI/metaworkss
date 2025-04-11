@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
-import DirectAgent from '@/components/did-agent/direct-agent';
+import DIDConsultant from '@/components/did-agent/did-consultant';
 
 const VirtualAgentPage = () => {
   return (
@@ -25,9 +25,13 @@ const VirtualAgentPage = () => {
         </div>
       </div>
       
-      {/* Main Content - Use our new Direct Agent Component */}
+      {/* Main Content - Use our improved DID Consultant Component */}
       <div className="flex-1 overflow-hidden p-4">
-        <DirectAgent fullPage={true} />
+        <DIDConsultant 
+          fullscreen={true}
+          title="Full-Featured Security Consultant" 
+          description="Your personal AI-powered security advisor, ready to help with compliance, risk assessment, and best practices."
+        />
       </div>
     </div>
   );

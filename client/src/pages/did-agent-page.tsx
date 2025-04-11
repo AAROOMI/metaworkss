@@ -3,13 +3,13 @@ import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
-import DirectAgent from '@/components/did-agent/direct-agent';
+import DIDConsultant from '@/components/did-agent/did-consultant';
 
 const DIDAgentPage = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       <Helmet>
-        <title>MetaWorks | D-ID Security Assistant</title>
+        <title>MetaWorks | Security Consultant</title>
       </Helmet>
       
       {/* Header */}
@@ -21,7 +21,7 @@ const DIDAgentPage = () => {
               Back to Dashboard
             </Button>
           </Link>
-          <h1 className="text-xl font-semibold">MetaWorks D-ID Security Assistant</h1>
+          <h1 className="text-xl font-semibold">MetaWorks Security Consultant</h1>
         </div>
       </div>
       
@@ -37,10 +37,10 @@ const DIDAgentPage = () => {
           </div>
           
           {/* Direct D-ID Agent Integration */}
-          <div className="bg-card rounded-lg p-6 shadow-md border">
-            <h3 className="text-lg font-semibold mb-4">Interactive AI Assistant</h3>
-            <DirectAgent />
-          </div>
+          <DIDConsultant 
+            title="Interactive Security Consultant" 
+            description="Ask me any questions about your security program, compliance requirements, or best practices."
+          />
           
           {/* Additional Information and Resources */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
