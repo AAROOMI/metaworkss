@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import FrameAgent from '@/components/did-agent/frame-agent';
+import DynamicAgent from '@/components/did-agent/dynamic-agent';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
@@ -28,8 +29,9 @@ export default function FrameAgentPage() {
         </p>
       </div>
       
-      <Tabs defaultValue="strict" className="mb-8">
-        <TabsList className="w-full grid grid-cols-8 mb-6 overflow-x-auto">
+      <Tabs defaultValue="dynamic" className="mb-8">
+        <TabsList className="w-full grid grid-cols-9 mb-6 overflow-x-auto">
+          <TabsTrigger value="dynamic">Dynamic API</TabsTrigger>
           <TabsTrigger value="strict">Strict Agent</TabsTrigger>
           <TabsTrigger value="alternative">Alternative</TabsTrigger>
           <TabsTrigger value="legacy">Legacy</TabsTrigger>
@@ -39,6 +41,10 @@ export default function FrameAgentPage() {
           <TabsTrigger value="simple">Simple</TabsTrigger>
           <TabsTrigger value="decorated">Decorated</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="dynamic" className="h-[600px]">
+          <DynamicAgent height="100%" />
+        </TabsContent>
         
         <TabsContent value="strict" className="h-[600px]">
           <FrameAgent 

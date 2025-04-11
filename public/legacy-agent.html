@@ -3,75 +3,303 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legacy D-ID Agent</title>
+  <title>MetaWorks Virtual Consultant - Legacy Mode</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background-color: #1e293b;
+      background-color: #0f172a;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      overflow: hidden;
     }
     .container {
-      max-width: 1200px;
-      height: 100%;
-      margin: 0 auto;
-      padding: 1rem;
       display: flex;
       flex-direction: column;
+      max-width: 100%;
+      height: 100%;
+      margin: 0 auto;
     }
-    header {
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .header {
       text-align: center;
+      padding: 15px;
+      background-color: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
     }
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
+    .title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+    .subtitle {
+      margin: 5px 0 0;
+      font-size: 16px;
+      opacity: 0.7;
     }
     .agent-container {
       flex: 1;
       position: relative;
-      margin: 1rem 0;
+      min-height: 400px;
     }
-    #agent-container {
+    #did-agent {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
+    }
+    .status-bar {
+      background-color: rgba(15, 23, 42, 0.9);
+      padding: 10px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #64748b;
+      margin-right: 8px;
+    }
+    .loading {
+      background-color: #3b82f6;
+    }
+    .ready {
+      background-color: #10b981;
+    }
+    .error {
+      background-color: #ef4444;
+    }
+    #status-text {
+      opacity: 0.8;
+    }
+    .fallback-message {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 5;
+      text-align: center;
+      padding: 20px;
+    }
+    .fallback-message h2 {
+      margin-bottom: 10px;
+    }
+    .fallback-message p {
+      margin-bottom: 20px;
+      max-width: 550px;
+      line-height: 1.6;
+    }
+    .retry-button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.2s;
+    }
+    .retry-button:hover {
+      background-color: #2563eb;
+    }
+    .retry-button:active {
+      background-color: #1d4ed8;
+    }
+    .loading-animation {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+    }
+    .loading-animation div {
+      position: absolute;
+      top: 33px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #3b82f6;
+      animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+    .loading-animation div:nth-child(1) {
+      left: 8px;
+      animation: loading-animation1 0.6s infinite;
+    }
+    .loading-animation div:nth-child(2) {
+      left: 8px;
+      animation: loading-animation2 0.6s infinite;
+    }
+    .loading-animation div:nth-child(3) {
+      left: 32px;
+      animation: loading-animation2 0.6s infinite;
+    }
+    .loading-animation div:nth-child(4) {
+      left: 56px;
+      animation: loading-animation3 0.6s infinite;
+    }
+    @keyframes loading-animation1 {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+    @keyframes loading-animation3 {
+      0% { transform: scale(1); }
+      100% { transform: scale(0); }
+    }
+    @keyframes loading-animation2 {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(24px, 0); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>MetaWorks Virtual Consultant</h1>
-      <p>Legacy Implementation</p>
-    </header>
+    <div class="header">
+      <h1 class="title">MetaWorks Virtual Consultant</h1>
+      <p class="subtitle">AI-powered cybersecurity assistant</p>
+    </div>
     
     <div class="agent-container">
-      <div id="agent-container"></div>
+      <div id="did-agent"></div>
+      
+      <div id="fallback" class="fallback-message" style="display: none;">
+        <div class="loading-animation">
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <h2>Loading Virtual Consultant</h2>
+        <p>Our AI-powered cybersecurity consultant is initializing. If the agent doesn't appear after 10 seconds, please use the button below to try again.</p>
+        <button id="retry-button" class="retry-button">Retry Loading Agent</button>
+      </div>
+    </div>
+    
+    <div class="status-bar">
+      <span id="status-indicator" class="status-indicator"></span>
+      <span id="status-text">Initializing...</span>
     </div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Create and add the script tag
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = 'https://agent.d-id.com/v1/index.js';
-      script.dataset.name = 'did-agent';
-      script.dataset.target = '#agent-container';
-      script.dataset.mode = 'fabio';
-      script.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
-      script.dataset.agentId = 'agt_YjpQXzSG';
-      script.dataset.monitor = 'true';
-      
-      // Append to document
-      document.body.appendChild(script);
-      
-      console.log('D-ID agent script added');
+    // Initialize variables
+    const statusText = document.getElementById('status-text');
+    const statusIndicator = document.getElementById('status-indicator');
+    const fallbackMessage = document.getElementById('fallback');
+    const retryButton = document.getElementById('retry-button');
+    const agentContainer = document.getElementById('did-agent');
+    
+    // Set initial state
+    updateStatus('loading', 'Loading D-ID virtual consultant...');
+    
+    // Show fallback message after a delay
+    const fallbackTimeout = setTimeout(() => {
+      fallbackMessage.style.display = 'flex';
+    }, 5000);
+    
+    // Retry button handler
+    retryButton.addEventListener('click', () => {
+      fallbackMessage.style.display = 'none';
+      initializeAgent();
     });
+    
+    // Function to update status display
+    function updateStatus(state, message) {
+      statusText.textContent = message;
+      statusIndicator.className = 'status-indicator ' + state;
+    }
+    
+    // Initialize the D-ID agent
+    function initializeAgent() {
+      updateStatus('loading', 'Initializing D-ID agent...');
+      
+      try {
+        // Clear any existing script elements
+        const existingScript = document.getElementById('did-script');
+        if (existingScript) {
+          existingScript.remove();
+        }
+        
+        // Create and add the D-ID script
+        const script = document.createElement('script');
+        script.id = 'did-script';
+        script.type = 'module';
+        script.src = 'https://agent.d-id.com/v1/index.js';
+        script.setAttribute('data-name', 'did-agent');
+        script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
+        script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
+        script.setAttribute('data-monitor', 'true');
+        
+        // Event listeners
+        script.onload = function() {
+          updateStatus('loading', 'D-ID script loaded, initializing agent...');
+          console.log('D-ID script loaded successfully');
+          
+          // Clear the fallback timeout since the script loaded
+          clearTimeout(fallbackTimeout);
+        };
+        
+        script.onerror = function() {
+          updateStatus('error', 'Failed to load D-ID script');
+          console.error('Failed to load D-ID script');
+          fallbackMessage.style.display = 'flex';
+        };
+        
+        // Add the script to the document
+        document.body.appendChild(script);
+        
+        // Listen for messages from the D-ID agent
+        window.addEventListener('message', function(event) {
+          const data = event.data;
+          if (data && data.source === 'did-agent') {
+            console.log('D-ID agent event:', data);
+            
+            if (data.type === 'ready') {
+              updateStatus('ready', 'Virtual consultant is ready');
+              fallbackMessage.style.display = 'none';
+            } else if (data.type === 'error') {
+              updateStatus('error', 'Agent error: ' + (data.error || 'Unknown error'));
+              // Don't show fallback immediately on all errors, some might be recoverable
+              setTimeout(() => {
+                // Only show fallback if we're still in error state
+                if (statusIndicator.classList.contains('error')) {
+                  fallbackMessage.style.display = 'flex';
+                }
+              }, 3000);
+            }
+          }
+        });
+        
+        console.log('D-ID agent initialization started');
+      } catch (error) {
+        console.error('Error initializing D-ID agent:', error);
+        updateStatus('error', 'Initialization error: ' + error.message);
+        fallbackMessage.style.display = 'flex';
+      }
+    }
+    
+    // Start agent initialization when the page loads
+    window.addEventListener('DOMContentLoaded', initializeAgent);
+    
+    // Set a timeout to verify the agent is actually working
+    setTimeout(() => {
+      if (!statusIndicator.classList.contains('ready')) {
+        updateStatus('error', 'Agent failed to initialize in time');
+        fallbackMessage.style.display = 'flex';
+      }
+    }, 15000);
   </script>
 </body>
 </html>
