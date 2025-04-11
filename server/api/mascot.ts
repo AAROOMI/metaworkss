@@ -78,7 +78,7 @@ mascotRouter.post('/api/mascot/ask', async (req, res) => {
         { role: "user", content: question }
       ],
       max_tokens: 150, // Keep responses concise
-      temperature: personality === 'quirky' ? 0.8 : 0.5, // Higher temperature for quirky personality
+      temperature: validPersonality === 'quirky' ? 0.8 : 0.5 // Higher temperature for quirky personality
     });
     
     // Extract and return the answer
@@ -98,18 +98,16 @@ mascotRouter.post('/api/mascot/ask', async (req, res) => {
 // Endpoint for getting contextual tips based on the current page/section
 mascotRouter.post('/api/mascot/contextual-tips', async (req, res) => {
   try {
-    const { context, personality = 'friendly' as PersonalityType } = req.body;
+    const { context, personality = 'friendly' } = req.body;
     
     if (!context) {
       return res.status(400).json({ error: 'Context is required' });
     }
     
-    // Validate personality type
-    const validPersonality = (
-      personality === 'friendly' || 
-      personality === 'serious' || 
-      personality === 'quirky'
-    ) ? personality : 'friendly';
+    // Validate personality type using our type guard
+    const validPersonality: PersonalityType = isValidPersonality(personality) 
+      ? personality 
+      : 'friendly';
     
     // Get the appropriate personality prompt
     const systemPrompt = personalityPrompts[validPersonality];
