@@ -13,6 +13,8 @@ import {
   files,
   complianceReports,
   reportShareLinks,
+  risks,
+  assessmentRisks,
   policyCategories,
   policyTemplates,
   generatedPolicies,
@@ -61,7 +63,11 @@ import {
   type UserBadge,
   type InsertUserBadge,
   type UserGameStats,
-  type InsertUserGameStats
+  type InsertUserGameStats,
+  type Risk,
+  type InsertRisk,
+  type AssessmentRisk,
+  type InsertAssessmentRisk
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -195,6 +201,18 @@ export interface IStorage {
   updateUserGameStats(userId: number, stats: Partial<InsertUserGameStats>): Promise<UserGameStats>;
   getUsersTopGameStats(limit: number): Promise<UserGameStats[]>;
   
+  // Risk Management
+  saveRisk(risk: Partial<Risk>): Promise<Risk>;
+  getRisks(companyId?: number): Promise<Risk[]>;
+  getRiskById(id: number): Promise<Risk | undefined>;
+  deleteRisk(id: number): Promise<void>;
+  
+  // Assessment Risk Management
+  saveAssessmentRisk(assessmentRisk: Partial<AssessmentRisk>): Promise<AssessmentRisk>;
+  getAssessmentRisksByAssessmentId(assessmentId: number): Promise<AssessmentRisk[]>;
+  getAssessmentRiskById(id: number): Promise<AssessmentRisk | undefined>;
+  deleteAssessmentRisk(id: number): Promise<void>;
+  
   // Session storage
   sessionStore: session.Store;
 }
@@ -248,6 +266,15 @@ export class DatabaseStorage implements IStorage {
       const [updated] = await db.update(companyInfo)
         .set({
           companyName: info.companyName || existingCompany.companyName,
+          sector: info.sector !== undefined ? info.sector : existingCompany.sector,
+          size: info.size !== undefined ? info.size : existingCompany.size,
+          website: info.website !== undefined ? info.website : existingCompany.website,
+          address: info.address !== undefined ? info.address : existingCompany.address,
+          city: info.city !== undefined ? info.city : existingCompany.city,
+          country: info.country !== undefined ? info.country : existingCompany.country,
+          postalCode: info.postalCode !== undefined ? info.postalCode : existingCompany.postalCode,
+          contactEmail: info.contactEmail !== undefined ? info.contactEmail : existingCompany.contactEmail,
+          contactPhone: info.contactPhone !== undefined ? info.contactPhone : existingCompany.contactPhone,
           ceoName: info.ceoName !== undefined ? info.ceoName : existingCompany.ceoName,
           cioName: info.cioName !== undefined ? info.cioName : existingCompany.cioName,
           ctoName: info.ctoName !== undefined ? info.ctoName : existingCompany.ctoName,
@@ -261,6 +288,15 @@ export class DatabaseStorage implements IStorage {
       // Create new company
       const [company] = await db.insert(companyInfo).values({
         companyName: info.companyName || '',
+        sector: info.sector,
+        size: info.size,
+        website: info.website,
+        address: info.address,
+        city: info.city,
+        country: info.country,
+        postalCode: info.postalCode,
+        contactEmail: info.contactEmail,
+        contactPhone: info.contactPhone,
         ceoName: info.ceoName,
         cioName: info.cioName,
         ctoName: info.ctoName,
@@ -1235,6 +1271,114 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(userGameStats)
       .orderBy(desc(userGameStats.totalPoints))
       .limit(limit);
+  }
+
+  // Risk Management methods
+  async saveRisk(risk: Partial<Risk>): Promise<Risk> {
+    if (risk.id) {
+      // Update existing risk
+      const [updated] = await db.update(risks)
+        .set({
+          title: risk.title,
+          description: risk.description,
+          cause: risk.cause,
+          category: risk.category,
+          owner: risk.owner,
+          likelihood: risk.likelihood,
+          impact: risk.impact,
+          inherentRiskLevel: risk.inherentRiskLevel,
+          existingControls: risk.existingControls,
+          controlEffectiveness: risk.controlEffectiveness,
+          residualRiskLevel: risk.residualRiskLevel,
+          mitigationActions: risk.mitigationActions,
+          targetDate: risk.targetDate,
+          isAccepted: risk.isAccepted,
+          companyId: risk.companyId,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(risks.id, risk.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new risk
+      const [newRisk] = await db.insert(risks).values({
+        ...risk,
+        title: risk.title!,
+        description: risk.description!,
+        category: risk.category!,
+        likelihood: risk.likelihood!,
+        impact: risk.impact!,
+        inherentRiskLevel: risk.inherentRiskLevel!,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as InsertRisk).returning();
+      return newRisk;
+    }
+  }
+
+  async getRisks(companyId?: number): Promise<Risk[]> {
+    if (companyId) {
+      return await db.select().from(risks).where(eq(risks.companyId!, companyId));
+    }
+    return await db.select().from(risks);
+  }
+
+  async getRiskById(id: number): Promise<Risk | undefined> {
+    const [risk] = await db.select().from(risks).where(eq(risks.id, id));
+    return risk;
+  }
+
+  async deleteRisk(id: number): Promise<void> {
+    await db.delete(risks).where(eq(risks.id, id));
+  }
+
+  async saveAssessmentRisk(assessmentRisk: Partial<AssessmentRisk>): Promise<AssessmentRisk> {
+    if (assessmentRisk.id) {
+      // Update existing assessment risk
+      const [updated] = await db.update(assessmentRisks)
+        .set({
+          assessmentId: assessmentRisk.assessmentId,
+          riskId: assessmentRisk.riskId,
+          status: assessmentRisk.status,
+          notes: assessmentRisk.notes,
+          evidence: assessmentRisk.evidence,
+          reviewedBy: assessmentRisk.reviewedBy,
+          reviewedAt: assessmentRisk.reviewedAt,
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(assessmentRisks.id, assessmentRisk.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new assessment risk
+      const [newAssessmentRisk] = await db.insert(assessmentRisks).values({
+        assessmentId: assessmentRisk.assessmentId!,
+        riskId: assessmentRisk.riskId!,
+        status: assessmentRisk.status || 'to_assess',
+        notes: assessmentRisk.notes,
+        evidence: assessmentRisk.evidence,
+        reviewedBy: assessmentRisk.reviewedBy,
+        reviewedAt: assessmentRisk.reviewedAt,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as InsertAssessmentRisk).returning();
+      return newAssessmentRisk;
+    }
+  }
+
+  async getAssessmentRisksByAssessmentId(assessmentId: number): Promise<AssessmentRisk[]> {
+    return await db.select()
+      .from(assessmentRisks)
+      .where(eq(assessmentRisks.assessmentId, assessmentId));
+  }
+
+  async getAssessmentRiskById(id: number): Promise<AssessmentRisk | undefined> {
+    const [assessmentRisk] = await db.select().from(assessmentRisks).where(eq(assessmentRisks.id, id));
+    return assessmentRisk;
+  }
+
+  async deleteAssessmentRisk(id: number): Promise<void> {
+    await db.delete(assessmentRisks).where(eq(assessmentRisks.id, id));
   }
 }
 

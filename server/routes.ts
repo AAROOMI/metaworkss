@@ -13,6 +13,8 @@ import assessmentResultsRouter from "./api/assessment-results";
 import frameworksRouter from "./api/frameworks";
 import domainsRouter from "./api/domains";
 import subdomainsRouter from "./api/subdomains";
+import risksRouter from './api/risks';
+import assessmentRisksRouter from './api/assessment-risks';
 import controlsRouter from "./api/controls";
 import policyManagementRouter from "./api/policy-management";
 import companyInfoRouter from "./api/company-info";
@@ -389,6 +391,10 @@ app.get("/api/dashboard-access", async (req, res) => {
       next(error);
     }
   });
+
+  // Register risk management routes
+  app.use('/api/risks', risksRouter);
+  app.use('/api/assessment-risks', assessmentRisksRouter);
 
   const httpServer = createServer(app);
   return httpServer;

@@ -400,6 +400,55 @@ export const insertUserGameStatsSchema = createInsertSchema(userGameStats).omit(
   updatedAt: true
 });
 
+// Risk Management Schema
+export const risks = pgTable('risks', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  cause: text('cause'),
+  category: text('category').notNull(), // 'Strategic', 'Operational', 'Compliance'
+  owner: text('owner'),
+  likelihood: text('likelihood').notNull(), // 'Very Likely', 'Likely', 'Possible', 'Unlikely', 'Very Unlikely'
+  impact: text('impact').notNull(), // 'Catastrophic', 'Major', 'Serious', 'Medium', 'Minor'
+  inherentRiskLevel: text('inherent_risk_level').notNull(), // 'High', 'Medium', 'Low'
+  existingControls: text('existing_controls'),
+  controlEffectiveness: text('control_effectiveness'), // 'Effective', 'Needs Improvement', 'None'
+  residualRiskLevel: text('residual_risk_level'), // 'High', 'Medium', 'Low'
+  mitigationActions: text('mitigation_actions'),
+  targetDate: text('target_date'),
+  isAccepted: boolean('is_accepted').default(false),
+  companyId: integer('company_id').references(() => companyInfo.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+// Risk Assessment Link Table
+export const assessmentRisks = pgTable('assessment_risks', {
+  id: serial('id').primaryKey(),
+  assessmentId: integer('assessment_id').notNull().references(() => assessments.id),
+  riskId: integer('risk_id').notNull().references(() => risks.id),
+  status: text('status').notNull().default('to_assess'), // 'to_assess', 'in_progress', 'completed'
+  notes: text('notes'),
+  evidence: text('evidence'),
+  reviewedBy: integer('reviewed_by').references(() => users.id),
+  reviewedAt: timestamp('reviewed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+// Create insert schemas for risk management
+export const insertRiskSchema = createInsertSchema(risks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertAssessmentRiskSchema = createInsertSchema(assessmentRisks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
 // Define onboarding and gamification types
 export type OnboardingStep = typeof onboardingSteps.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
@@ -412,3 +461,10 @@ export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
 export type InsertBadge = z.infer<typeof insertBadgeSchema>;
 export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
 export type InsertUserGameStats = z.infer<typeof insertUserGameStatsSchema>;
+
+// Define risk management types
+export type Risk = typeof risks.$inferSelect;
+export type AssessmentRisk = typeof assessmentRisks.$inferSelect;
+
+export type InsertRisk = z.infer<typeof insertRiskSchema>;
+export type InsertAssessmentRisk = z.infer<typeof insertAssessmentRiskSchema>;

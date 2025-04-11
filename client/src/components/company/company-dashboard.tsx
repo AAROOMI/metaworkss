@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { FileUploader } from '@/components/upload/file-uploader';
+import { DirectFileUploader } from '@/components/common/direct-file-uploader';
 import { Building2, FileText, Upload, Image, Download, FileIcon, Trash2, Save, Edit, X, Check } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -144,11 +145,23 @@ export default function CompanyDashboard() {
   // Upload company logo mutation
   const uploadLogoMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Create formData properly
       const formData = new FormData();
       formData.append('logo', file);
-      const res = await apiRequest('POST', '/api/upload/logo', formData, 
-        { isFormData: true });
-      return await res.json();
+      
+      // Manual fetch implementation for FormData upload instead of using apiRequest
+      const response = await fetch('/api/upload/logo', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || 'Failed to upload logo');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/company'] });
@@ -169,10 +182,23 @@ export default function CompanyDashboard() {
   // Upload company document mutation
   const uploadDocumentMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Create formData properly
       const formData = new FormData();
       formData.append('document', file);
-      const res = await apiRequest('POST', '/api/company/documents', formData, { isFormData: true });
-      return await res.json();
+      
+      // Manual fetch implementation for FormData upload
+      const response = await fetch('/api/upload/document', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || 'Failed to upload document');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/company/documents'] });
@@ -307,11 +333,19 @@ export default function CompanyDashboard() {
                     </div>
                   )}
                   
-                  <FileUploader 
-                    onFileSelect={handleLogoUpload}
+                  <DirectFileUploader
+                    endpoint="/api/upload/logo"
+                    fieldName="logo"
                     accept="image/*"
                     buttonText="Upload Logo"
-                    isLoading={uploadLogoMutation.isPending}
+                    onFileUploaded={(fileId, filename, url) => {
+                      // Update company info with the uploaded logo info
+                      queryClient.invalidateQueries({ queryKey: ['/api/company'] });
+                      toast({
+                        title: "Logo uploaded",
+                        description: "Your company logo has been uploaded successfully."
+                      });
+                    }}
                   />
                   
                   {companyInfo?.logoId && (
@@ -561,11 +595,19 @@ export default function CompanyDashboard() {
                     Upload important documents related to your company for compliance purposes.
                   </p>
                   
-                  <FileUploader 
-                    onFileSelect={handleDocumentUpload}
+                  <DirectFileUploader
+                    endpoint="/api/upload/document"
+                    fieldName="document"
                     accept=".pdf,.doc,.docx"
                     buttonText="Upload Document"
-                    isLoading={uploadDocumentMutation.isPending}
+                    onFileUploaded={(fileId, filename, url) => {
+                      // Update documents list
+                      queryClient.invalidateQueries({ queryKey: ['/api/company/documents'] });
+                      toast({
+                        title: "Document uploaded",
+                        description: "Your document has been uploaded successfully."
+                      });
+                    }}
                   />
                 </div>
                 
