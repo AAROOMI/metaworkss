@@ -38,14 +38,14 @@ const personalityPrompts: Record<PersonalityType, string> = {
 mascotRouter.post('/api/mascot/ask', async (req, res) => {
   try {
     // Get the question and personality from the request
-    const { question, personality = 'friendly' } = req.body;
+    const { question, personality = 'friendly' as PersonalityType } = req.body;
     
     if (!question) {
       return res.status(400).json({ error: 'Question is required' });
     }
     
     // Get the appropriate personality prompt
-    const systemPrompt = personalityPrompts[personality] || personalityPrompts.friendly;
+    const systemPrompt = personalityPrompts[personality as PersonalityType] || personalityPrompts.friendly;
     
     // Add context about cybersecurity compliance
     const complianceContext = `
@@ -75,11 +75,11 @@ mascotRouter.post('/api/mascot/ask', async (req, res) => {
     const answer = response.choices[0].message.content;
     res.json({ answer });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing mascot question:', error);
     res.status(500).json({ 
       error: 'Failed to process your question',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
     });
   }
 });
@@ -87,14 +87,14 @@ mascotRouter.post('/api/mascot/ask', async (req, res) => {
 // Endpoint for getting contextual tips based on the current page/section
 mascotRouter.post('/api/mascot/contextual-tips', async (req, res) => {
   try {
-    const { context, personality = 'friendly' } = req.body;
+    const { context, personality = 'friendly' as PersonalityType } = req.body;
     
     if (!context) {
       return res.status(400).json({ error: 'Context is required' });
     }
     
     // Get the appropriate personality prompt
-    const systemPrompt = personalityPrompts[personality] || personalityPrompts.friendly;
+    const systemPrompt = personalityPrompts[personality as PersonalityType] || personalityPrompts.friendly;
     
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await openai.chat.completions.create({
@@ -119,11 +119,11 @@ mascotRouter.post('/api/mascot/contextual-tips', async (req, res) => {
     const tip = response.choices[0].message.content;
     res.json({ tip });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error generating contextual tip:', error);
     res.status(500).json({ 
       error: 'Failed to generate contextual tip',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
     });
   }
 });

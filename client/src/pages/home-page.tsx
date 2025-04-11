@@ -4,6 +4,7 @@ import HeroSection from "@/components/landing/hero-section";
 import FeaturesSection from "@/components/landing/features-section";
 import CompanyInfoSection from "@/components/landing/company-info-section";
 import ComplianceLogos from "@/components/landing/compliance-logos";
+import VirtualConsultantCTA from "@/components/landing/virtual-consultant-cta";
 import Footer from "@/components/landing/footer";
 import { Shield } from "lucide-react";
 import backgroundImage from "@assets/metawork background.png";
