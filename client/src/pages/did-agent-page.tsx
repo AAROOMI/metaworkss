@@ -27,11 +27,32 @@ export default function DIDAgentPage() {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Agent Column */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-4">
               <AgentScript 
                 height="600px"
                 containerClassName="rounded-lg overflow-hidden shadow-lg"
               />
+              
+              <div className="flex items-center justify-center space-x-4 text-sm">
+                <a 
+                  href="/direct-agent.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline flex items-center gap-1"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Open direct agent page
+                </a>
+                <a 
+                  href="/did-agent.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline flex items-center gap-1"
+                >
+                  <Shield className="h-4 w-4" />
+                  Open agent in iframe
+                </a>
+              </div>
             </div>
             
             {/* Information Column */}

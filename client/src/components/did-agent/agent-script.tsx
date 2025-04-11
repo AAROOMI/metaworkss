@@ -24,8 +24,8 @@ export default function AgentScript({
     script.dataset.mode = 'fabio';
     
     // Set a default agent ID (will be overwritten if API call succeeds)
-    script.dataset.clientKey = 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==';
-    script.dataset.agentId = 'agt_954OZ9Ea';
+    script.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
+    script.dataset.agentId = 'agt_YjpQXzSG';
     
     // Then try to get the credentials from the server
     fetch('/api/did-credentials')
