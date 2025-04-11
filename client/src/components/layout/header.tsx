@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { Shield, Menu, X, Presentation, UserCog, Headphones } from "lucide-react";
+import { Shield, Menu, X, Presentation, UserCog } from "lucide-react";
 import { ThemeSwitch } from "./theme-switch";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -56,15 +56,6 @@ export default function Header() {
             <a href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</a>
             <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">About</a>
             
-            {/* Virtual Consultant Link */}
-            <a 
-              onClick={() => navigate("/virtual-consultant")}
-              className="flex items-center text-sm font-medium hover:text-primary transition-colors cursor-pointer"
-            >
-              <Headphones className="mr-2 h-4 w-4 text-primary" />
-              <span>Virtual Consultant</span>
-            </a>
-            
             {/* Dark/Light Mode Toggle */}
             <ThemeSwitch>Toggle theme</ThemeSwitch>
             
@@ -75,7 +66,7 @@ export default function Header() {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    onClick={() => navigate("/agent-test")}
+                    onClick={() => navigate("/did-agent")}
                     className="relative"
                   >
                     <Presentation className="h-5 w-5 text-primary" />
@@ -83,7 +74,7 @@ export default function Header() {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Test D-ID Implementations</p>
+                  <p>D-ID Virtual Agent</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -190,20 +181,12 @@ export default function Header() {
               )}
               
               <a 
-                onClick={() => { navigate('/virtual-consultant'); setIsMenuOpen(false); }}
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-              >
-                <Headphones className="mr-2 h-4 w-4 text-primary" />
-                <span>Virtual Consultant</span>
-                <span className="ml-2 h-2 w-2 bg-green-500 rounded-full"></span>
-              </a>
-              
-              <a 
-                onClick={() => { navigate('/agent-test'); setIsMenuOpen(false); }}
+                onClick={() => { navigate('/did-agent'); setIsMenuOpen(false); }}
                 className="flex items-center px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
               >
                 <Presentation className="mr-2 h-4 w-4 text-primary" />
-                <span>Agent Test Page</span>
+                <span>D-ID Agent</span>
+                <span className="ml-2 h-2 w-2 bg-green-500 rounded-full"></span>
               </a>
               
               <div className="flex items-center px-3 py-2">

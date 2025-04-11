@@ -4,7 +4,6 @@ import HeroSection from "@/components/landing/hero-section";
 import FeaturesSection from "@/components/landing/features-section";
 import CompanyInfoSection from "@/components/landing/company-info-section";
 import ComplianceLogos from "@/components/landing/compliance-logos";
-import VirtualConsultantCTA from "@/components/landing/virtual-consultant-cta";
 import Footer from "@/components/landing/footer";
 import { Shield } from "lucide-react";
 import backgroundImage from "@assets/metawork background.png";
@@ -29,11 +28,6 @@ export default function HomePage() {
       <HeroSection />
       <ComplianceLogos />
       <FeaturesSection />
-      
-      <div className="container mx-auto px-4 py-12">
-        <VirtualConsultantCTA />
-      </div>
-      
       <CompanyInfoSection />
       <Footer />
       
