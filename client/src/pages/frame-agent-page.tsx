@@ -29,8 +29,9 @@ export default function FrameAgentPage() {
         </p>
       </div>
       
-      <Tabs defaultValue="dynamic" className="mb-8">
-        <TabsList className="w-full grid grid-cols-9 mb-6 overflow-x-auto">
+      <Tabs defaultValue="integrated" className="mb-8">
+        <TabsList className="w-full grid grid-cols-10 mb-6 overflow-x-auto">
+          <TabsTrigger value="integrated">Integrated</TabsTrigger>
           <TabsTrigger value="dynamic">Dynamic API</TabsTrigger>
           <TabsTrigger value="strict">Strict Agent</TabsTrigger>
           <TabsTrigger value="alternative">Alternative</TabsTrigger>
@@ -41,6 +42,13 @@ export default function FrameAgentPage() {
           <TabsTrigger value="simple">Simple</TabsTrigger>
           <TabsTrigger value="decorated">Decorated</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="integrated" className="h-[600px]">
+          <FrameAgent 
+            height="100%" 
+            src="/integrated-agent.html"
+          />
+        </TabsContent>
         
         <TabsContent value="dynamic" className="h-[600px]">
           <DynamicAgent height="100%" />
@@ -104,7 +112,13 @@ export default function FrameAgentPage() {
       </Tabs>
       
       <h3 className="text-xl font-medium mb-4 text-center">Standalone Testing Pages</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <Button variant="outline" asChild className="text-xs bg-primary/10 border-primary/20 hover:bg-primary/20">
+          <a href="/integrated-agent.html" target="_blank" className="font-medium">
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Integrated Agent
+          </a>
+        </Button>
         <Button variant="outline" asChild className="text-xs">
           <a href="/strict-agent.html" target="_blank">
             <ExternalLink className="mr-2 h-3 w-3" />
