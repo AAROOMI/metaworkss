@@ -33,24 +33,32 @@ export default function DIDAgentPage() {
                 containerClassName="rounded-lg overflow-hidden shadow-lg"
               />
               
-              <div className="flex items-center justify-center space-x-4 text-sm">
+              <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+                <a 
+                  href="/standalone-agent.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline flex items-center gap-1 px-3 py-2 bg-primary/10 rounded-md"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Minimal agent (recommended)
+                </a>
                 <a 
                   href="/direct-agent.html" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-1"
+                  className="text-primary hover:underline flex items-center gap-1 px-3 py-2 bg-primary/10 rounded-md"
                 >
-                  <Sparkles className="h-4 w-4" />
-                  Open direct agent page
+                  <Shield className="h-4 w-4" />
+                  Styled agent
                 </a>
                 <a 
                   href="/did-agent.html" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-1"
+                  className="text-muted-foreground hover:text-primary hover:underline flex items-center gap-1"
                 >
-                  <Shield className="h-4 w-4" />
-                  Open agent in iframe
+                  Advanced iframe version
                 </a>
               </div>
             </div>
