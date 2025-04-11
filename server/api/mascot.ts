@@ -12,8 +12,11 @@ const openai = new OpenAI({
 // Create router
 const mascotRouter = Router();
 
+// Define valid personality types
+type PersonalityType = 'friendly' | 'serious' | 'quirky';
+
 // Define personality prompts
-const personalityPrompts = {
+const personalityPrompts: Record<PersonalityType, string> = {
   friendly: `You are a friendly and approachable security mascot named "Security Buddy" for a cybersecurity compliance platform. 
   Your tone is supportive, encouraging, and helpful. You explain security concepts in simple terms with relatable examples. 
   You always maintain a positive outlook, even when discussing security threats or compliance gaps. 
