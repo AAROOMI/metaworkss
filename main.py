@@ -161,5 +161,5 @@ async def proxy_did_request(path: str, request: dict):
 
 if __name__ == "__main__":
     import uvicorn
-    # Run the server with uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
+    # Run the server with uvicorn (using port 5001 to avoid conflict with Express)
+    uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=True)

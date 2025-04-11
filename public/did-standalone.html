@@ -143,132 +143,105 @@
         let didChat;
         let isMuted = false;
         
-        // Agent configuration using new credentials
-        const didConfig = {
-            baseURL: "https://app2.d-id.com/",
-            apiKey: null, // Client-side doesn't need the API key
-            agentId: null, // Will be set from API
-            clientKey: null, // Will be set from API
-            autoplay: true,
-            stream: true, 
-            rtl: false,
-            background: null,
-            enableFrames: true
-        };
-        
-        // Get the D-ID config from our API first to avoid exposing credentials in client-side code
-        fetch('/api/did-config')
-            .then(response => response.json())
-            .then(config => {
-                // Update configuration with values from API
-                didConfig.agentId = config.agentId;
-                didConfig.clientKey = config.clientKey;
+        // Function to initialize D-ID chat
+        function initDIDChat() {
+            const didElement = document.getElementById('didChatContainer');
+            const loadingElement = document.getElementById('loading');
+            const errorContainer = document.getElementById('error-container');
+            
+            errorContainer.textContent = ""; // Clear previous errors
+            
+            try {
+                // Import the D-ID library script
+                const script = document.createElement('script');
+                script.src = 'https://sdk.d-id.com/agent-chat-ui/did.js';
+                script.async = true;
                 
-                // Function to initialize D-ID chat
-                function initDIDChat() {
-                    const didElement = document.getElementById('didChatContainer');
-                    const loadingElement = document.getElementById('loading');
-                    const errorContainer = document.getElementById('error-container');
-                    
-                    errorContainer.textContent = ""; // Clear previous errors
-                    
+                script.onload = function() {
                     try {
-                        // Import the D-ID library script
-                        const script = document.createElement('script');
-                        script.src = 'https://sdk.d-id.com/agent-chat-ui/did.js';
-                        script.async = true;
+                        // Initialize DID with credentials
+                        // Note that we're using environment variables via server-side processing
+                        // %NEW_DID_AGENT_ID% and %NEW_DID_CLIENT_KEY% will be replaced with actual values
+                        didChat = new DID.AgentChatUI({
+                            baseURL: "https://app2.d-id.com/",
+                            clientKey: "__NEW_DID_CLIENT_KEY__", // Will be server-side replaced
+                            agentId: "__NEW_DID_AGENT_ID__", // Will be server-side replaced
+                            container: didElement,
+                            autoplay: true,
+                            stream: true,
+                            rtl: false,
+                            enableFrames: true
+                        });
                         
-                        script.onload = function() {
-                            try {
-                                // Initialize DID with new credentials
-                                didChat = new DID.AgentChatUI({
-                                    baseURL: didConfig.baseURL,
-                                    clientKey: didConfig.clientKey,
-                                    agentId: didConfig.agentId,
-                                    container: didElement,
-                                    autoplay: didConfig.autoplay,
-                                    stream: didConfig.stream,
-                                    rtl: didConfig.rtl,
-                                    background: didConfig.background,
-                                    enableFrames: didConfig.enableFrames
-                                });
-                                
-                                didChat.on('ready', function() {
-                                    console.log('D-ID Agent is ready!');
-                                    loadingElement.style.display = 'none';
-                                });
-                                
-                                didChat.on('error', function(error) {
-                                    console.error('D-ID Agent error:', error);
-                                    errorContainer.textContent = `Error: ${error.message || JSON.stringify(error)}`;
-                                    loadingElement.style.display = 'none';
-                                });
-                                
-                                // Initialize the chat interface
-                                didChat.start();
-                                
-                            } catch (err) {
-                                console.error('Error initializing D-ID agent:', err);
-                                errorContainer.textContent = `Initialization Error: ${err.message || JSON.stringify(err)}`;
-                                loadingElement.style.display = 'none';
-                            }
-                        };
-                        
-                        script.onerror = function(err) {
-                            console.error('Failed to load D-ID script:', err);
-                            errorContainer.textContent = 'Failed to load D-ID script. Please check your internet connection.';
+                        didChat.on('ready', function() {
+                            console.log('D-ID Agent is ready!');
                             loadingElement.style.display = 'none';
-                        };
+                        });
                         
-                        document.body.appendChild(script);
+                        didChat.on('error', function(error) {
+                            console.error('D-ID Agent error:', error);
+                            errorContainer.textContent = `Error: ${error.message || JSON.stringify(error)}`;
+                            loadingElement.style.display = 'none';
+                        });
+                        
+                        // Initialize the chat interface
+                        didChat.start();
                         
                     } catch (err) {
-                        console.error('Error setting up D-ID agent:', err);
-                        errorContainer.textContent = `Setup Error: ${err.message || JSON.stringify(err)}`;
+                        console.error('Error initializing D-ID agent:', err);
+                        errorContainer.textContent = `Initialization Error: ${err.message || JSON.stringify(err)}`;
                         loadingElement.style.display = 'none';
                     }
+                };
+                
+                script.onerror = function(err) {
+                    console.error('Failed to load D-ID script:', err);
+                    errorContainer.textContent = 'Failed to load D-ID script. Please check your internet connection.';
+                    loadingElement.style.display = 'none';
+                };
+                
+                document.body.appendChild(script);
+                
+            } catch (err) {
+                console.error('Error setting up D-ID agent:', err);
+                errorContainer.textContent = `Setup Error: ${err.message || JSON.stringify(err)}`;
+                loadingElement.style.display = 'none';
+            }
+        }
+        
+        // Initialize DID chat when page loads
+        initDIDChat();
+        
+        // Reset button handler
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (didChat) {
+                const loadingElement = document.getElementById('loading');
+                loadingElement.style.display = 'flex';
+                
+                try {
+                    didChat.destroy();
+                } catch (err) {
+                    console.error('Error destroying D-ID chat:', err);
                 }
                 
-                // Initialize DID chat when page loads
-                initDIDChat();
-                
-                // Reset button handler
-                document.getElementById('resetBtn').addEventListener('click', function() {
-                    if (didChat) {
-                        const loadingElement = document.getElementById('loading');
-                        loadingElement.style.display = 'flex';
-                        
-                        try {
-                            didChat.destroy();
-                        } catch (err) {
-                            console.error('Error destroying D-ID chat:', err);
-                        }
-                        
-                        setTimeout(() => {
-                            initDIDChat();
-                        }, 1000);
-                    }
-                });
-                
-                // Mute button handler
-                document.getElementById('muteBtn').addEventListener('click', function() {
-                    if (didChat) {
-                        try {
-                            isMuted = !isMuted;
-                            didChat.setMuted(isMuted);
-                            console.log('Agent ' + (isMuted ? 'muted' : 'unmuted'));
-                        } catch (err) {
-                            console.error('Error toggling mute:', err);
-                        }
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching D-ID configuration:', error);
-                const errorContainer = document.getElementById('error-container');
-                errorContainer.textContent = `Failed to get D-ID configuration: ${error.message || JSON.stringify(error)}`;
-                document.getElementById('loading').style.display = 'none';
-            });
+                setTimeout(() => {
+                    initDIDChat();
+                }, 1000);
+            }
+        });
+        
+        // Mute button handler
+        document.getElementById('muteBtn').addEventListener('click', function() {
+            if (didChat) {
+                try {
+                    isMuted = !isMuted;
+                    didChat.setMuted(isMuted);
+                    console.log('Agent ' + (isMuted ? 'muted' : 'unmuted'));
+                } catch (err) {
+                    console.error('Error toggling mute:', err);
+                }
+            }
+        });
     </script>
 </body>
 </html>
