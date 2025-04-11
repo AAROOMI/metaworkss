@@ -20,16 +20,19 @@ export default function SecuredDIDAgent() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = async (): Promise<Record<string, string>> => {
     // In production, you would get this from the Clerk SDK
     // For now, we'll just simulate an auth token if a user is logged in
     if (!user) {
-      return {};
+      return {
+        'Content-Type': 'application/json'
+      };
     }
     
     // In production, get the actual token from Clerk
     return {
-      Authorization: `Bearer mock-token-for-${user.id}`
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer mock-token-for-${user.id}`
     };
   };
 
@@ -44,10 +47,7 @@ export default function SecuredDIDAgent() {
       // Call the secure endpoint
       const response = await fetch('/api/did/secure-agent', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers
-        },
+        headers,
         body: JSON.stringify({ userId: user?.id })
       });
       
