@@ -23,16 +23,25 @@ export default function AgentScript({
     script.dataset.name = 'did-agent';
     script.dataset.mode = 'fabio';
     
-    // Use the environment variables for DID agent credentials
+    // Set a default agent ID (will be overwritten if API call succeeds)
+    script.dataset.clientKey = 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==';
+    script.dataset.agentId = 'agt_954OZ9Ea';
+    
+    // Then try to get the credentials from the server
     fetch('/api/did-credentials')
       .then(response => response.json())
       .then(data => {
-        script.dataset.clientKey = data.clientKey;
-        script.dataset.agentId = data.agentId;
-        console.log('DID credentials loaded successfully');
+        if (data.clientKey && data.agentId) {
+          script.dataset.clientKey = data.clientKey;
+          script.dataset.agentId = data.agentId;
+          console.log('DID credentials loaded successfully from API');
+        } else {
+          console.warn('API returned empty DID credentials, using defaults');
+        }
       })
       .catch(error => {
         console.error('Error fetching DID credentials:', error);
+        console.warn('Using default DID credentials due to API error');
       });
       
     script.dataset.monitor = 'true';
