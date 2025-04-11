@@ -15,7 +15,8 @@ import {
   HelpCircle,
   Settings,
   GraduationCap,
-  Headphones
+  Headphones,
+  User
 } from "lucide-react";
 
 // Type for sidebar items
@@ -197,7 +198,7 @@ export default function UserSidebar() {
             {/* Embedded Virtual Agent */}
             <Link href="/virtual-agent">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-blue-500 to-primary">
-                <UserRound className="mr-2 h-4 w-4" />
+                <User className="mr-2 h-4 w-4" />
                 Embedded Consultant
               </Button>
             </Link>
