@@ -10,172 +10,147 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            background-color: #0f172a; /* Dark background */
-            color: #f8fafc;
+            background-color: #0f172a;
+            color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .header {
-            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-        }
-        
-        .header h1 svg {
-            margin-right: 0.5rem;
-            color: #3b82f6;
-        }
-        
-        .header .buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .btn {
-            background-color: rgba(59, 130, 246, 0.1);
-            color: #f8fafc;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s;
-        }
-        
-        .btn:hover {
-            background-color: rgba(59, 130, 246, 0.2);
-        }
-        
-        .btn svg {
-            margin-right: 0.25rem;
+            overflow: hidden;
         }
         
         .container {
-            height: calc(100% - 70px);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .title {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .subtitle {
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .agent-container {
             width: 100%;
+            max-width: 800px;
+            height: 450px;
             position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
         
         .loading {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             background-color: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
             z-index: 10;
         }
         
         .spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(59, 130, 246, 0.1);
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: #3b82f6;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
         }
         
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
+        }
+        
+        #did-agent {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .back-button {
+            margin-top: 20px;
+            background: #4338ca;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-button:hover {
+            background: #4f46e5;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-            MetaWorks Security Consultant
-        </h1>
-        <div class="buttons">
-            <button class="btn" onclick="window.location.reload()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M23 4v6h-6"></path>
-                    <path d="M1 20v-6h6"></path>
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path>
-                    <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"></path>
-                </svg>
-                Reload
-            </button>
-            <button class="btn" id="fullscreen-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 3 21 3 21 9"></polyline>
-                    <polyline points="9 21 3 21 3 15"></polyline>
-                    <line x1="21" y1="3" x2="14" y2="10"></line>
-                    <line x1="3" y1="21" x2="10" y2="14"></line>
-                </svg>
-                Fullscreen
-            </button>
-        </div>
-    </div>
-    
     <div class="container">
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Loading your virtual consultant...</p>
+        <div class="title">MetaWorks Virtual Security Consultant</div>
+        <div class="subtitle">Ask me anything about cybersecurity compliance, risk management, or policy questions.</div>
+        
+        <div class="agent-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+            
+            <!-- D-ID Agent will be loaded here -->
+            <div id="did-agent"></div>
+            
+            <div class="overlay">Powered by MetaWorks AI</div>
         </div>
         
-        <div id="did-agent-container" style="height: 100%; width: 100%;"></div>
+        <a href="/" class="back-button">Back to Dashboard</a>
     </div>
 
-    <!-- D-ID Agent Script -->
-    <script
-        type="module"
-        src="https://agent.d-id.com/v1/index.js"
-        data-name="did-agent"
-        data-target="#did-agent-container"
-        data-mode="fabio"
-        data-client-key="YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw=="
-        data-agent-id="agt_mNHiVcSw"
-        data-monitor="true">
+    <!-- Direct D-ID Agent Integration - Using the provided script tag -->
+    <script 
+        type="module" 
+        src="https://agent.d-id.com/v1/index.js" 
+        data-name="did-agent" 
+        data-mode="fabio" 
+        data-client-key="YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw==" 
+        data-agent-id="agt_mNHiVcSw" 
+        data-monitor="true"
+        onload="document.getElementById('loading').style.display = 'none';"
+        onerror="console.error('Failed to load D-ID agent');document.getElementById('loading').innerHTML = '<div>Error loading agent. Please try again later.</div>';">
     </script>
-
+    
     <script>
-        // Handle fullscreen functionality
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-        const container = document.querySelector('.container');
+        console.log("D-ID Agent standalone page loaded");
         
-        fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
+        // Handle error if the D-ID script doesn't load
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT') {
+                console.error('Error loading script:', e);
+                document.getElementById('loading').innerHTML = '<div>Error loading agent. Please try again later.</div>';
             }
-        });
-
-        // Hide loading spinner after a delay
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 3000);
-        });
-        
-        // Log when the D-ID agent script is loaded
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM content loaded, waiting for D-ID agent...');
-        });
+        }, true);
     </script>
 </body>
 </html>

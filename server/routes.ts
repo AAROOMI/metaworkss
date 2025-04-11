@@ -159,29 +159,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from attached_assets
   app.use('/attached_assets', express.static(path.join(process.cwd(), 'public', 'attached_assets')));
   
-  // Direct route to the standalone D-ID agent page with credentials injected
+  // Direct route to the standalone D-ID agent page
   app.get('/did-standalone', (req, res) => {
-    const filePath = path.join(process.cwd(), 'public', 'did-standalone.html');
-    
-    // Read the HTML file
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading D-ID standalone file:', err);
-        return res.status(500).send('Error loading D-ID agent');
-      }
-      
-      // Replace the placeholder credentials with actual environment variables
-      const agentId = process.env.NEW_DID_AGENT_ID || process.env.DID_AGENT_ID;
-      const clientKey = process.env.NEW_DID_CLIENT_KEY || process.env.DID_CLIENT_KEY;
-      
-      // Replace placeholders with actual values
-      let html = data.replace('__NEW_DID_AGENT_ID__', agentId)
-                    .replace('__NEW_DID_CLIENT_KEY__', clientKey);
-      
-      // Send the modified HTML
-      res.setHeader('Content-Type', 'text/html');
-      res.send(html);
-    });
+    // Use the static HTML file with hardcoded credentials
+    res.sendFile(path.join(process.cwd(), 'public', 'did-agent-standalone.html'));
   });
 
   // Policy management endpoints
