@@ -28,12 +28,11 @@ export default function DIDAgentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Agent Column */}
             <div className="lg:col-span-2 space-y-4">
-              <AgentScript 
-                height="600px"
-                containerClassName="rounded-lg overflow-hidden shadow-lg"
+              <iframe
+                src="/exact-agent.html" 
+                className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg border border-border"
+                title="MetaWorks Virtual Security Assistant"
               />
-              
-
             </div>
             
             {/* Information Column */}
