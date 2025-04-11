@@ -29,7 +29,7 @@ export default function DIDAgentPage() {
             {/* Agent Column */}
             <div className="lg:col-span-2 space-y-4">
               <iframe
-                src="/exact-agent.html" 
+                src="/did-agent.html" 
                 className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg border border-border"
                 title="MetaWorks Virtual Security Assistant"
               />
