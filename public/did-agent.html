@@ -69,26 +69,8 @@
           script.setAttribute('data-name', 'did-agent');
           script.setAttribute('data-target', '#did-agent');
           script.setAttribute('data-mode', 'fabio');
-          // Set default credentials
-          script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
-          script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
-          
-          // Try to fetch credentials from server
-          fetch('/api/did-credentials')
-            .then(response => response.json())
-            .then(data => {
-              if (data.clientKey && data.agentId) {
-                script.setAttribute('data-client-key', data.clientKey);
-                script.setAttribute('data-agent-id', data.agentId);
-                console.log('D-ID credentials loaded for iframe from API');
-              } else {
-                console.warn('API returned empty DID credentials, using defaults');
-              }
-            })
-            .catch(error => {
-              console.error('Error loading D-ID credentials:', error);
-              console.warn('Using default credentials due to API error');
-            });
+          script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
+          script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
           script.setAttribute('data-monitor', 'true');
 
           script.onload = () => {

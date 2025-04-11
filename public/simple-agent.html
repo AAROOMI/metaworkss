@@ -74,60 +74,35 @@
     <div id="did-agent"></div>
   </div>
 
-  <!-- The script tag will be created dynamically with credentials from the API -->
+  <script
+    type="module"
+    src="https://agent.d-id.com/v1/index.js"
+    data-name="did-agent"
+    data-target="#did-agent"
+    data-mode="fabio"
+    data-client-key="Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD"
+    data-agent-id="agt_YjpQXzSG"
+    data-monitor="true">
+  </script>
+
   <script>
+    // Handle loading state
     document.addEventListener('DOMContentLoaded', () => {
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = 'https://agent.d-id.com/v1/index.js';
-      script.setAttribute('data-name', 'did-agent');
-      script.setAttribute('data-target', '#did-agent');
-      script.setAttribute('data-mode', 'fabio');
+      const script = document.querySelector('script[data-name="did-agent"]');
       
-      // Set default credentials
-      script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
-      script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
-      script.setAttribute('data-monitor', 'true');
-      
-      // Set up script event handlers
+      // Hide loading when agent is loaded
       script.onload = () => {
         console.log('D-ID Agent script loaded successfully');
         document.getElementById('loading').style.display = 'none';
       };
       
+      // Show error if loading fails
       script.onerror = (error) => {
         console.error('Error loading D-ID Agent script:', error);
         document.getElementById('error-message').style.display = 'block';
         document.getElementById('loading').style.display = 'none';
       };
-      
-      // Try to fetch credentials from server
-      fetch('/api/did-credentials')
-        .then(response => response.json())
-        .then(data => {
-          if (data.clientKey && data.agentId) {
-            script.setAttribute('data-client-key', data.clientKey);
-            script.setAttribute('data-agent-id', data.agentId);
-            console.log('D-ID credentials loaded for simple iframe from API');
-          } else {
-            console.warn('API returned empty DID credentials, using defaults');
-          }
-          
-          // Add script to document after setting all attributes
-          document.body.appendChild(script);
-          console.log('D-ID Agent script added to the document');
-        })
-        .catch(error => {
-          console.error('Failed to fetch D-ID credentials:', error);
-          console.warn('Using default credentials due to API error');
-          
-          // Still add the script with default credentials
-          document.body.appendChild(script);
-          console.log('D-ID Agent script added with default credentials');
-        });
     });
   </script>
-
-  <!-- The event handlers were moved to the dynamically created script element above -->
 </body>
 </html>

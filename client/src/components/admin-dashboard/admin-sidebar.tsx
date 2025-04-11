@@ -14,9 +14,7 @@ import {
   LineChart,
   FileSpreadsheet,
   HelpCircle,
-  Bell,
-  Headphones,
-  User
+  Bell
 } from "lucide-react";
 
 interface SidebarItem {
@@ -121,37 +119,6 @@ export default function AdminSidebar() {
               </Link>
             ))}
           </nav>
-          
-          {/* AI Assistance Section */}
-          <div className="mt-6 px-2 space-y-3">
-            <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              AI Assistance
-            </h3>
-            
-            {/* Direct D-ID Integration - External window */}
-            <a href="/consultant-redirect.html" target="_blank" rel="noopener noreferrer">
-              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
-                <Headphones className="mr-2 h-4 w-4" />
-                External Consultant
-              </Button>
-            </a>
-            
-            {/* Direct D-ID Integration - Embedded */}
-            <Link href="/did-agent">
-              <Button variant="secondary" className="w-full justify-start">
-                <User className="mr-2 h-4 w-4" />
-                Security Assistant
-              </Button>
-            </Link>
-            
-            {/* Full Screen D-ID Integration */}
-            <Link href="/fullscreen-consultant">
-              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-blue-500 to-primary">
-                <User className="mr-2 h-4 w-4" />
-                Fullscreen Consultant
-              </Button>
-            </Link>
-          </div>
           
           {/* User Dashboard Link */}
           <div className="px-2 mt-6">

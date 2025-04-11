@@ -1,9 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertTriangle, Shield, ShieldAlert, ShieldCheck, ShieldOff, Info } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { AlertTriangle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface DomainData {
   domain: string;
@@ -23,11 +20,11 @@ function RiskHeatmapComponent({ domains = [] }: RiskHeatmapProps) {
   // If no domains or empty data, show placeholder
   if (!domains || domains.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-6 space-y-4 h-64 bg-card/30 backdrop-blur-sm rounded-lg border border-border/30">
-        <AlertTriangle className="h-12 w-12 text-amber-500 opacity-80" />
-        <h3 className="text-lg font-medium">No Risk Data Available</h3>
-        <p className="text-center text-muted-foreground max-w-md">
-          There is no risk data to display for this assessment. Complete an assessment to view your risk heatmap.
+      <div className="flex flex-col items-center justify-center p-6 space-y-4 h-64">
+        <AlertTriangle className="h-12 w-12 text-yellow-500" />
+        <h3 className="text-lg font-medium">No Data Available</h3>
+        <p className="text-center text-gray-500">
+          There is no risk data to display for this assessment.
         </p>
       </div>
     );
@@ -35,25 +32,17 @@ function RiskHeatmapComponent({ domains = [] }: RiskHeatmapProps) {
 
   // Function to determine color based on risk level
   const getRiskColor = (riskLevel: number) => {
-    if (riskLevel <= 20) return "bg-emerald-600/90"; // Very Low Risk
-    if (riskLevel <= 40) return "bg-green-500/90"; // Low Risk
-    if (riskLevel <= 60) return "bg-amber-500/90"; // Medium Risk
-    if (riskLevel <= 80) return "bg-orange-500/90"; // High Risk
-    return "bg-red-600/90"; // Very High Risk
+    if (riskLevel <= 20) return "bg-green-500"; // Very Low Risk
+    if (riskLevel <= 40) return "bg-green-300"; // Low Risk
+    if (riskLevel <= 60) return "bg-yellow-300"; // Medium Risk
+    if (riskLevel <= 80) return "bg-orange-400"; // High Risk
+    return "bg-red-500"; // Very High Risk
   };
 
-  // Function to get badge colors
-  const getRiskBadgeColor = (riskLevel: number) => {
-    if (riskLevel <= 20) return "bg-emerald-500/20 text-emerald-600 border-emerald-500/30"; 
-    if (riskLevel <= 40) return "bg-green-500/20 text-green-600 border-green-500/30"; 
-    if (riskLevel <= 60) return "bg-amber-500/20 text-amber-600 border-amber-500/30"; 
-    if (riskLevel <= 80) return "bg-orange-500/20 text-orange-600 border-orange-500/30"; 
-    return "bg-red-500/20 text-red-600 border-red-500/30"; 
-  };
-
-  // Function to get text color
+  // Function to get text color based on background color
   const getTextColor = (riskLevel: number) => {
-    return "text-white"; // All backgrounds are dark enough for white text
+    if (riskLevel <= 40) return "text-gray-800"; // Dark text for light backgrounds
+    return "text-white"; // Light text for dark backgrounds
   };
 
   // Function to get risk level label
@@ -65,114 +54,67 @@ function RiskHeatmapComponent({ domains = [] }: RiskHeatmapProps) {
     return "Very High";
   };
 
-  // Function to get risk icon
-  const getRiskIcon = (riskLevel: number) => {
-    if (riskLevel <= 20) return <ShieldCheck className="h-4 w-4" />;
-    if (riskLevel <= 40) return <Shield className="h-4 w-4" />;
-    if (riskLevel <= 60) return <ShieldAlert className="h-4 w-4" />;
-    if (riskLevel <= 80) return <ShieldOff className="h-4 w-4" />;
-    return <ShieldOff className="h-4 w-4" />;
-  };
-
-  // Calculate compliance percentage for visual bars
-  const getCompliancePercentage = (domain: DomainData) => {
-    const total = domain.implemented + domain.partially_implemented + domain.not_implemented;
-    if (total === 0) return 0;
-    
-    // Full compliance for implemented, half for partially implemented
-    return Math.round(((domain.implemented * 1.0) + (domain.partially_implemented * 0.5)) / total * 100);
-  };
-
   return (
-    <TooltipProvider>
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[440px] overflow-y-auto pr-2">
-          {domains.map((domain, index) => {
-            const compliancePercentage = getCompliancePercentage(domain);
-            return (
-              <Card key={index} className="overflow-hidden border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className={`h-1.5 ${getRiskColor(domain.risk_level)}`}></div>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="text-base font-medium flex items-center">
-                        {domain.domainCode} - {domain.domain}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 ml-1.5 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            <p className="text-xs">
-                              Risk level is calculated based on control implementation status and criticality
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </h4>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {domain.controls.length} controls
-                      </div>
-                    </div>
-                    <Badge className={`${getRiskBadgeColor(domain.risk_level)}`}>
-                      <span className="flex items-center gap-1">
-                        {getRiskIcon(domain.risk_level)}
-                        {getRiskLabel(domain.risk_level)} Risk
-                      </span>
-                    </Badge>
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[340px] overflow-y-auto pr-2">
+        {domains.map((domain, index) => (
+          <Card key={index} className={`p-0 overflow-hidden border-l-4 ${getRiskColor(domain.risk_level)}`}>
+            <div className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-sm font-medium mb-1">{domain.domainCode || 'D'} - {domain.domain}</h4>
+                  <div className="text-xs text-gray-500">
+                    {domain.controls.length} controls
                   </div>
-                  
-                  <div className="mb-3">
-                    <div className="flex justify-between items-center text-xs mb-1">
-                      <span className="text-muted-foreground">Compliance</span>
-                      <span className="font-medium">{compliancePercentage}%</span>
-                    </div>
-                    <Progress value={compliancePercentage} className="h-2" />
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-md py-2 px-2">
-                      <span className="text-lg font-semibold text-emerald-600">{domain.implemented}</span>
-                      <span className="block text-xs text-muted-foreground">Implemented</span>
-                    </div>
-                    <div className="bg-amber-500/10 border border-amber-500/30 rounded-md py-2 px-2">
-                      <span className="text-lg font-semibold text-amber-600">{domain.partially_implemented}</span>
-                      <span className="block text-xs text-muted-foreground">Partial</span>
-                    </div>
-                    <div className="bg-red-500/10 border border-red-500/30 rounded-md py-2 px-2">
-                      <span className="text-lg font-semibold text-red-600">{domain.not_implemented}</span>
-                      <span className="block text-xs text-muted-foreground">Not Impl.</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                </div>
+                <div className={`text-xs font-medium px-2 py-1 rounded ${getRiskColor(domain.risk_level)} ${getTextColor(domain.risk_level)}`}>
+                  {getRiskLabel(domain.risk_level)}
+                </div>
+              </div>
+              
+              <div className="mt-3 grid grid-cols-3 gap-1 text-center text-xs">
+                <div className="bg-green-100 text-green-800 rounded py-1">
+                  <span className="font-medium">{domain.implemented}</span>
+                  <span className="block text-[10px]">Implemented</span>
+                </div>
+                <div className="bg-yellow-100 text-yellow-800 rounded py-1">
+                  <span className="font-medium">{domain.partially_implemented}</span>
+                  <span className="block text-[10px]">Partial</span>
+                </div>
+                <div className="bg-red-100 text-red-800 rounded py-1">
+                  <span className="font-medium">{domain.not_implemented}</span>
+                  <span className="block text-[10px]">Not Impl.</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Legend */}
+      <div className="mt-4 flex justify-center items-center space-x-4 text-xs">
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-green-500 mr-1"></div>
+          <span>Very Low</span>
         </div>
-        
-        {/* Legend */}
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 p-2 bg-card/30 backdrop-blur-sm rounded-lg border border-border/30">
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-sm bg-emerald-600/90 mr-2"></div>
-            <span className="text-xs font-medium">Very Low Risk</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-sm bg-green-500/90 mr-2"></div>
-            <span className="text-xs font-medium">Low Risk</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-sm bg-amber-500/90 mr-2"></div>
-            <span className="text-xs font-medium">Medium Risk</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-sm bg-orange-500/90 mr-2"></div>
-            <span className="text-xs font-medium">High Risk</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-sm bg-red-600/90 mr-2"></div>
-            <span className="text-xs font-medium">Very High Risk</span>
-          </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-green-300 mr-1"></div>
+          <span>Low</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-yellow-300 mr-1"></div>
+          <span>Medium</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-orange-400 mr-1"></div>
+          <span>High</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-red-500 mr-1"></div>
+          <span>Very High</span>
         </div>
       </div>
-    </TooltipProvider>
+    </div>
   );
 }
 
@@ -218,51 +160,9 @@ const sampleDomainData: DomainData[] = [
 
 // Default export with data fetching for dashboard
 export default function RiskHeatmap() {
-  const { data: riskData, isLoading, error } = useQuery({
-    queryKey: ["/api/risk-prediction/dashboard"],
-    retry: 1,
-  });
-  
-  // If still loading or no data, show loading state or sample data
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-6 h-64">
-        <div className="text-center">
-          <div className="h-8 w-8 border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-sm text-muted-foreground">Loading risk data...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // If there is an error or no risk data
-  if (error || !riskData || !riskData.domain_risk_distribution) {
-    return <RiskHeatmapComponent domains={[]} />;
-  }
-  
-  // Map API data to the format expected by the heatmap component
-  const domainData: DomainData[] = riskData.high_risk_domains?.map((domain: any) => {
-    return {
-      domain: domain.domain,
-      domainCode: domain.domain_code || domain.domain.substring(0, 3).toUpperCase(),
-      controls: domain.control_risks || [],
-      implemented: domain.implemented || 0,
-      partially_implemented: domain.partially_implemented || 0,
-      not_implemented: domain.not_implemented || 0,
-      risk_level: 
-        domain.risk_level === "High" ? 80 :
-        domain.risk_level === "Medium" ? 60 :
-        domain.risk_level === "Low" ? 40 : 20
-    };
-  }) || [];
-  
-  // If no data is available from the API, fallback to sample data for demonstration
-  if (domainData.length === 0) {
-    // For demo purposes, otherwise we would just show empty state
-    return <RiskHeatmapComponent domains={sampleDomainData} />;
-  }
-  
-  return <RiskHeatmapComponent domains={domainData} />;
+  // In a real implementation, we would fetch domain data
+  // For now, showing sample data
+  return <RiskHeatmapComponent domains={sampleDomainData} />;
 }
 
 // Named export for when data is provided

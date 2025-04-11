@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
 import path from "path";
-import fs from "fs";
 import { logoUpload, documentUpload, saveFileToDatabase, getFileById, deleteFile } from "./file-service";
 import dotenv from "dotenv";
 import express from 'express';
@@ -14,8 +13,6 @@ import assessmentResultsRouter from "./api/assessment-results";
 import frameworksRouter from "./api/frameworks";
 import domainsRouter from "./api/domains";
 import subdomainsRouter from "./api/subdomains";
-import risksRouter from './api/risks';
-import assessmentRisksRouter from './api/assessment-risks';
 import controlsRouter from "./api/controls";
 import policyManagementRouter from "./api/policy-management";
 import companyInfoRouter from "./api/company-info";
@@ -23,10 +20,8 @@ import { registerReportsRoutes } from "./api/reports";
 import { onboardingRouter } from "./api/onboarding";
 import { gamificationRouter } from "./api/gamification";
 import didAgentRouter from "./api/did-agent";
-import didProxyRouter from "./api/did-proxy";
 import progressRouter from "./api/progress";
 import riskPredictionRouter from "./api/risk-prediction";
-import externalAgentRouter from "./api/external-agent-bridge";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -43,11 +38,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ publishableKey });
   });
 
-  // Use our dedicated DID Agent router
-  app.use(didAgentRouter);
-  
-  // Make sure our D-ID API endpoints are public
-  // We removed the direct credentials endpoint in favor of the proxy approach
+  // Use our dedicated DID Agent router (removed older implementation in favor of the modular one)
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {
@@ -159,17 +150,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve static files from attached_assets
   app.use('/attached_assets', express.static(path.join(process.cwd(), 'public', 'attached_assets')));
-  
-  // Direct route to the standalone D-ID agent page
-  app.get('/did-standalone', (req, res) => {
-    // Use the static HTML file with hardcoded credentials
-    res.sendFile(path.join(process.cwd(), 'public', 'did-agent-standalone.html'));
-  });
-  
-  // Route for the external agent integration documentation
-  app.get('/external-agent-integration', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'public', 'external-agent-integration.html'));
-  });
 
   // Policy management endpoints
   app.post("/api/policies", async (req, res, next) => {
@@ -360,10 +340,8 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/gamification", gamificationRouter);
   app.use("/api/did-agent", didAgentRouter);
-  app.use(didProxyRouter);
   app.use(progressRouter);
   app.use(riskPredictionRouter);
-  app.use("/api/external-agent", externalAgentRouter);
   
   // Register reports API routes
   registerReportsRoutes(app);
@@ -411,10 +389,6 @@ app.get("/api/dashboard-access", async (req, res) => {
       next(error);
     }
   });
-
-  // Register risk management routes
-  app.use('/api/risks', risksRouter);
-  app.use('/api/assessment-risks', assessmentRisksRouter);
 
   const httpServer = createServer(app);
   return httpServer;

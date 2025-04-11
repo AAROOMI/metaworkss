@@ -13,40 +13,39 @@ export default function AgentScript({
   className = '',
   containerClassName = '',
 }: AgentScriptProps) {
-  const didAgentRef = useRef<HTMLDivElement>(null);
+  const agentContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!didAgentRef.current) return;
-
-    // Clear any existing content
-    didAgentRef.current.innerHTML = '';
-
-    // Create and inject the script element with the exact attributes
+    // Create script element
     const script = document.createElement('script');
     script.type = 'module';
     script.src = 'https://agent.d-id.com/v1/index.js';
-    script.setAttribute('data-name', 'did-agent');
-    script.setAttribute('data-mode', 'fabio');
-    script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
-    script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
-    script.setAttribute('data-monitor', 'true');
-    script.setAttribute('data-target', '#did-agent-container');
-
-    // Create a target div for the agent
-    const targetDiv = document.createElement('div');
-    targetDiv.id = 'did-agent-container';
-    targetDiv.style.width = '100%';
-    targetDiv.style.height = '100%';
-
-    // Add both elements to the container
-    didAgentRef.current.appendChild(targetDiv);
-    didAgentRef.current.appendChild(script);
+    script.dataset.name = 'did-agent';
+    script.dataset.mode = 'fabio';
+    script.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
+    script.dataset.agentId = 'agt_YjpQXzSG';
+    script.dataset.monitor = 'true';
+    
+    // Only add the script if it doesn't already exist
+    if (agentContainerRef.current && !agentContainerRef.current.querySelector('script')) {
+      agentContainerRef.current.appendChild(script);
+    }
+    
+    // Cleanup function
+    return () => {
+      if (agentContainerRef.current) {
+        const scriptElement = agentContainerRef.current.querySelector('script');
+        if (scriptElement) {
+          agentContainerRef.current.removeChild(scriptElement);
+        }
+      }
+    };
   }, []);
 
   return (
     <div className={`${containerClassName}`}>
       <div 
-        ref={didAgentRef}
+        ref={agentContainerRef}
         style={{ height, width }}
         className={`bg-card rounded-lg overflow-hidden ${className}`}
       />

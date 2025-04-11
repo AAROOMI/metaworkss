@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { Shield, Menu, X, Presentation, UserCog } from "lucide-react";
+import { Shield, Menu, X, Presentation } from "lucide-react";
 import { ThemeSwitch } from "./theme-switch";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useClerkUser, ClerkUserButton } from "@/components/clerk/clerk-auth";
-import { isAdmin } from "@/lib/clerk-roles";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location, navigate] = useLocation();
   const { user, logoutMutation } = useAuth();
-  const { isSignedIn, user: clerkUser } = useClerkUser();
-  const isClerkAdmin = isSignedIn && isAdmin(clerkUser);
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -92,25 +88,6 @@ export default function Header() {
                 </Button>
                 <Button onClick={handleLogout}>Logout</Button>
               </>
-            ) : isSignedIn ? (
-              <>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/admin-dashboard")}
-                  className="hidden md:inline-flex items-center gap-2"
-                >
-                  <UserCog className="h-4 w-4" />
-                  Admin Dashboard
-                </Button>
-                {isClerkAdmin && (
-                  <Button onClick={() => navigate("/clerk-admin")} variant="outline" className="hidden md:inline-flex">
-                    Clerk Admin
-                  </Button>
-                )}
-                <div className="hidden md:block">
-                  <ClerkUserButton />
-                </div>
-              </>
             ) : (
               <>
                 <Button
@@ -118,15 +95,7 @@ export default function Header() {
                   onClick={handleLogin}
                   className="hidden md:inline-flex"
                 >
-                  Standard Login
-                </Button>
-                <Button 
-                  variant="default"
-                  onClick={handleClerkAuth}
-                  className="hidden md:inline-flex items-center gap-2"
-                >
-                  <Shield className="h-4 w-4" />
-                  Admin Sign In
+                  Login
                 </Button>
                 <Button onClick={handleSignup}>Get Started</Button>
               </>
@@ -165,43 +134,13 @@ export default function Header() {
                     User Dashboard
                   </a>
                 </>
-              ) : isSignedIn ? (
-                <>
-                  <a 
-                    onClick={() => { navigate('/admin-dashboard'); setIsMenuOpen(false); }}
-                    className="flex items-center px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-                  >
-                    <UserCog className="mr-2 h-4 w-4" />
-                    Admin Dashboard
-                  </a>
-                  {isClerkAdmin && (
-                    <a 
-                      onClick={() => { navigate('/clerk-admin'); setIsMenuOpen(false); }}
-                      className="flex items-center px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-                    >
-                      <Shield className="mr-2 h-4 w-4 text-primary" />
-                      Clerk Admin
-                    </a>
-                  )}
-                  <div className="px-3 py-2 flex items-center">
-                    <span className="mr-2">Account:</span>
-                    <ClerkUserButton />
-                  </div>
-                </>
               ) : (
                 <>
                   <a 
                     onClick={() => { navigate('/auth'); setIsMenuOpen(false); }}
                     className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
                   >
-                    Standard Login
-                  </a>
-                  <a 
-                    onClick={() => { navigate('/clerk-auth'); setIsMenuOpen(false); }}
-                    className="flex items-center px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
-                  >
-                    <Shield className="mr-2 h-4 w-4 text-primary" />
-                    Admin Sign In
+                    Login
                   </a>
                 </>
               )}

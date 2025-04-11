@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ArrowLeft, FileText, Plus, Download, Filter, Settings, Calendar, Clock, Check, X, Pencil, Trash2, Upload, Loader2, AlertCircle } from "lucide-react";
-import { DirectFileUploader } from "@/components/common/direct-file-uploader";
 import { Policy } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -126,9 +125,42 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
       return;
     }
     
-    // Always update with current form state
-    // The fileId and documentUrl are already in formState if a file was uploaded
-    createPolicyMutation.mutate(formState);
+    // Upload file first if available
+    if (file) {
+      const formData = new FormData();
+      formData.append("document", file);
+      
+      // Create form data for file upload
+      fetch("/api/upload/document", {
+        method: "POST",
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          // Now create the policy with the file ID and document URL
+          createPolicyMutation.mutate({ 
+            ...formState,
+            fileId: data.fileId,
+            documentUrl: `/uploads/documents/${data.filename}` // Store the correct document URL path
+          });
+        })
+        .catch(err => {
+          toast({
+            title: "File upload failed",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    } else {
+      // Create policy without file
+      createPolicyMutation.mutate(formState);
+    }
   };
   
   return (
@@ -230,23 +262,12 @@ function PolicyForm({ onCancel }: { onCancel: () => void }) {
       
       <div className="space-y-2">
         <Label htmlFor="document">Upload Policy Document</Label>
-        <DirectFileUploader
-          endpoint="/api/upload/document"
-          fieldName="document"
-          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          buttonText="Upload Policy Document"
-          onFileUploaded={(fileId, filename, url) => {
-            // Store file info to be submitted with form later
-            setFormState(prev => ({
-              ...prev,
-              fileId,
-              documentUrl: url
-            }));
-            toast({
-              title: "Document uploaded",
-              description: "Document has been attached and will be saved when you click 'Save Policy'",
-            });
-          }}
+        <Input 
+          id="document" 
+          type="file" 
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+          onChange={handleFileChange}
+          className="cursor-pointer"
         />
         <p className="text-xs text-muted-foreground mt-1">
           Supported file types: PDF, DOCX (Max size: 10MB)
@@ -370,9 +391,42 @@ function PolicyEditForm({ policy, onCancel }: { policy: PolicyWithDetails; onCan
       return;
     }
     
-    // Always update with current form state
-    // The fileId and documentUrl are already in formState if a file was uploaded
-    updatePolicyMutation.mutate(formState);
+    // Upload file first if available
+    if (file) {
+      const formData = new FormData();
+      formData.append("document", file);
+      
+      // Create form data for file upload
+      fetch("/api/upload/document", {
+        method: "POST",
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          // Now update the policy with the file ID and document URL
+          updatePolicyMutation.mutate({ 
+            ...formState,
+            fileId: data.fileId,
+            documentUrl: `/uploads/documents/${data.filename}` // Store the correct document URL path
+          });
+        })
+        .catch(err => {
+          toast({
+            title: "File upload failed",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    } else {
+      // Update policy without file
+      updatePolicyMutation.mutate(formState);
+    }
   };
   
   return (
@@ -474,23 +528,12 @@ function PolicyEditForm({ policy, onCancel }: { policy: PolicyWithDetails; onCan
       
       <div className="space-y-2">
         <Label htmlFor="document">Upload New Document</Label>
-        <DirectFileUploader
-          endpoint="/api/upload/document"
-          fieldName="document"
-          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          buttonText="Upload New Document"
-          onFileUploaded={(fileId, filename, url) => {
-            // Store file info to be submitted with form later
-            setFormState(prev => ({
-              ...prev,
-              fileId,
-              documentUrl: url
-            }));
-            toast({
-              title: "Document uploaded",
-              description: "Document has been attached and will be saved when you click 'Update Policy'",
-            });
-          }}
+        <Input 
+          id="document" 
+          type="file" 
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+          onChange={handleFileChange}
+          className="cursor-pointer"
         />
         <p className="text-xs text-muted-foreground mt-1">
           Supported file types: PDF, DOCX (Max size: 10MB)
