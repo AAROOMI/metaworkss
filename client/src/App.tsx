@@ -12,7 +12,6 @@ import VirtualAssistantPage from "@/pages/virtual-assistant-page";
 import DIDAgentPage from "@/pages/did-agent-page";
 import AgentTestPage from "@/pages/agent-test-page";
 import FrameAgentPage from "@/pages/frame-agent-page";
-import IntegratedAgentPage from "@/pages/integrated-agent-page";
 import NcaEccPage from "@/pages/frameworks/nca-ecc-page";
 import NcaEccAssessmentPage from "@/pages/frameworks/nca-ecc-assessment-page";
 import SamaPage from "@/pages/frameworks/sama-page";
@@ -72,11 +71,9 @@ function Router() {
       
       {/* Public Routes */}
       <Route path="/did-agent" component={DIDAgentPage} />
-      <Route path="/agent" component={IntegratedAgentPage} />
-      <Route path="/virtual-consultant" component={IntegratedAgentPage} />
+      <Route path="/agent" component={DIDAgentPage} />
       <Route path="/agent-test" component={AgentTestPage} />
       <Route path="/frame-agent" component={FrameAgentPage} />
-      <Route path="/integrated-agent" component={IntegratedAgentPage} />
       <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
       <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />
       <Route path="/frameworks/sama" component={SamaPage} />

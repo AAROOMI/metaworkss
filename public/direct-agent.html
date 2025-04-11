@@ -3,213 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MetaWorks Virtual Consultant</title>
+  <title>MetaWorks Virtual Agent</title>
   <style>
-    * {
+    body, html {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body, html {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       height: 100%;
       width: 100%;
+      overflow: hidden;
       background-color: #0f172a;
       color: white;
-      overflow: hidden;
+      font-family: Arial, sans-serif;
     }
-    
     .container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100%;
-    }
-    
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      background-color: #1e293b;
-      border-bottom: 1px solid #334155;
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .logo-icon {
-      width: 2rem;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #4f46e5;
-      border-radius: 0.25rem;
-      font-weight: bold;
-    }
-    
-    .header-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-    }
-    
-    .agent-container {
-      position: relative;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    #did-agent {
       width: 100%;
       height: 100%;
-    }
-    
-    .status {
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      color: white;
-      border-radius: 1rem;
-      background-color: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
     }
-    
-    .status-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-    
-    .loading { background-color: #eab308; }
-    .ready { background-color: #10b981; }
-    .error { background-color: #ef4444; }
-    
-    .footer {
-      padding: 0.5rem;
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
       text-align: center;
-      background-color: #1e293b;
-      border-top: 1px solid #334155;
-      font-size: 0.75rem;
-      color: #94a3b8;
+    }
+    #did-agent {
+      width: 100%;
+      height: 75%;
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header class="header">
-      <div class="logo">
-        <div class="logo-icon">M</div>
-        <h1 class="header-title">MetaWorks Virtual Consultant</h1>
-      </div>
-    </header>
-    
-    <div class="agent-container">
-      <div id="did-agent"></div>
-      <div class="status">
-        <span id="status-indicator" class="status-indicator loading"></span>
-        <span id="status-text">Initializing...</span>
-      </div>
-    </div>
-    
-    <footer class="footer">
-      MetaWorks Cybersecurity Platform &copy; 2024
-    </footer>
+    <h1>MetaWorks Virtual Cybersecurity Consultant</h1>
+    <div id="did-agent"></div>
   </div>
-  
-  <script type="module">
-    // DOM elements
-    const statusIndicator = document.getElementById('status-indicator');
-    const statusText = document.getElementById('status-text');
-    
-    // Update status display
-    function updateStatus(state, message) {
-      statusIndicator.className = `status-indicator ${state}`;
-      statusText.textContent = message;
-    }
-    
-    // Script injection with retry
-    async function loadAgent(retryCount = 0) {
-      try {
-        updateStatus('loading', 'Loading consultant...');
-        
-        // Clean up any existing script
-        const existingScript = document.getElementById('did-agent-script');
-        if (existingScript) {
-          existingScript.remove();
-        }
-        
-        // Create script element
-        const script = document.createElement('script');
-        script.id = 'did-agent-script';
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
-        script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
-        script.setAttribute('data-api-key', 'YWJkdWxsYWhhYmR1bGF6aXoyODc4QGdtYWlsLmNvbQ:AY9mNPPjRnl69cFmhE4Zj');
-        script.setAttribute('data-monitor', 'true');
-        
-        // Add to document
-        document.body.appendChild(script);
-        console.log('Agent script added to document');
-        
-        // Set up message listener for DID agent
-        window.addEventListener('message', handleAgentMessages);
-        
-        // Set timeout for verification
-        setTimeout(() => {
-          if (statusIndicator.className !== 'status-indicator ready') {
-            if (retryCount < 2) {
-              console.log(`Retry attempt ${retryCount + 1}`);
-              loadAgent(retryCount + 1);
-            } else {
-              updateStatus('error', 'Failed to load. Try refreshing.');
-            }
-          }
-        }, 10000);
-      } catch (error) {
-        console.error('Error loading agent:', error);
-        updateStatus('error', 'Error: ' + error.message);
-      }
-    }
-    
-    // Handle messages from DID agent
-    function handleAgentMessages(event) {
-      const data = event.data;
-      
-      // Filter for DID agent messages
-      if (!data || data.source !== 'did-agent') return;
-      
-      console.log('DID agent event:', data);
-      
-      switch (data.type) {
-        case 'ready':
-          updateStatus('ready', 'Consultant ready');
-          break;
-        case 'error':
-          updateStatus('error', 'Agent error');
-          console.error('DID agent error:', data.error);
-          break;
-      }
-    }
-    
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('Page loaded, initializing agent');
-      loadAgent();
-    });
+
+  <!-- D-ID Agent Script - Exactly as provided -->
+  <script
+    type="module"
+    src="https://agent.d-id.com/v1/index.js"
+    data-name="did-agent"
+    data-mode="fabio"
+    data-client-key="Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD"
+    data-agent-id="agt_YjpQXzSG"
+    data-monitor="true">
   </script>
 </body>
 </html>

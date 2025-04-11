@@ -24,10 +24,6 @@ export default function HeroSection() {
     }
   };
   
-  const navigateToVirtualConsultant = () => {
-    navigate("/virtual-consultant");
-  };
-  
   return (
     <section className="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden bg-background">
       <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-primary/5"></div>
@@ -51,7 +47,7 @@ export default function HeroSection() {
               Innovative Cybersecurity Solutions for Comprehensive Compliance and Protection.
             </p>
             
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               {/* Dashboard Button */}
               <button 
                 onClick={navigateToDashboard}
@@ -68,15 +64,6 @@ export default function HeroSection() {
                 Admin Control
               </button>
             </div>
-            
-            {/* Virtual Consultant Button */}
-            <button 
-              onClick={navigateToVirtualConsultant}
-              className="mb-4 w-full py-3 rounded-lg font-medium text-center border border-emerald-500/50 bg-emerald-500/10 text-emerald-500 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-emerald-500/20 focus:outline-none flex items-center justify-center gap-2"
-            >
-              <Shield className="h-5 w-5" />
-              <span>Talk to Virtual Cybersecurity Consultant</span>
-            </button>
             
             {/* Stats */}
             <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-4">
