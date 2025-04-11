@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaWorks Virtual Assistant</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 24px;
+    }
+    button {
+      background-color: #6366f1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 32px;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #4f46e5;
+    }
+    #agent-container {
+      width: 100%;
+      height: 80vh;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Click the Button to Start the AI Agent</h1>
+  <button onclick="loadDIDAgent()">Launch AI Assistant</button>
+
+  <div id="agent-container"></div>
+
+  <script>
+    function loadDIDAgent() {
+      const container = document.getElementById('agent-container');
+      if (container.innerHTML === '') {
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://agent.d-id.com/v1/index.js';
+        script.setAttribute('data-name', 'did-agent');
+        script.setAttribute('data-mode', 'fabio');
+        script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
+        script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
+        script.setAttribute('data-monitor', 'true');
+        
+        container.appendChild(script);
+      }
+      
+      // Show the container
+      container.style.display = 'block';
+      
+      // Hide the button and heading
+      document.querySelector('h1').style.display = 'none';
+      document.querySelector('button').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
