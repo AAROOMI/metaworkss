@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External AI Agent Integration</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #4f46e5, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin-top: 30px;
+            color: #e2e8f0;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+        
+        pre {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            color: #a5b4fc;
+        }
+        
+        .section {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .api-endpoint {
+            background-color: #334155;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .get {
+            background-color: #3b82f6;
+        }
+        
+        .post {
+            background-color: #10b981;
+        }
+        
+        .url {
+            font-family: 'Courier New', Courier, monospace;
+            color: #e2e8f0;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-top: 40px;
+            background: #4338ca;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .back-button:hover {
+            background: #4f46e5;
+        }
+        
+        .note {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .example {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>External AI Agent Integration</h1>
+            <p>This guide will help you integrate your custom AI agent with the MetaWorks platform.</p>
+        </div>
+        
+        <div class="section">
+            <h2>Overview</h2>
+            <p>The MetaWorks platform provides a bridge API for integrating external AI agents. This API allows you to connect your own AI agent implementation without affecting the main application.</p>
+            <p>By using this bridge, you can:</p>
+            <ul>
+                <li>Deploy your own AI agent service separately</li>
+                <li>Connect it to MetaWorks through a secure API</li>
+                <li>Customize the AI's behavior independently</li>
+                <li>Update or replace your AI agent implementation without changing the main application</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Integration Steps</h2>
+            
+            <h3>1. Set up your external AI agent service</h3>
+            <p>First, build your AI agent service as a separate application. This can be a Node.js/Express API, a Python FastAPI service, or any other framework of your choice. Your service should expose endpoints for:</p>
+            <ul>
+                <li>Initializing a session</li>
+                <li>Processing queries and returning responses</li>
+                <li>A health check endpoint</li>
+            </ul>
+            
+            <div class="example">
+                <p>Your AI agent service should be accessible at a URL, for example: <code>http://localhost:5001</code> during development or a deployed URL in production.</p>
+            </div>
+            
+            <h3>2. Configure the integration in MetaWorks</h3>
+            <p>Use the configuration endpoint to set up the connection to your external AI agent service:</p>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/external-agent/config</span>
+            </div>
+            
+            <p>Request body example:</p>
+            <pre><code>{
+  "serviceUrl": "http://your-agent-service-url",
+  "displayConfig": {
+    "title": "Security Consultant",
+    "subtitle": "Ask me about cybersecurity compliance",
+    "iconType": "shield"
+  },
+  "enabled": true
+}</code></pre>
+            
+            <h3>3. Test the connection</h3>
+            <p>Use the health check endpoint to verify that your AI agent service is accessible:</p>
+            
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/external-agent/health</span>
+            </div>
+            
+            <p>Expected response:</p>
+            <pre><code>{
+  "status": "available",
+  "details": { ... }
+}</code></pre>
+            
+            <h3>4. Initialize a session</h3>
+            <p>Before interacting with your AI agent, initialize a session:</p>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/external-agent/session</span>
+            </div>
+            
+            <p>Request body example:</p>
+            <pre><code>{
+  "userId": "123",
+  "username": "johndoe"
+}</code></pre>
+            
+            <p>Expected response:</p>
+            <pre><code>{
+  "sessionId": "abcd1234",
+  "created": "2025-04-11T12:34:56Z"
+}</code></pre>
+            
+            <h3>5. Send queries to your AI agent</h3>
+            <p>Use the query endpoint to interact with your AI agent:</p>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/external-agent/query</span>
+            </div>
+            
+            <p>Request body example:</p>
+            <pre><code>{
+  "query": "What are the key requirements for NCA ECC compliance?",
+  "sessionId": "abcd1234"
+}</code></pre>
+            
+            <p>Expected response:</p>
+            <pre><code>{
+  "response": "The NCA Essential Cybersecurity Controls (ECC) framework has several key requirements...",
+  "confidence": 0.92,
+  "sources": [
+    { "title": "NCA ECC Documentation", "url": "..." }
+  ]
+}</code></pre>
+        </div>
+        
+        <div class="section">
+            <h2>API Reference</h2>
+            
+            <h3>Configuration Endpoint</h3>
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/external-agent/config</span>
+            </div>
+            <p>Retrieves the current configuration for the external agent integration.</p>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/external-agent/config</span>
+            </div>
+            <p>Updates the configuration for the external agent integration.</p>
+            
+            <h3>Session Management</h3>
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/external-agent/session</span>
+            </div>
+            <p>Initializes a new session with the external agent service.</p>
+            
+            <h3>Query Endpoint</h3>
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/external-agent/query</span>
+            </div>
+            <p>Sends a query to the external agent and returns the response.</p>
+            
+            <h3>Health Check</h3>
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/external-agent/health</span>
+            </div>
+            <p>Checks the availability of the external agent service.</p>
+        </div>
+        
+        <div class="section">
+            <h2>Sample External Agent Service</h2>
+            <p>Here's a minimal example of an external agent service built with Express:</p>
+            
+            <pre><code>const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = process.env.PORT || 5001;
+
+// Use JSON parser
+app.use(bodyParser.json());
+
+// Sessions store
+const sessions = new Map();
+
+// Initialize a new session
+app.post('/api/agent/session', (req, res) => {
+  const { userId, username } = req.body;
+  const sessionId = `session_${Date.now()}`;
+  
+  sessions.set(sessionId, {
+    userId,
+    username,
+    created: new Date().toISOString(),
+    history: []
+  });
+  
+  res.json({
+    sessionId,
+    created: sessions.get(sessionId).created
+  });
+});
+
+// Process a query
+app.post('/api/agent/query', (req, res) => {
+  const { query, sessionId } = req.body;
+  
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.status(400).json({ error: "Invalid session ID" });
+  }
+  
+  const session = sessions.get(sessionId);
+  
+  // Add the query to the session history
+  session.history.push({
+    query,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Process the query (replace this with your AI logic)
+  const response = `This is a sample response to: ${query}`;
+  
+  // Add the response to the session history
+  session.history.push({
+    response,
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json({
+    response,
+    confidence: 0.85,
+    sessionId
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    sessions: sessions.size
+  });
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`External AI agent service running on port ${port}`);
+});</code></pre>
+            
+            <div class="note">
+                <p>Note: This is a simplified example. In a production environment, you would implement actual AI capabilities, proper authentication, and error handling.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Security Considerations</h2>
+            <ul>
+                <li>Always use HTTPS for communication between MetaWorks and your external agent service</li>
+                <li>Implement proper authentication for your external agent service</li>
+                <li>Set the <code>EXTERNAL_AGENT_API_KEY</code> environment variable in MetaWorks to authenticate with your service</li>
+                <li>Sanitize and validate all user inputs before processing</li>
+                <li>Implement rate limiting to prevent abuse</li>
+            </ul>
+        </div>
+        
+        <a href="/" class="back-button">Back to Dashboard</a>
+    </div>
+</body>
+</html>

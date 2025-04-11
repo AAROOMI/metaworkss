@@ -26,6 +26,7 @@ import didAgentRouter from "./api/did-agent";
 import didProxyRouter from "./api/did-proxy";
 import progressRouter from "./api/progress";
 import riskPredictionRouter from "./api/risk-prediction";
+import externalAgentRouter from "./api/external-agent-bridge";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -163,6 +164,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/did-standalone', (req, res) => {
     // Use the static HTML file with hardcoded credentials
     res.sendFile(path.join(process.cwd(), 'public', 'did-agent-standalone.html'));
+  });
+  
+  // Route for the external agent integration documentation
+  app.get('/external-agent-integration', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'public', 'external-agent-integration.html'));
   });
 
   // Policy management endpoints
@@ -357,6 +363,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use(didProxyRouter);
   app.use(progressRouter);
   app.use(riskPredictionRouter);
+  app.use("/api/external-agent", externalAgentRouter);
   
   // Register reports API routes
   registerReportsRoutes(app);
