@@ -1,26 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { Shield } from "lucide-react";
+import { Shield, Shield as ShieldIcon, LogIn } from "lucide-react";
 import metaLogo from "@assets/metawork keylogo.webp";
+import { useClerkUser } from "@/components/clerk/clerk-auth";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClerkSignIn, ClerkSignUp } from "@/components/clerk/clerk-auth";
 
 export default function HeroSection() {
   const [_, navigate] = useLocation();
   const { user } = useAuth();
+  const { isSignedIn, user: clerkUser } = useClerkUser();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   const navigateToDashboard = () => {
-    if (user) {
+    if (isSignedIn) {
+      navigate("/admin-dashboard");
+    } else if (user) {
       navigate("/dashboard");
     } else {
-      navigate("/auth");
+      setIsAuthModalOpen(true);
     }
   };
   
   const navigateToAdmin = () => {
-    if (user) {
+    if (isSignedIn) {
+      navigate("/admin-dashboard");
+    } else if (user) {
       navigate("/admin");
     } else {
-      navigate("/auth");
+      setIsAuthModalOpen(true);
     }
   };
   
@@ -116,6 +127,39 @@ export default function HeroSection() {
           animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}} />
+
+      {/* Clerk Auth Modal */}
+      <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Secure Access</DialogTitle>
+            <DialogDescription>
+              Log in or create an account to access the MetaWorks dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="signin" className="flex justify-center">
+              <ClerkSignIn />
+            </TabsContent>
+            
+            <TabsContent value="signup" className="flex justify-center">
+              <ClerkSignUp />
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex justify-center mt-4">
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+              Use Standard Login
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
