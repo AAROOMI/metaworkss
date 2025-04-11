@@ -4,49 +4,27 @@ import axios from 'axios';
 const router = Router();
 
 /**
- * Proxy for D-ID API requests
- * This keeps API keys secure on the backend
+ * D-ID Integration API
  */
 
-// Initialize agent
-router.post('/api/did/initialize-agent', async (req, res) => {
+// Get D-ID integration credentials
+router.get('/api/did/credentials', async (req, res) => {
   try {
-    // Get credentials from environment variables
-    const didApiKey = process.env.DID_API_KEY;
     const didAgentId = process.env.DID_AGENT_ID;
+    const didClientKey = process.env.DID_CLIENT_KEY;
     
-    if (!didApiKey || !didAgentId) {
+    if (!didAgentId || !didClientKey) {
       return res.status(500).json({ error: 'Missing D-ID credentials' });
     }
     
-    // Make request to D-ID API to initialize agent
-    const response = await axios.post('https://api.d-id.com/talks/streams', 
-      {
-        source_url: "presenter_id:Noelle",
-        agent_id: didAgentId,
-        driver_id: "mzmtwlxz7b" 
-      },
-      {
-        headers: {
-          'Authorization': `Basic ${didApiKey}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    
-    // Return stream ID and session data to frontend
+    // Return the credentials needed for direct integration
     res.json({
-      streamId: response.data.id,
-      sessionId: response.data.session_id,
-      agentId: didAgentId
+      agentId: didAgentId,
+      clientKey: didClientKey
     });
   } catch (error: any) {
-    console.error('Error initializing D-ID agent:', 
-      error?.response?.data || error?.message || String(error));
-    res.status(500).json({ 
-      error: 'Failed to initialize D-ID agent',
-      details: error?.response?.data || error?.message || String(error)
-    });
+    console.error('Error getting D-ID credentials:', String(error));
+    res.status(500).json({ error: 'Failed to get D-ID credentials' });
   }
 });
 
