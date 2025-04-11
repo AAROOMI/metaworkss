@@ -186,8 +186,8 @@ export default function UserSidebar() {
               </Button>
             </Link>
             
-            {/* MetaWorks Consultant - Direct HTML page */}
-            <a href="/metaworks-consultant.html" target="_blank" rel="noopener noreferrer">
+            {/* MetaWorks Consultant - Redirect Page */}
+            <a href="/consultant-redirect.html" target="_blank" rel="noopener noreferrer">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
                 <Headphones className="mr-2 h-4 w-4" />
                 MetaWorks Consultant
