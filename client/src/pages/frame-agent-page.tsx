@@ -28,15 +28,31 @@ export default function FrameAgentPage() {
         </p>
       </div>
       
-      <Tabs defaultValue="legacy" className="mb-8">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
-          <TabsTrigger value="legacy">Legacy Agent</TabsTrigger>
-          <TabsTrigger value="pure">Pure Agent</TabsTrigger>
-          <TabsTrigger value="basic">Basic Agent</TabsTrigger>
-          <TabsTrigger value="direct">Direct Script</TabsTrigger>
-          <TabsTrigger value="simple">Simple HTML</TabsTrigger>
-          <TabsTrigger value="decorated">Decorated HTML</TabsTrigger>
+      <Tabs defaultValue="strict" className="mb-8">
+        <TabsList className="w-full grid grid-cols-8 mb-6 overflow-x-auto">
+          <TabsTrigger value="strict">Strict Agent</TabsTrigger>
+          <TabsTrigger value="alternative">Alternative</TabsTrigger>
+          <TabsTrigger value="legacy">Legacy</TabsTrigger>
+          <TabsTrigger value="pure">Pure</TabsTrigger>
+          <TabsTrigger value="basic">Basic</TabsTrigger>
+          <TabsTrigger value="direct">Direct</TabsTrigger>
+          <TabsTrigger value="simple">Simple</TabsTrigger>
+          <TabsTrigger value="decorated">Decorated</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="strict" className="h-[600px]">
+          <FrameAgent 
+            height="100%" 
+            src="/strict-agent.html"
+          />
+        </TabsContent>
+        
+        <TabsContent value="alternative" className="h-[600px]">
+          <FrameAgent 
+            height="100%" 
+            src="/alternative-agent.html"
+          />
+        </TabsContent>
         
         <TabsContent value="legacy" className="h-[600px]">
           <FrameAgent 
@@ -82,7 +98,19 @@ export default function FrameAgentPage() {
       </Tabs>
       
       <h3 className="text-xl font-medium mb-4 text-center">Standalone Testing Pages</h3>
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <Button variant="outline" asChild className="text-xs">
+          <a href="/strict-agent.html" target="_blank">
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Strict Agent
+          </a>
+        </Button>
+        <Button variant="outline" asChild className="text-xs">
+          <a href="/alternative-agent.html" target="_blank">
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Alternative Agent
+          </a>
+        </Button>
         <Button variant="outline" asChild className="text-xs">
           <a href="/legacy-agent.html" target="_blank">
             <ExternalLink className="mr-2 h-3 w-3" />

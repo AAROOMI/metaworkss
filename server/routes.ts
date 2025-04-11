@@ -46,7 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Use our dedicated DID Agent router
-  app.use(didAgentRouter);
+  app.use('/api/did-agent', didAgentRouter);
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {
@@ -347,7 +347,6 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use("/api/company", companyInfoRouter);
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/gamification", gamificationRouter);
-  app.use("/api/did-agent", didAgentRouter);
   app.use(progressRouter);
   app.use(riskPredictionRouter);
   
