@@ -12,10 +12,6 @@
             width: 100vw;
             overflow: hidden;
             background-color: #121212;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
         .back-button {
             position: absolute;
@@ -36,6 +32,14 @@
         .back-button:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
     </style>
 </head>
 <body>
@@ -43,15 +47,10 @@
         ← Back to Dashboard
     </button>
 
-    <!-- D-ID Agent Script - directly embedded -->
-    <script
-        type="module"
-        src="https://agent.d-id.com/v1/index.js"
-        data-name="did-agent"
-        data-mode="fabio"
-        data-client-key="Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD"
-        data-agent-id="agt_YjpQXzSG"
-        data-monitor="true">
-    </script>
+    <!-- D-ID Agent Share Link - embedded as iframe -->
+    <iframe 
+        src="https://studio.d-id.com/agents/share?id=agt_YjpQXzSG&utm_source=copy&key=WjI5dloyeGxMVzloZFhSb01ud3hNRGM1TWpNME5qWTNORFkxTURVeU1UTTJPVEU2V0hKdlJGRlNZbkJITW5nMlNYSkdSRGxJY2paRA==" 
+        allowfullscreen>
+    </iframe>
 </body>
 </html>
