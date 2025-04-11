@@ -39,14 +39,20 @@
             text-align: center;
         }
         
-        .agent-container {
+        .iframe-container {
             width: 100%;
             max-width: 800px;
-            height: 450px;
+            height: 500px;
             position: relative;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         
         .loading {
@@ -73,11 +79,6 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-        
-        #did-agent {
-            width: 100%;
-            height: 100%;
         }
         
         .overlay {
@@ -114,43 +115,34 @@
         <div class="title">MetaWorks Virtual Security Consultant</div>
         <div class="subtitle">Ask me anything about cybersecurity compliance, risk management, or policy questions.</div>
         
-        <div class="agent-container">
+        <div class="iframe-container">
             <div class="loading" id="loading">
                 <div class="spinner"></div>
             </div>
             
-            <!-- D-ID Agent will be loaded here -->
-            <div id="did-agent"></div>
+            <!-- Direct embedding of the D-ID studio share URL -->
+            <iframe 
+                id="didAgentIframe" 
+                src="https://studio.d-id.com/agents/share?id=agt_mNHiVcSw&utm_source=copy&key=YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw==" 
+                allowfullscreen 
+                allow="camera;microphone"
+                onload="document.getElementById('loading').style.display = 'none';">
+            </iframe>
             
             <div class="overlay">Powered by MetaWorks AI</div>
         </div>
         
         <a href="/" class="back-button">Back to Dashboard</a>
     </div>
-
-    <!-- Direct D-ID Agent Integration - Using the provided script tag -->
-    <script 
-        type="module" 
-        src="https://agent.d-id.com/v1/index.js" 
-        data-name="did-agent" 
-        data-mode="fabio" 
-        data-client-key="YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw==" 
-        data-agent-id="agt_mNHiVcSw" 
-        data-monitor="true"
-        onload="document.getElementById('loading').style.display = 'none';"
-        onerror="console.error('Failed to load D-ID agent');document.getElementById('loading').innerHTML = '<div>Error loading agent. Please try again later.</div>';">
-    </script>
     
     <script>
-        console.log("D-ID Agent standalone page loaded");
+        console.log("D-ID Agent iframe page loaded");
         
-        // Handle error if the D-ID script doesn't load
-        window.addEventListener('error', function(e) {
-            if (e.target.tagName === 'SCRIPT') {
-                console.error('Error loading script:', e);
-                document.getElementById('loading').innerHTML = '<div>Error loading agent. Please try again later.</div>';
-            }
-        }, true);
+        // Handle iframe load errors
+        document.getElementById('didAgentIframe').onerror = function() {
+            console.error('Failed to load D-ID agent iframe');
+            document.getElementById('loading').innerHTML = '<div>Error loading D-ID agent. Please try again later.</div>';
+        };
     </script>
 </body>
 </html>
