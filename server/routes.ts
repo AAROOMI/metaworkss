@@ -22,6 +22,7 @@ import { registerReportsRoutes } from "./api/reports";
 import { onboardingRouter } from "./api/onboarding";
 import { gamificationRouter } from "./api/gamification";
 import didAgentRouter from "./api/did-agent";
+import didProxyRouter from "./api/did-proxy";
 import progressRouter from "./api/progress";
 import riskPredictionRouter from "./api/risk-prediction";
 
@@ -351,6 +352,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/gamification", gamificationRouter);
   app.use("/api/did-agent", didAgentRouter);
+  app.use(didProxyRouter);
   app.use(progressRouter);
   app.use(riskPredictionRouter);
   

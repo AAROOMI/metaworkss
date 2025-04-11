@@ -190,9 +190,17 @@ export default function UserSidebar() {
             <a href="/consultant-redirect.html" target="_blank" rel="noopener noreferrer">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
                 <Headphones className="mr-2 h-4 w-4" />
-                MetaWorks Consultant
+                External Consultant
               </Button>
             </a>
+            
+            {/* Embedded Virtual Agent */}
+            <Link href="/virtual-agent">
+              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-blue-500 to-primary">
+                <UserRound className="mr-2 h-4 w-4" />
+                Embedded Consultant
+              </Button>
+            </Link>
           </div>
         </div>
       </ScrollArea>
