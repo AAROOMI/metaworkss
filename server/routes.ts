@@ -37,6 +37,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/clerk-key", (req, res) => {
     const publishableKey = process.env.CLERK_PUBLISHABLE_KEY;
     console.log("Sending Clerk publishable key:", publishableKey);
+    
+    // Add CORS headers for production deployment
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
     res.json({ publishableKey });
   });
 
