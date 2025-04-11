@@ -30,6 +30,7 @@ import ClerkAdminPage from "@/pages/clerk-admin-page";
 import UserDashboard from "@/pages/user-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import SharedReportPage from "@/pages/shared-report-page";
+import DIDAgentFullscreen from "@/pages/did-agent-fullscreen";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ClerkProtectedRoute } from "@/lib/clerk-protected-route";
@@ -72,6 +73,7 @@ function Router() {
       <Route path="/did-agent" component={DIDAgentPage} />
       <Route path="/agent" component={DIDAgentPage} />
       <Route path="/agent-test" component={AgentTestPage} />
+      <Route path="/consultant" component={DIDAgentFullscreen} />
       <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
       <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />
       <Route path="/frameworks/sama" component={SamaPage} />
