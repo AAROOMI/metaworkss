@@ -210,6 +210,14 @@ export default function UserSidebar() {
                 Fullscreen Consultant
               </Button>
             </Link>
+            
+            {/* Standalone D-ID Agent */}
+            <a href="/did-standalone" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" className="w-full justify-start">
+                <Headphones className="mr-2 h-4 w-4" />
+                Standalone Version
+              </Button>
+            </a>
           </div>
         </div>
       </ScrollArea>

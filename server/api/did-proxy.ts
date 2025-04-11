@@ -27,12 +27,9 @@ const getDIDHeaders = () => {
 // Get public D-ID integration script configuration
 router.get('/api/did/config', async (req, res) => {
   try {
-    const didAgentId = process.env.DID_AGENT_ID;
-    const didClientKey = process.env.DID_CLIENT_KEY;
-    
-    if (!didAgentId || !didClientKey) {
-      return res.status(500).json({ error: 'Missing D-ID credentials' });
-    }
+    // Use new credentials provided by the user
+    const didAgentId = "agt_mNHiVcSw";
+    const didClientKey = "YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw==";
     
     // Return minimal configuration for script loading
     res.json({
@@ -53,12 +50,9 @@ router.get('/api/did/config', async (req, res) => {
 // Get D-ID share URL for external window
 router.get('/api/did/share-url', async (req, res) => {
   try {
-    const didAgentId = process.env.DID_AGENT_ID;
-    const didClientKey = process.env.DID_CLIENT_KEY;
-    
-    if (!didAgentId || !didClientKey) {
-      return res.status(500).json({ error: 'Missing D-ID credentials' });
-    }
+    // Use new credentials provided by the user
+    const didAgentId = "agt_mNHiVcSw";
+    const didClientKey = "YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw==";
     
     // Construct the D-ID share URL
     const shareUrl = `https://studio.d-id.com/agents/share?id=${didAgentId}&utm_source=copy&key=${didClientKey}`;
@@ -93,11 +87,8 @@ router.get('/api/did/agent/:agentId', async (req, res) => {
 // Proxy for D-ID initialize session
 router.post('/api/did/initialize', async (req, res) => {
   try {
-    const didAgentId = process.env.DID_AGENT_ID;
-    
-    if (!didAgentId) {
-      return res.status(500).json({ error: 'Missing DID_AGENT_ID' });
-    }
+    // Use new credentials provided by the user
+    const didAgentId = "agt_mNHiVcSw";
     
     const headers = getDIDHeaders();
     

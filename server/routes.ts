@@ -157,6 +157,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve static files from attached_assets
   app.use('/attached_assets', express.static(path.join(process.cwd(), 'public', 'attached_assets')));
+  
+  // Direct route to the standalone D-ID agent page
+  app.get('/did-standalone', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'public', 'did-agent-standalone.html'));
+  });
 
   // Policy management endpoints
   app.post("/api/policies", async (req, res, next) => {
