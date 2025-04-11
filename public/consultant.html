@@ -47,10 +47,12 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(15, 23, 42, 0.8);
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         
         .loading {
@@ -79,16 +81,6 @@
             to { transform: rotate(360deg); }
         }
         
-        .overlay {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        
         .back-button {
             margin-top: 20px;
             background: #4338ca;
@@ -113,37 +105,59 @@
         <div class="title">MetaWorks Virtual Security Consultant</div>
         <div class="subtitle">Ask me anything about cybersecurity compliance, risk management, or policy questions.</div>
         
-        <div class="agent-container" id="did-container">
+        <div class="agent-container">
             <div class="loading" id="loading">
                 <div class="spinner"></div>
             </div>
             
-            <div class="overlay">Powered by MetaWorks AI</div>
+            <!-- Using iframe with direct D-ID share URL -->
+            <iframe 
+                id="didAgentIframe" 
+                src="https://studio.d-id.com/agents/share?id=agt_mNHiVcSw&utm_source=copy&key=YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw==" 
+                allowfullscreen 
+                allow="camera;microphone"
+                onload="document.getElementById('loading').style.display = 'none';">
+            </iframe>
         </div>
         
         <a href="/" class="back-button">Back to Dashboard</a>
     </div>
     
-    <!-- D-ID Agent Script with your provided key -->
-    <script
-        type="module"
-        src="https://agent.d-id.com/v1/index.js"
-        data-name="did-agent"
-        data-mode="fabio"
-        data-client-key="YXV0aDB8NjdmOTNiZmI4MDFlMDM5NzI0YjdmYTlkOmlIYUFHMWlQb005NFF0T0Z4Z0RvRw=="
-        data-agent-id="agt_mNHiVcSw"
-        data-monitor="true">
-    </script>
-    
     <script>
-        console.log("D-ID Agent page loaded");
+        console.log("D-ID Agent iframe page loaded");
         
-        // Hide loading spinner after agent loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Give D-ID agent some time to initialize
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 5000);
+        // Better error handling
+        const iframe = document.getElementById('didAgentIframe');
+        const loadingElement = document.getElementById('loading');
+        
+        // Handle iframe load event
+        iframe.onload = function() {
+            console.log("Iframe loaded successfully");
+            loadingElement.style.display = 'none';
+        };
+        
+        // Handle iframe error
+        iframe.onerror = function(error) {
+            console.error("Error loading iframe:", error);
+            loadingElement.innerHTML = '<div style="text-align: center; padding: 20px;"><h3>Failed to load consultant</h3><p>Please try again later or refresh the page.</p></div>';
+        };
+        
+        // Backup timeout to hide loading if iframe onload doesn't fire
+        setTimeout(() => {
+            if (loadingElement.style.display !== 'none') {
+                console.log("Using backup timeout to hide loading");
+                loadingElement.style.display = 'none';
+            }
+        }, 10000);
+        
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error("Global error caught:", event.error);
+        });
+        
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error("Unhandled promise rejection:", event.reason);
         });
     </script>
 </body>
