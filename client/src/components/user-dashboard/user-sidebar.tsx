@@ -186,8 +186,8 @@ export default function UserSidebar() {
               </Button>
             </Link>
             
-            {/* MetaWorks Consultant - Direct link to D-ID agent */}
-            <a href="https://studio.d-id.com/agents/share?id=agt_YjpQXzSG&utm_source=copy&key=WjI5dloyeGxMVzloZFhSb01ud3hNRGM1TWpNME5qWTNORFkxTURVeU1UTTJPVEU2V0hKdlJGRlNZbkJITW5nMlNYSkdSRGxJY2paRA==" target="_blank" rel="noopener noreferrer">
+            {/* MetaWorks Consultant - Fullscreen D-ID agent */}
+            <a href="/fullscreen-agent.html" target="_blank" rel="noopener noreferrer">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
                 <Headphones className="mr-2 h-4 w-4" />
                 MetaWorks Consultant
