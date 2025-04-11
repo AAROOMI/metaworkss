@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaWorks Security Consultant</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .title {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .subtitle {
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        #did-container {
+            width: 100%;
+            max-width: 640px;
+            height: 360px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(15, 23, 42, 0.7);
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        button {
+            background: #4338ca;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #4f46e5;
+        }
+        
+        .overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            margin-top: 10px;
+            text-align: center;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">MetaWorks Virtual Security Consultant</div>
+        <div class="subtitle">Ask me anything about cybersecurity compliance, risk management, or policy questions.</div>
+        
+        <div id="did-container">
+            <div id="loading">
+                <div class="spinner"></div>
+            </div>
+            <div id="didChatContainer"></div>
+            <div class="overlay">Powered by MetaWorks AI</div>
+        </div>
+        
+        <div class="controls">
+            <button id="resetBtn">Reset Conversation</button>
+            <button id="muteBtn">Mute/Unmute</button>
+        </div>
+        
+        <div id="error-container" class="error-message"></div>
+    </div>
+
+    <script>
+        console.log("DOM content loaded, waiting for D-ID agent...");
+        
+        // Initialize variables
+        let didChat;
+        let isMuted = false;
+        
+        // Agent configuration using new credentials
+        const didConfig = {
+            baseURL: "https://app2.d-id.com/",
+            apiKey: null, // Client-side doesn't need the API key
+            agentId: null, // Will be set from API
+            clientKey: null, // Will be set from API
+            autoplay: true,
+            stream: true, 
+            rtl: false,
+            background: null,
+            enableFrames: true
+        };
+        
+        // Get the D-ID config from our API first to avoid exposing credentials in client-side code
+        fetch('/api/did-config')
+            .then(response => response.json())
+            .then(config => {
+                // Update configuration with values from API
+                didConfig.agentId = config.agentId;
+                didConfig.clientKey = config.clientKey;
+                
+                // Function to initialize D-ID chat
+                function initDIDChat() {
+                    const didElement = document.getElementById('didChatContainer');
+                    const loadingElement = document.getElementById('loading');
+                    const errorContainer = document.getElementById('error-container');
+                    
+                    errorContainer.textContent = ""; // Clear previous errors
+                    
+                    try {
+                        // Import the D-ID library script
+                        const script = document.createElement('script');
+                        script.src = 'https://sdk.d-id.com/agent-chat-ui/did.js';
+                        script.async = true;
+                        
+                        script.onload = function() {
+                            try {
+                                // Initialize DID with new credentials
+                                didChat = new DID.AgentChatUI({
+                                    baseURL: didConfig.baseURL,
+                                    clientKey: didConfig.clientKey,
+                                    agentId: didConfig.agentId,
+                                    container: didElement,
+                                    autoplay: didConfig.autoplay,
+                                    stream: didConfig.stream,
+                                    rtl: didConfig.rtl,
+                                    background: didConfig.background,
+                                    enableFrames: didConfig.enableFrames
+                                });
+                                
+                                didChat.on('ready', function() {
+                                    console.log('D-ID Agent is ready!');
+                                    loadingElement.style.display = 'none';
+                                });
+                                
+                                didChat.on('error', function(error) {
+                                    console.error('D-ID Agent error:', error);
+                                    errorContainer.textContent = `Error: ${error.message || JSON.stringify(error)}`;
+                                    loadingElement.style.display = 'none';
+                                });
+                                
+                                // Initialize the chat interface
+                                didChat.start();
+                                
+                            } catch (err) {
+                                console.error('Error initializing D-ID agent:', err);
+                                errorContainer.textContent = `Initialization Error: ${err.message || JSON.stringify(err)}`;
+                                loadingElement.style.display = 'none';
+                            }
+                        };
+                        
+                        script.onerror = function(err) {
+                            console.error('Failed to load D-ID script:', err);
+                            errorContainer.textContent = 'Failed to load D-ID script. Please check your internet connection.';
+                            loadingElement.style.display = 'none';
+                        };
+                        
+                        document.body.appendChild(script);
+                        
+                    } catch (err) {
+                        console.error('Error setting up D-ID agent:', err);
+                        errorContainer.textContent = `Setup Error: ${err.message || JSON.stringify(err)}`;
+                        loadingElement.style.display = 'none';
+                    }
+                }
+                
+                // Initialize DID chat when page loads
+                initDIDChat();
+                
+                // Reset button handler
+                document.getElementById('resetBtn').addEventListener('click', function() {
+                    if (didChat) {
+                        const loadingElement = document.getElementById('loading');
+                        loadingElement.style.display = 'flex';
+                        
+                        try {
+                            didChat.destroy();
+                        } catch (err) {
+                            console.error('Error destroying D-ID chat:', err);
+                        }
+                        
+                        setTimeout(() => {
+                            initDIDChat();
+                        }, 1000);
+                    }
+                });
+                
+                // Mute button handler
+                document.getElementById('muteBtn').addEventListener('click', function() {
+                    if (didChat) {
+                        try {
+                            isMuted = !isMuted;
+                            didChat.setMuted(isMuted);
+                            console.log('Agent ' + (isMuted ? 'muted' : 'unmuted'));
+                        } catch (err) {
+                            console.error('Error toggling mute:', err);
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching D-ID configuration:', error);
+                const errorContainer = document.getElementById('error-container');
+                errorContainer.textContent = `Failed to get D-ID configuration: ${error.message || JSON.stringify(error)}`;
+                document.getElementById('loading').style.display = 'none';
+            });
+    </script>
+</body>
+</html>

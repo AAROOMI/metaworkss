@@ -19,9 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-D_ID_API_KEY = os.getenv("DID_API_KEY")
-DID_AGENT_ID = os.getenv("DID_AGENT_ID")
-DID_CLIENT_KEY = os.getenv("DID_CLIENT_KEY")
+# Try to use new credentials first, fall back to old ones if not available
+D_ID_API_KEY = os.getenv("NEW_DID_API_KEY") or os.getenv("DID_API_KEY")
+DID_AGENT_ID = os.getenv("NEW_DID_AGENT_ID") or os.getenv("DID_AGENT_ID")
+DID_CLIENT_KEY = os.getenv("NEW_DID_CLIENT_KEY") or os.getenv("DID_CLIENT_KEY")
 
 @app.get("/")
 async def root():
@@ -41,6 +42,18 @@ async def get_did_config():
             "monitor": True,
             "mode": "fabio"
         }
+    }
+
+@app.get("/api/did-config")
+async def get_did_config_for_standalone():
+    """Get D-ID configuration for the standalone frontend."""
+    if not DID_AGENT_ID or not DID_CLIENT_KEY:
+        raise HTTPException(status_code=500, detail="Missing D-ID credentials")
+    
+    return {
+        "agentId": DID_AGENT_ID,
+        "clientKey": DID_CLIENT_KEY,
+        "baseURL": "https://app2.d-id.com/"
     }
 
 @app.get("/api/did/share-url")
