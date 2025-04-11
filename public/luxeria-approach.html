@@ -3,76 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MetaWorks Virtual Assistant</title>
+  <title>MetaWorks | Virtual Security Consultant</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background-color: #0f172a;
-      color: white;
-      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background-color: #101010;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .container {
       display: flex;
       flex-direction: column;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      color: white;
+    }
+    .agent-container {
+      flex: 1;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      background-color: #202020;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid #303030;
     }
     h1 {
-      margin-bottom: 24px;
+      font-size: 2rem;
+      margin-bottom: 10px;
     }
-    button {
-      background-color: #6366f1;
+    p {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+    .close-button {
+      display: inline-block;
+      background-color: #555;
       color: white;
       border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 6px;
+      padding: 8px 16px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-bottom: 32px;
-      transition: background-color 0.2s;
+      font-size: 14px;
+      margin-top: 20px;
+      text-decoration: none;
     }
-    button:hover {
-      background-color: #4f46e5;
-    }
-    #agent-container {
-      width: 100%;
-      height: 80vh;
-      display: none;
+    .close-button:hover {
+      background-color: #666;
     }
   </style>
 </head>
 <body>
-  <h1>Click the Button to Start the AI Agent</h1>
-  <button onclick="loadDIDAgent()">Launch AI Assistant</button>
-
-  <div id="agent-container"></div>
-
-  <script>
-    function loadDIDAgent() {
-      const container = document.getElementById('agent-container');
-      if (container.innerHTML === '') {
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-mode', 'fabio');
-        // Luxeria credentials
-        script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-        script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
-        script.setAttribute('data-monitor', 'true');
-        
-        container.appendChild(script);
-      }
-      
-      // Show the container
-      container.style.display = 'block';
-      
-      // Hide the button and heading
-      document.querySelector('h1').style.display = 'none';
-      document.querySelector('button').style.display = 'none';
-    }
-  </script>
+  <div class="container">
+    <div class="header">
+      <h1>MetaWorks Virtual Security Consultant</h1>
+      <p>Ask anything about cybersecurity frameworks, compliance, and best practices.</p>
+    </div>
+    <div class="agent-container">
+      <script
+        type="module"
+        src="https://agent.d-id.com/v1/index.js"
+        data-name="did-agent"
+        data-mode="fabio"
+        data-client-key="Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD"
+        data-agent-id="agt_YjpQXzSG"
+        data-monitor="true">
+      </script>
+    </div>
+    <div style="text-align: center;">
+      <a href="javascript:window.close();" class="close-button">Close Window</a>
+    </div>
+  </div>
 </body>
 </html>
