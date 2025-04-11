@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Basic D-ID Agent</title>
+  <title>D-ID Agent</title>
   <style>
-    body, html {
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      height: 100%;
-      width: 100%;
-      background-color: #1e293b;
+      background-color: #121212;
+      color: white;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     #did-agent {
       width: 100%;
@@ -21,14 +22,22 @@
 <body>
   <div id="did-agent"></div>
 
-  <script
-    type="module"
-    src="https://agent.d-id.com/v1/index.js"
-    data-name="did-agent"
-    data-mode="fabio"
-    data-client-key="Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD"
-    data-agent-id="agt_YjpQXzSG"
-    data-monitor="true">
+  <script>
+    // Create script tag with D-ID attributes
+    window.addEventListener('DOMContentLoaded', function() {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://agent.d-id.com/v1/index.js';
+      script.setAttribute('data-name', 'did-agent');
+      script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
+      script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
+      script.setAttribute('data-api-key', 'YWJkdWxsYWhhYmR1bGF6aXoyODc4QGdtYWlsLmNvbQ:AY9mNPPjRnl69cFmhE4Zj');
+      script.setAttribute('data-monitor', 'true');
+      
+      document.body.appendChild(script);
+      
+      console.log('D-ID script added with credentials');
+    });
   </script>
 </body>
 </html>

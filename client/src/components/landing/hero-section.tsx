@@ -25,7 +25,7 @@ export default function HeroSection() {
   };
   
   const navigateToVirtualConsultant = () => {
-    navigate("/simple-agent");
+    window.open('/direct-did-agent.html', '_blank');
   };
   
   return (

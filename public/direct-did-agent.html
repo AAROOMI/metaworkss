@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaWorks Virtual Security Consultant</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .redirect-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #0f172a;
+      color: white;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      max-width: 600px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #4f46e5;
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px 0;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .button {
+      background-color: #4f46e5;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover {
+      background-color: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <div class="redirect-container">
+    <h1>MetaWorks Virtual Security Consultant</h1>
+    <p>You'll be redirected to our virtual consultant in a moment. The consultant will appear in a new window.</p>
+    <div class="spinner"></div>
+    <p id="counter">Redirecting in 3 seconds...</p>
+    <a href="https://d-id.com/agent?client-key=Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD&agent-id=agt_YjpQXzSG&api-key=YWJkdWxsYWhhYmR1bGF6aXoyODc4QGdtYWlsLmNvbQ:AY9mNPPjRnl69cFmhE4Zj" 
+       class="button" 
+       target="_blank" 
+       id="direct-link">
+      Open Consultant Now
+    </a>
+  </div>
+
+  <script>
+    // Auto-redirect countdown
+    let count = 3;
+    const counter = document.getElementById('counter');
+    const directLink = document.getElementById('direct-link');
+    
+    const countdownInterval = setInterval(() => {
+      count--;
+      if (count <= 0) {
+        clearInterval(countdownInterval);
+        counter.textContent = 'Opening consultant...';
+        directLink.click(); // Automatically click the link
+      } else {
+        counter.textContent = `Redirecting in ${count} seconds...`;
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
