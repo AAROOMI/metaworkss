@@ -37,16 +37,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/clerk-key", (req, res) => {
     const publishableKey = process.env.CLERK_PUBLISHABLE_KEY;
     console.log("Sending Clerk publishable key:", publishableKey);
-    
-    // Add CORS headers for production deployment
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
     res.json({ publishableKey });
   });
 
   // Use our dedicated DID Agent router
-  app.use('/api/did-agent', didAgentRouter);
+  app.use(didAgentRouter);
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {
@@ -347,6 +342,7 @@ app.get("/api/dashboard-access", async (req, res) => {
   app.use("/api/company", companyInfoRouter);
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/gamification", gamificationRouter);
+  app.use("/api/did-agent", didAgentRouter);
   app.use(progressRouter);
   app.use(riskPredictionRouter);
   

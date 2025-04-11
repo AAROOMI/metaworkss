@@ -11,20 +11,9 @@ export function ClerkProtectedRoute({
   path: string;
   component: () => React.JSX.Element | null;
 }) {
-  // Wrap the hook call in try/catch to prevent crashes
-  let isSignedIn = false;
-  let user = undefined;
-  let isLoading = true;
-  
-  try {
-    const userInfo = useClerkUser();
-    isSignedIn = userInfo?.isSignedIn || false;
-    user = userInfo?.user;
-    isLoading = user === undefined;
-  } catch (error) {
-    console.error("Error with Clerk auth:", error);
-    isLoading = false;
-  }
+  const { isSignedIn, user } = useClerkUser();
+  // Use a simpler check since isLoaded isn't available 
+  const isLoading = user === undefined;
 
   if (isLoading) {
     return (

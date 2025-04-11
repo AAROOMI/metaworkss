@@ -87,22 +87,12 @@ export function ClerkUserButton() {
 }
 
 export function useClerkUser() {
-  try {
-    const { isSignedIn, user } = useUser();
-    const { signOut } = useAuth();
-    
-    return {
-      isSignedIn,
-      user,
-      signOut,
-    };
-  } catch (error) {
-    console.error("Failed to access Clerk user data:", error);
-    // Return fallback values to avoid breaking the application
-    return {
-      isSignedIn: false,
-      user: null,
-      signOut: () => Promise.resolve(),
-    };
-  }
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useAuth();
+  
+  return {
+    isSignedIn,
+    user,
+    signOut,
+  };
 }

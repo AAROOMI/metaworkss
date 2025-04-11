@@ -1,52 +1,144 @@
-import { Router } from "express";
+import express from 'express';
+import { Request, Response } from 'express';
 
-const router = Router();
+const router = express.Router();
 
-/**
- * Endpoint to get D-ID agent credentials from environment variables
- * This provides better security than hardcoding credentials in the frontend
- */
-router.get("/credentials", (req, res) => {
+// Endpoint to get DID API keys (public versions to validate on frontend)
+router.get('/api/did-keys', async (req: Request, res: Response) => {
   try {
-    // Get credentials from environment variables
-    const agentId = process.env.DID_AGENT_ID;
+    // Send safe versions of the keys - only enough to validate they exist
+    // Never expose full API keys to client
+    res.json({
+      agentId: process.env.DID_AGENT_ID || null,
+      apiKey: process.env.DID_API_KEY ? true : null
+    });
+  } catch (error) {
+    console.error('Error fetching DID keys:', error);
+    res.status(500).json({ error: 'Failed to retrieve DID keys' });
+  }
+});
+
+// Endpoint to get credentials needed for the D-ID agent in the frontend
+router.get('/api/did-credentials', async (req: Request, res: Response) => {
+  try {
+    // Get necessary credentials from environment
     const clientKey = process.env.DID_CLIENT_KEY;
+    const agentId = process.env.DID_AGENT_ID;
     
-    // Validate credentials exist
-    if (!agentId || !clientKey) {
-      console.error("D-ID credentials missing from environment variables");
-      return res.status(500).json({ 
-        error: "D-ID credentials not configured", 
-        message: "The application is not properly configured with D-ID credentials."
+    if (!clientKey || !agentId) {
+      console.error('Missing D-ID credentials. Required: DID_CLIENT_KEY, DID_AGENT_ID');
+      return res.status(500).json({ error: 'D-ID credentials are not properly configured' });
+    }
+    
+    // Send credentials required for the D-ID agent script
+    res.json({
+      clientKey,
+      agentId
+    });
+  } catch (error) {
+    console.error('Error fetching D-ID credentials:', error);
+    res.status(500).json({ error: 'Failed to retrieve D-ID credentials' });
+  }
+});
+
+// Endpoint to create a new talk with the DID agent
+router.post('/api/did-agent/talk', async (req: Request, res: Response) => {
+  try {
+    const { text, presenter_id = 'kgn-KqCZSo' } = req.body;
+    
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+    
+    // Get API key from environment
+    const apiKey = process.env.DID_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'DID API key is not configured' });
+    }
+    
+    // Create talk using D-ID API
+    const response = await fetch('https://api.d-id.com/talks', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        script: {
+          type: "text",
+          input: text,
+          provider: {
+            type: "microsoft",
+            voice_id: "en-US-ChristopherNeural",
+            voice_config: {
+              style: "Calm"
+            }
+          }
+        },
+        config: {
+          fluent: true,
+          pad_audio: 0,
+          stitch: true,
+        },
+        presenter_id,
+        driver_id: "mdo-gpt",
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('D-ID API error:', errorData);
+      return res.status(response.status).json({ 
+        error: errorData.message || 'Error communicating with D-ID API'
       });
     }
     
-    // Return masked credentials (for security logging)
-    console.log(`Sending D-ID credentials - Agent ID: ${maskString(agentId)}, Client Key: ${maskString(clientKey)}`);
-    
-    // Return credentials
-    return res.status(200).json({
-      agentId,
-      clientKey
-    });
+    const data = await response.json();
+    res.json(data);
   } catch (error) {
-    console.error("Error retrieving D-ID credentials:", error);
-    return res.status(500).json({ 
-      error: "Internal server error", 
-      message: "Failed to retrieve D-ID agent credentials."
+    console.error('Error creating talk:', error);
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : 'Failed to create talk'
     });
   }
 });
 
-/**
- * Helper function to mask sensitive strings for logging
- */
-function maskString(str: string): string {
-  if (!str) return '';
-  if (str.length <= 8) {
-    return '****';
+// Endpoint to check the status of a talk
+router.get('/api/did-agent/talk/:id', async (req: Request, res: Response) => {
+  try {
+    const talkId = req.params.id;
+    
+    // Get API key from environment
+    const apiKey = process.env.DID_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'DID API key is not configured' });
+    }
+    
+    // Check talk status
+    const response = await fetch(`https://api.d-id.com/talks/${talkId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('D-ID API error:', errorData);
+      return res.status(response.status).json({ 
+        error: errorData.message || 'Error communicating with D-ID API'
+      });
+    }
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error checking talk status:', error);
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : 'Failed to check talk status'
+    });
   }
-  return str.substring(0, 4) + '...' + str.substring(str.length - 4);
-}
+});
 
 export default router;
