@@ -25,7 +25,7 @@ export default function HeroSection() {
   };
   
   const navigateToVirtualConsultant = () => {
-    navigate("/simple-agent");
+    navigate("/virtual-consultant");
   };
   
   return (
