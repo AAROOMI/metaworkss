@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
 import path from "path";
+import fs from "fs";
 import { logoUpload, documentUpload, saveFileToDatabase, getFileById, deleteFile } from "./file-service";
 import dotenv from "dotenv";
 import express from 'express';
