@@ -10,17 +10,28 @@ interface CustomClerkProviderProps {
 export function CustomClerkProvider({ children }: CustomClerkProviderProps) {
   const [key, setKey] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetchClerkPublishableKey()
-      .then(fetchedKey => {
-        setKey(fetchedKey);
+    const getKey = async () => {
+      try {
+        const fetchedKey = await fetchClerkPublishableKey();
+        if (fetchedKey) {
+          setKey(fetchedKey);
+          setLoading(false);
+        } else {
+          console.error("Empty Clerk publishable key received");
+          setError(true);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Error fetching Clerk publishable key:", err);
+        setError(true);
         setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching Clerk publishable key:", error);
-        setLoading(false);
-      });
+      }
+    };
+    
+    getKey();
   }, []);
 
   if (loading) {
@@ -34,12 +45,30 @@ export function CustomClerkProvider({ children }: CustomClerkProviderProps) {
     );
   }
 
-  if (!key) {
-    console.warn("Missing Clerk Publishable Key. User authentication might not work correctly.");
+  if (error || !key) {
+    console.warn("Missing Clerk Publishable Key. Using application without Clerk authentication.");
     return <>{children}</>;
   }
 
-  return <ClerkProvider publishableKey={key}>{children}</ClerkProvider>;
+  // Add error boundary to handle Clerk initialization errors
+  try {
+    return (
+      <ClerkProvider 
+        publishableKey={key}
+        appearance={{
+          elements: {
+            card: "bg-card",
+            formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90"
+          }
+        }}
+      >
+        {children}
+      </ClerkProvider>
+    );
+  } catch (err) {
+    console.error("Error initializing ClerkProvider:", err);
+    return <>{children}</>;
+  }
 }
 
 export default CustomClerkProvider;
