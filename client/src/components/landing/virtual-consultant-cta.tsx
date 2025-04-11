@@ -14,12 +14,13 @@ export default function VirtualConsultantCTA() {
             with our advanced AI-powered virtual consultant.
           </p>
           <div className="pt-4">
-            <Link href="/virtual-consultant">
-              <a className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-medium py-3 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl">
-                Try Virtual Consultant
-                <ArrowUpRight size={18} />
-              </a>
-            </Link>
+            <button
+              onClick={() => window.location.href = '/virtual-consultant'}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-medium py-3 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl"
+            >
+              Try Virtual Consultant
+              <ArrowUpRight size={18} />
+            </button>
           </div>
         </div>
         <div className="rounded-lg overflow-hidden w-full md:w-1/2 h-[200px] md:h-[250px] shadow-2xl border border-slate-700">
