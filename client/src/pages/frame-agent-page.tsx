@@ -21,14 +21,45 @@ export default function FrameAgentPage() {
         </p>
       </header>
       
-      <Tabs defaultValue="frame" className="mb-8">
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="frame">Frame Integration</TabsTrigger>
+      <div className="text-center mb-8 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+        <h3 className="text-yellow-500 font-medium mb-2">Try Different Implementations</h3>
+        <p className="text-sm text-muted-foreground">
+          We've created multiple implementations of the D-ID virtual agent. If one doesn't work, try another using the tabs below or the standalone links.
+        </p>
+      </div>
+      
+      <Tabs defaultValue="legacy" className="mb-8">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
+          <TabsTrigger value="legacy">Legacy Agent</TabsTrigger>
+          <TabsTrigger value="pure">Pure Agent</TabsTrigger>
+          <TabsTrigger value="basic">Basic Agent</TabsTrigger>
+          <TabsTrigger value="direct">Direct Script</TabsTrigger>
           <TabsTrigger value="simple">Simple HTML</TabsTrigger>
           <TabsTrigger value="decorated">Decorated HTML</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="frame" className="h-[600px]">
+        <TabsContent value="legacy" className="h-[600px]">
+          <FrameAgent 
+            height="100%" 
+            src="/legacy-agent.html"
+          />
+        </TabsContent>
+        
+        <TabsContent value="pure" className="h-[600px]">
+          <FrameAgent 
+            height="100%" 
+            src="/pure-agent.html"
+          />
+        </TabsContent>
+        
+        <TabsContent value="basic" className="h-[600px]">
+          <FrameAgent 
+            height="100%" 
+            src="/basic-agent.html"
+          />
+        </TabsContent>
+        
+        <TabsContent value="direct" className="h-[600px]">
           <FrameAgent 
             height="100%" 
             src="/direct-script.html"
@@ -50,25 +81,48 @@ export default function FrameAgentPage() {
         </TabsContent>
       </Tabs>
       
-      <div className="flex justify-center space-x-4">
-        <Button variant="outline" asChild>
+      <h3 className="text-xl font-medium mb-4 text-center">Standalone Testing Pages</h3>
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+        <Button variant="outline" asChild className="text-xs">
+          <a href="/legacy-agent.html" target="_blank">
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Legacy Agent
+          </a>
+        </Button>
+        <Button variant="outline" asChild className="text-xs">
+          <a href="/pure-agent.html" target="_blank">
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Pure Agent
+          </a>
+        </Button>
+        <Button variant="outline" asChild className="text-xs">
+          <a href="/basic-agent.html" target="_blank">
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Basic Agent
+          </a>
+        </Button>
+        <Button variant="outline" asChild className="text-xs">
           <a href="/direct-script.html" target="_blank">
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Open Direct Script
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Direct Script
           </a>
         </Button>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild className="text-xs">
           <a href="/direct-agent.html" target="_blank">
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Open Simple Agent
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Simple Agent
           </a>
         </Button>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild className="text-xs">
           <a href="/agent-demo.html" target="_blank">
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Open Decorated Agent
+            <ExternalLink className="mr-2 h-3 w-3" />
+            Decorated Agent
           </a>
         </Button>
+      </div>
+      
+      <div className="text-center text-sm text-muted-foreground">
+        <p>Using D-ID agent with client key starting with <code className="bg-muted p-1 rounded">Z29vZ2xlLW9hdXRo</code> and agent ID <code className="bg-muted p-1 rounded">agt_YjpQXzSG</code></p>
       </div>
     </div>
   );
