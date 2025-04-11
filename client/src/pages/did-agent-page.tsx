@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Helmet } from "react-helmet-async";
 import { Sparkles, BookOpen, Shield, FileCheck } from "lucide-react";
+import AgentScript from "@/components/did-agent/agent-script";
 
 export default function DIDAgentPage() {
   return (
@@ -27,12 +28,11 @@ export default function DIDAgentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Agent Column */}
             <div className="lg:col-span-2 space-y-4">
-              <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border p-8 h-[600px] flex flex-col items-center justify-center text-center">
-                <iframe
-                  src="/clickable-agent.html" 
-                  className="w-full h-full rounded-lg overflow-hidden"
-                  title="MetaWorks Virtual Security Assistant"
-                  frameBorder="0"
+              <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border">
+                <AgentScript 
+                  height="600px"
+                  width="100%"
+                  className="w-full"
                 />
               </div>
             </div>
