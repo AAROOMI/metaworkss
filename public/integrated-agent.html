@@ -262,10 +262,38 @@
     const retryButton = document.getElementById('retry-button');
     const agentContainer = document.getElementById('did-agent');
     
-    // D-ID credentials - hardcoded for this example
-    // In a production environment, these should be fetched from a secure API
-    const DID_AGENT_ID = 'agt_YjpQXzSG';
-    const DID_CLIENT_KEY = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
+    // D-ID credentials will be fetched from server
+    let DID_AGENT_ID = '';
+    let DID_CLIENT_KEY = '';
+    
+    // Fetch D-ID credentials from server API
+    async function fetchCredentials() {
+      try {
+        updateStatus('loading', 'Fetching credentials...');
+        const response = await fetch('/api/did-credentials');
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Credentials fetched successfully');
+        
+        // Save credentials
+        DID_AGENT_ID = data.agentId;
+        DID_CLIENT_KEY = data.clientKey;
+        
+        // Validate credentials
+        if (!DID_AGENT_ID || !DID_CLIENT_KEY) {
+          throw new Error('Invalid credentials received from server');
+        }
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to fetch credentials:', error);
+        updateStatus('error', `Credential error: ${error.message}`);
+        return false;
+      }
+    }
     
     // Update UI status
     function updateStatus(state, message) {
@@ -289,9 +317,15 @@
     }
     
     // Initialize D-ID agent
-    function initializeAgent() {
+    async function initializeAgent() {
       try {
-        updateStatus('loading', 'Loading virtual consultant...');
+        updateStatus('loading', 'Preparing virtual consultant...');
+        
+        // First, get credentials
+        const credentialsOk = await fetchCredentials();
+        if (!credentialsOk) {
+          throw new Error('Could not get valid credentials');
+        }
         
         // Remove any existing agent script
         const existingScript = document.getElementById('did-script');
@@ -299,33 +333,45 @@
           existingScript.remove();
         }
         
-        // Create and add D-ID script
-        const script = document.createElement('script');
-        script.id = 'did-script';
-        script.type = 'module';
-        script.src = 'https://agent.d-id.com/v1/index.js';
-        script.setAttribute('data-name', 'did-agent');
-        script.setAttribute('data-client-key', DID_CLIENT_KEY);
-        script.setAttribute('data-agent-id', DID_AGENT_ID);
-        script.setAttribute('data-monitor', 'true');
+        console.log('Using agent ID:', DID_AGENT_ID);
         
-        // Add event listeners
-        script.onload = function() {
-          console.log('D-ID script loaded successfully');
-          updateStatus('loading', 'Script loaded, initializing agent...');
-        };
+        updateStatus('loading', 'Loading consultant interface...');
         
-        script.onerror = function(error) {
-          console.error('Failed to load D-ID script:', error);
-          updateStatus('error', 'Failed to load virtual consultant');
-        };
-        
-        // Add script to document
-        document.body.appendChild(script);
-        console.log('Added D-ID script to document');
-        
-        // Setup message listener for agent events
-        window.addEventListener('message', handleAgentMessages);
+        // Create and add D-ID script with a small delay to ensure clean initialization
+        setTimeout(() => {
+          try {
+            const script = document.createElement('script');
+            script.id = 'did-script';
+            script.type = 'module';
+            script.src = 'https://agent.d-id.com/v1/index.js';
+            script.setAttribute('data-name', 'did-agent');
+            script.setAttribute('data-client-key', DID_CLIENT_KEY);
+            script.setAttribute('data-agent-id', DID_AGENT_ID);
+            script.setAttribute('data-monitor', 'true');
+            
+            // Add event listeners
+            script.onload = function() {
+              console.log('D-ID script loaded successfully');
+              updateStatus('loading', 'Script loaded, initializing agent...');
+            };
+            
+            script.onerror = function(error) {
+              console.error('Failed to load D-ID script:', error);
+              updateStatus('error', 'Failed to load virtual consultant');
+            };
+            
+            // Add script to document
+            document.body.appendChild(script);
+            console.log('Added D-ID script to document');
+            
+            // Setup message listener for agent events if not already set
+            window.removeEventListener('message', handleAgentMessages);
+            window.addEventListener('message', handleAgentMessages);
+          } catch (innerError) {
+            console.error('Error creating script:', innerError);
+            updateStatus('error', `Script creation error: ${innerError.message}`);
+          }
+        }, 500); // Small delay for stability
       } catch (error) {
         console.error('Error initializing agent:', error);
         updateStatus('error', `Initialization error: ${error.message}`);
