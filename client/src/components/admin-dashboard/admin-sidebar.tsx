@@ -127,13 +127,13 @@ export default function AdminSidebar() {
               AI Assistance
             </h3>
             
-            {/* MetaWorks Consultant - Launch page */}
-            <Link href="/consultant">
+            {/* MetaWorks Consultant - Direct HTML page */}
+            <a href="/metaworks-consultant.html" target="_blank" rel="noopener noreferrer">
               <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
                 <Headphones className="mr-2 h-4 w-4" />
                 MetaWorks Consultant
               </Button>
-            </Link>
+            </a>
           </div>
           
           {/* User Dashboard Link */}
