@@ -74,43 +74,41 @@
     <div id="did-agent"></div>
   </div>
 
-  <!-- The script tag will be created dynamically with credentials from the API -->
+  <!-- Using the direct script with hardcoded credentials as provided -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      fetch('/api/did-credentials')
-        .then(response => response.json())
-        .then(data => {
-          const script = document.createElement('script');
-          script.type = 'module';
-          script.src = 'https://agent.d-id.com/v1/index.js';
-          script.setAttribute('data-name', 'did-agent');
-          script.setAttribute('data-target', '#did-agent');
-          script.setAttribute('data-mode', 'fabio');
-          script.setAttribute('data-client-key', data.clientKey);
-          script.setAttribute('data-agent-id', data.agentId);
-          script.setAttribute('data-monitor', 'true');
+      try {
+        // Create script with exact parameters provided
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://agent.d-id.com/v1/index.js';
+        script.setAttribute('data-name', 'did-agent');
+        script.setAttribute('data-target', '#did-agent');
+        script.setAttribute('data-mode', 'fabio');
+        script.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD');
+        script.setAttribute('data-agent-id', 'agt_YjpQXzSG');
+        script.setAttribute('data-monitor', 'true');
           
-          script.onload = () => {
-            console.log('D-ID Agent script loaded successfully');
-            document.getElementById('loading').style.display = 'none';
-          };
-          
-          script.onerror = (error) => {
-            console.error('Error loading D-ID Agent script:', error);
-            document.getElementById('error-message').style.display = 'block';
-            document.getElementById('loading').style.display = 'none';
-          };
-          
-          document.body.appendChild(script);
-          console.log('D-ID Agent script added to the document');
-        })
-        .catch(error => {
-          console.error('Failed to fetch D-ID credentials:', error);
-          document.getElementById('error-message').textContent = 
-            'Unable to load virtual consultant credentials. Please try again later.';
+        script.onload = () => {
+          console.log('D-ID Agent script loaded successfully');
+          document.getElementById('loading').style.display = 'none';
+        };
+        
+        script.onerror = (error) => {
+          console.error('Error loading D-ID Agent script:', error);
           document.getElementById('error-message').style.display = 'block';
           document.getElementById('loading').style.display = 'none';
-        });
+        };
+        
+        document.body.appendChild(script);
+        console.log('D-ID Agent script added to the document');
+      } catch (error) {
+        console.error('Failed to initialize D-ID agent:', error);
+        document.getElementById('error-message').textContent = 
+          'Unable to load virtual consultant. Please try again later.';
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+      }
     });
   </script>
 

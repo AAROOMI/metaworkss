@@ -38,14 +38,14 @@ export default function AgentScript({
           throw new Error('No agent ID returned from API');
         }
         
-        // Create script element
+        // Create script element with the exact parameters provided by user
         const script = document.createElement('script');
         script.type = 'module';
         script.src = 'https://agent.d-id.com/v1/index.js';
         script.dataset.name = 'did-agent';
         script.dataset.mode = 'fabio';
-        script.dataset.clientKey = data.clientKey;
-        script.dataset.agentId = data.agentId;
+        script.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
+        script.dataset.agentId = 'agt_YjpQXzSG';
         script.dataset.monitor = 'true';
         
         // Only add the script if it doesn't already exist and component is still mounted

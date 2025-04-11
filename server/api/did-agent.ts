@@ -21,20 +21,17 @@ router.get('/api/did-keys', async (req: Request, res: Response) => {
 // Endpoint to get credentials needed for the D-ID agent in the frontend
 router.get('/api/did-credentials', async (req: Request, res: Response) => {
   try {
-    // Get necessary credentials from environment
-    const clientKey = process.env.DID_CLIENT_KEY;
-    const agentId = process.env.DID_AGENT_ID;
-    
-    if (!clientKey || !agentId) {
-      console.error('Missing D-ID credentials. Required: DID_CLIENT_KEY, DID_AGENT_ID');
-      return res.status(500).json({ error: 'D-ID credentials are not properly configured' });
-    }
+    // Use hardcoded credentials as specified in the script
+    const clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
+    const agentId = 'agt_YjpQXzSG';
     
     // Send credentials required for the D-ID agent script
     res.json({
       clientKey,
       agentId
     });
+    
+    console.log('Sent D-ID credentials with client key prefix:', clientKey.substring(0, 10), '... and agent ID:', agentId);
   } catch (error) {
     console.error('Error fetching D-ID credentials:', error);
     res.status(500).json({ error: 'Failed to retrieve D-ID credentials' });
