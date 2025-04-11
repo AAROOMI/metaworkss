@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaWorks Virtual Security Assistant</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+    header {
+      padding: 20px;
+      text-align: center;
+      background-color: rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: white;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+    }
+    .agent-section {
+      flex: 2;
+      position: relative;
+    }
+    .info-section {
+      flex: 1;
+      padding: 20px;
+      background-color: rgba(0,0,0,0.2);
+      overflow-y: auto;
+    }
+    .card {
+      background-color: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 18px;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: white;
+    }
+    .card-subtitle {
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: rgba(255,255,255,0.7);
+    }
+    .info-item {
+      margin-bottom: 16px;
+    }
+    .info-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-content {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    .framework-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .framework-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .framework-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #6366f1;
+      margin-right: 8px;
+    }
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      z-index: 100;
+    }
+    .back-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.1);
+    }
+    @media (max-width: 768px) {
+      .main-content {
+        flex-direction: column;
+      }
+      .agent-section {
+        min-height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>MetaWorks Virtual Security Assistant</h1>
+    </header>
+    
+    <div class="main-content">
+      <div class="agent-section">
+        <a href="/" class="back-link">
+          <span class="back-icon">←</span> Back to Dashboard
+        </a>
+        <div id="did-agent" style="width: 100%; height: 100%;"></div>
+      </div>
+      
+      <div class="info-section">
+        <div class="card">
+          <h3 class="card-title">How To Use</h3>
+          <p class="card-subtitle">Tips for interacting with your virtual security assistant</p>
+          
+          <div class="info-item">
+            <div class="info-title">
+              <span>Ask About Frameworks</span>
+            </div>
+            <p class="info-content">
+              "Can you explain the NCA ECC framework domains?"
+            </p>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-title">
+              <span>Get Security Advice</span>
+            </div>
+            <p class="info-content">
+              "What are the best practices for password policies?"
+            </p>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-title">
+              <span>Policy Guidance</span>
+            </div>
+            <p class="info-content">
+              "What should I include in an acceptable use policy?"
+            </p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3 class="card-title">Supported Frameworks</h3>
+          
+          <ul class="framework-list">
+            <li class="framework-item">
+              <div class="framework-dot"></div>
+              <span>NCA ECC (Essential Cybersecurity Controls)</span>
+            </li>
+            <li class="framework-item">
+              <div class="framework-dot"></div>
+              <span>SAMA Cyber Security Framework</span>
+            </li>
+            <li class="framework-item">
+              <div class="framework-dot"></div>
+              <span>ISO 27001 Information Security</span>
+            </li>
+            <li class="framework-item">
+              <div class="framework-dot"></div>
+              <span>PDPL (Personal Data Protection Law)</span>
+            </li>
+            <li class="framework-item">
+              <div class="framework-dot"></div>
+              <span>IT General Controls (ITGC)</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Directly embed the D-ID agent script -->
+  <script
+    type="module"
+    src="https://agent.d-id.com/v1/index.js"
+    data-name="did-agent"
+    data-mode="fabio"
+    data-client-key="Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD"
+    data-agent-id="agt_YjpQXzSG"
+    data-monitor="true">
+  </script>
+</body>
+</html>

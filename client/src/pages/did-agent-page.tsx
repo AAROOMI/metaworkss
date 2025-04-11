@@ -28,11 +28,25 @@ export default function DIDAgentPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Agent Column */}
             <div className="lg:col-span-2 space-y-4">
-              <iframe
-                src="/direct-agent.html" 
-                className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg border border-border"
-                title="MetaWorks Virtual Security Assistant"
-              />
+              <div className="bg-card rounded-lg overflow-hidden shadow-lg border border-border p-8 h-[600px] flex flex-col items-center justify-center text-center">
+                <Shield className="h-16 w-16 text-primary mb-6" />
+                <h3 className="text-xl font-semibold mb-2">Virtual Security Assistant</h3>
+                <p className="text-muted-foreground mb-8 max-w-md">
+                  Our AI-powered cybersecurity consultant helps you understand compliance frameworks and security best practices.
+                </p>
+                <a 
+                  href="/standalone-virtual-agent.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-md font-medium flex items-center gap-2"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Launch Virtual Assistant
+                </a>
+                <p className="text-xs text-muted-foreground mt-4">
+                  Opens in a new window for optimal performance
+                </p>
+              </div>
             </div>
             
             {/* Information Column */}
