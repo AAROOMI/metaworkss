@@ -45,10 +45,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(didAgentRouter);
   
   // D-ID credentials endpoint
-  app.get("/api/did-credentials", (req, res) => {
+  app.get("/api/did/credentials", (req, res) => {
     res.json({
-      didAgentId: process.env.DID_AGENT_ID,
-      didClientKey: process.env.DID_CLIENT_KEY
+      agentId: process.env.DID_AGENT_ID,
+      clientKey: process.env.DID_CLIENT_KEY
     });
   });
 
