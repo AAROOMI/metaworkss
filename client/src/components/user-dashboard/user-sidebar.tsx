@@ -179,45 +179,11 @@ export default function UserSidebar() {
               AI Assistance
             </h3>
             
-            {/* Virtual Assistant Link */}
-            <Link href="/did-agent">
-              <Button variant="outline" className="w-full justify-start">
-                <Shield className="mr-2 h-4 w-4" />
-                Virtual Assistant
-              </Button>
-            </Link>
-            
-            {/* Direct D-ID Integration - External window */}
-            <a href="/consultant-redirect.html" target="_blank" rel="noopener noreferrer">
-              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
-                <Headphones className="mr-2 h-4 w-4" />
-                External Consultant
-              </Button>
-            </a>
-            
-            {/* Direct D-ID Integration - Embedded */}
-            <Link href="/did-agent">
-              <Button variant="secondary" className="w-full justify-start">
-                <User className="mr-2 h-4 w-4" />
-                Security Assistant
-              </Button>
-            </Link>
-            
-            {/* Full Screen D-ID Integration */}
-            <Link href="/fullscreen-consultant">
-              <Button variant="default" className="w-full justify-start bg-gradient-to-r from-blue-500 to-primary">
-                <User className="mr-2 h-4 w-4" />
-                Fullscreen Consultant
-              </Button>
-            </Link>
-            
-            {/* Standalone D-ID Agent */}
-            <a href="/did-standalone" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="w-full justify-start">
-                <Headphones className="mr-2 h-4 w-4" />
-                Standalone Version
-              </Button>
-            </a>
+            {/* Single Consultant Button */}
+            <Button variant="default" className="w-full justify-start bg-gradient-to-r from-primary to-emerald-500">
+              <User className="mr-2 h-4 w-4" />
+              Consultant
+            </Button>
           </div>
         </div>
       </ScrollArea>
