@@ -40,7 +40,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ publishableKey });
   });
 
-  // Use our dedicated DID Agent router (removed older implementation in favor of the modular one)
+  // Use our dedicated DID Agent router
+  app.use(didAgentRouter);
 
   // API endpoints for company information
   app.post("/api/company-info", async (req, res, next) => {

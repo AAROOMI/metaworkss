@@ -69,8 +69,25 @@
           script.setAttribute('data-name', 'did-agent');
           script.setAttribute('data-target', '#did-agent');
           script.setAttribute('data-mode', 'fabio');
-          script.setAttribute('data-client-key', 'YXV0aDB8NjdkYmZkZmY1MmQ3MzE2OWEzM2Q5NThiOklKaldaQmlNRjJnazZtVmlSSVpUag==');
-          script.setAttribute('data-agent-id', 'agt_954OZ9Ea');
+          // Fetch the D-ID credentials from the server
+          fetch('/api/did-credentials')
+            .then(response => response.json())
+            .then(data => {
+              script.setAttribute('data-client-key', data.clientKey);
+              script.setAttribute('data-agent-id', data.agentId);
+              console.log('D-ID credentials loaded for iframe');
+            })
+            .catch(error => {
+              console.error('Error loading D-ID credentials:', error);
+              document.getElementById('loading').innerHTML = `
+                <div style="text-align: center">
+                  <p>Failed to load virtual agent credentials</p>
+                  <button onclick="window.location.reload()" style="padding: 8px 16px; margin-top: 10px; cursor: pointer">
+                    Retry
+                  </button>
+                </div>
+              `;
+            });
           script.setAttribute('data-monitor', 'true');
 
           script.onload = () => {

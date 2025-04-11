@@ -22,8 +22,19 @@ export default function AgentScript({
     script.src = 'https://agent.d-id.com/v1/index.js';
     script.dataset.name = 'did-agent';
     script.dataset.mode = 'fabio';
-    script.dataset.clientKey = 'Z29vZ2xlLW9hdXRoMnwxMDc5MjM0NjY3NDY1MDUyMTM2OTE6WHJvRFFSYnBHMng2SXJGRDlIcjZD';
-    script.dataset.agentId = 'agt_YjpQXzSG';
+    
+    // Use the environment variables for DID agent credentials
+    fetch('/api/did-credentials')
+      .then(response => response.json())
+      .then(data => {
+        script.dataset.clientKey = data.clientKey;
+        script.dataset.agentId = data.agentId;
+        console.log('DID credentials loaded successfully');
+      })
+      .catch(error => {
+        console.error('Error fetching DID credentials:', error);
+      });
+      
     script.dataset.monitor = 'true';
     
     // Only add the script if it doesn't already exist
