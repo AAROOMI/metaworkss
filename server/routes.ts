@@ -35,8 +35,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Clerk authentication API key endpoint
   app.get("/api/clerk-key", (req, res) => {
-    const publishableKey = process.env.CLERK_PUBLISHABLE_KEY;
-    console.log("Sending Clerk publishable key:", publishableKey);
+    const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || "";
+    console.log("Sending Clerk publishable key:", publishableKey ? "[set]" : "[missing]");
     res.json({ publishableKey });
   });
 
