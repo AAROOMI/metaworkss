@@ -46,3 +46,6 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx tsx server/init-db.ts"
+
+[agent]
+expertMode = true

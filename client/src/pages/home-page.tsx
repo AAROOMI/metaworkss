@@ -3,7 +3,6 @@ import Header from "@/components/layout/header";
 import HeroSection from "@/components/landing/hero-section";
 import FeaturesSection from "@/components/landing/features-section";
 import ContactSection from "@/components/landing/contact-section";
-import DemoSection from "@/components/landing/demo-section";
 import ComplianceLogos from "@/components/landing/compliance-logos";
 import Footer from "@/components/landing/footer";
 import { Shield } from "lucide-react";
@@ -29,7 +28,6 @@ export default function HomePage() {
       <HeroSection />
       <ComplianceLogos />
       <FeaturesSection />
-      <DemoSection />
       <ContactSection />
       <Footer />
       
