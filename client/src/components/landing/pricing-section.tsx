@@ -4,7 +4,7 @@ import { Check, Sparkles } from "lucide-react";
 const pricingPlans = [
   {
     name: "Basic",
-    price: "Contact Us",
+    price: "Custom Pricing",
     description: "Perfect for small organizations starting their compliance journey",
     features: [
       "Up to 50 users",
@@ -20,7 +20,7 @@ const pricingPlans = [
   },
   {
     name: "Standard",
-    price: "Contact Us",
+    price: "Custom Pricing",
     description: "Ideal for growing organizations with advanced compliance needs",
     features: [
       "Up to 200 users",
@@ -38,7 +38,7 @@ const pricingPlans = [
   },
   {
     name: "Premium",
-    price: "Contact Us",
+    price: "Custom Pricing",
     description: "Enterprise-grade solution with dedicated support",
     features: [
       "Unlimited users",
@@ -120,24 +120,33 @@ export default function PricingSection() {
           ))}
         </div>
 
-        {/* CTA Buttons */}
-        <div className="text-center space-y-4">
-          <p className="text-gray-300 text-lg mb-6">
-            Not sure which plan is right for you?
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="/#demo" 
-              className="inline-block py-3 px-8 rounded-lg font-medium text-center bg-gradient-to-r from-primary to-emerald-400 text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-            >
-              Book a Demo
-            </a>
-            <a 
-              href="/#contact" 
-              className="inline-block py-3 px-8 rounded-lg font-medium text-center border border-primary/50 bg-background/30 text-primary shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-primary/10"
-            >
-              Contact Us
-            </a>
+        {/* CTA Section */}
+        <div className="text-center space-y-6 mt-16">
+          <div className="backdrop-blur-sm bg-gradient-to-br from-primary/10 to-emerald-400/10 border border-primary/20 rounded-2xl p-8 md:p-12">
+            <h3 className="text-2xl md:text-3xl font-bold mb-4 text-white">
+              Agentic Cybersecurity Workforce
+            </h3>
+            <p className="text-lg text-gray-300 max-w-4xl mx-auto mb-6">
+              Empower your leadership team with AI-powered compliance intelligence designed for CTOs, CISOs, CIOs, 
+              Compliance Officers, Risk Officers, and IT Managers. Get actionable insights, automated workflows, 
+              and real-time compliance monitoring tailored to your role.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a 
+                href="/#contact" 
+                className="inline-block py-3 px-8 rounded-lg font-medium text-center bg-gradient-to-r from-primary to-emerald-400 text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                data-testid="button-request-demo"
+              >
+                Request a Demo
+              </a>
+              <a 
+                href="/about" 
+                className="inline-block py-3 px-8 rounded-lg font-medium text-center border border-primary/50 bg-background/30 text-primary shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-primary/10"
+                data-testid="link-learn-more"
+              >
+                Learn More About Us
+              </a>
+            </div>
           </div>
         </div>
       </div>
