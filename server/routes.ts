@@ -24,6 +24,8 @@ import { gamificationRouter } from "./api/gamification";
 import didAgentRouter from "./api/did-agent";
 import progressRouter from "./api/progress";
 import riskPredictionRouter from "./api/risk-prediction";
+import contactRouter from "./api/contact";
+import bookDemoRouter from "./api/book-demo";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -395,6 +397,10 @@ app.get("/api/dashboard-access", async (req, res) => {
   // Register risk management routes
   app.use('/api/risks', risksRouter);
   app.use('/api/assessment-risks', assessmentRisksRouter);
+
+  // Register contact and demo request routes (public endpoints)
+  app.use(contactRouter);
+  app.use(bookDemoRouter);
 
   const httpServer = createServer(app);
   return httpServer;
