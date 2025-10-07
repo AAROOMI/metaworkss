@@ -75,7 +75,7 @@ export default function AboutSection() {
               <img 
                 src={mcitLogo} 
                 alt="Ministry of Communication and Information Technology" 
-                className="h-16 md:h-20 w-auto object-contain"
+                className="h-24 md:h-32 w-auto object-contain"
                 data-testid="img-mcit-logo"
               />
             </div>
