@@ -93,13 +93,13 @@ export default function SolutionSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
-              href="#demo" 
+              href="/#demo" 
               className="inline-block py-3 px-8 rounded-lg font-medium text-center bg-gradient-to-r from-primary to-emerald-400 text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
             >
               Book a Demo
             </a>
             <a 
-              href="#pricing" 
+              href="/pricing" 
               className="inline-block py-3 px-8 rounded-lg font-medium text-center border border-primary/50 bg-background/30 text-primary shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-primary/10"
             >
               View Pricing

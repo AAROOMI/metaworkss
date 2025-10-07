@@ -47,10 +47,10 @@ export default function Header() {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
-            <a href="#solution" className="text-sm font-medium hover:text-primary transition-colors">Solution</a>
-            <a href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</a>
-            <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">About</a>
+            <a href="/#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
+            <button onClick={() => navigate("/solution")} className="text-sm font-medium hover:text-primary transition-colors">Solution</button>
+            <button onClick={() => navigate("/pricing")} className="text-sm font-medium hover:text-primary transition-colors">Pricing</button>
+            <button onClick={() => navigate("/about")} className="text-sm font-medium hover:text-primary transition-colors">About</button>
             
             {/* Dark/Light Mode Toggle */}
             <ThemeSwitch>Toggle theme</ThemeSwitch>
@@ -120,10 +120,25 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden backdrop-blur-sm bg-background/90 absolute top-full left-0 w-full border-b border-primary/10">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Features</a>
-              <a href="#solution" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Solution</a>
-              <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Pricing</a>
-              <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">About</a>
+              <a href="/#features" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary">Features</a>
+              <a 
+                onClick={() => { navigate('/solution'); setIsMenuOpen(false); }}
+                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+              >
+                Solution
+              </a>
+              <a 
+                onClick={() => { navigate('/pricing'); setIsMenuOpen(false); }}
+                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+              >
+                Pricing
+              </a>
+              <a 
+                onClick={() => { navigate('/about'); setIsMenuOpen(false); }}
+                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-primary/10 hover:text-primary cursor-pointer"
+              >
+                About
+              </a>
               
               {user ? (
                 <>

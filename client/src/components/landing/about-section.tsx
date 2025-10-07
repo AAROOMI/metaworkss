@@ -126,7 +126,7 @@ export default function AboutSection() {
             Join hundreds of organizations trusting Meta Works for their compliance needs
           </p>
           <a 
-            href="#contact" 
+            href="/#contact" 
             className="inline-block py-3 px-8 rounded-lg font-medium text-center bg-gradient-to-r from-primary to-emerald-400 text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
           >
             Get in Touch

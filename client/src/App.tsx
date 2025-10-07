@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { HelmetProvider } from "react-helmet-async";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
+import SolutionPage from "@/pages/solution-page";
+import PricingPage from "@/pages/pricing-page";
+import AboutPage from "@/pages/about-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
@@ -38,64 +41,68 @@ import ThemeProvider from "@/components/layout/theme-switch";
 import CustomClerkProvider from "@/components/clerk/custom-clerk-provider";
 
 function Router() {
-	return (
-		<Switch>
-			<Route path="/" component={HomePage} />
-			{/* Standard Authentication Routes */}
-			<Route path="/login" component={AuthPage} />
-			<Route path="/auth" component={AuthPage} />
-			{/* Clerk Authentication Routes */}
-			<Route path="/clerk-auth" component={ClerkAuthPage} />
-			<Route path="/clerk-login" component={ClerkAuthPage} />
-			<ClerkProtectedRoute path="/clerk-admin" component={ClerkAdminPage} />
-			{/* New Role-Protected Routes */}
-			<AdminProtectedRoute path="/admin-dashboard" component={AdminDashboard} />
-			<UserProtectedRoute path="/user-dashboard" component={UserDashboard} />
-			{/* Protected Routes - accessible through either auth system */}
-			<ProtectedRoute path="/dashboard" component={DashboardPage} />
-			<ProtectedRoute path="/admin" component={AdminPage} />
-			<ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
-			<ProtectedRoute path="/risk-management" component={RiskManagementPage} />
-			<ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
-			<ProtectedRoute path="/risk-prediction" component={RiskPredictionPage} />
-			<ProtectedRoute path="/policies" component={PolicyManagementPage} />
-			<ProtectedRoute path="/security-timeline" component={SecurityTimelineDemo} />
-			<ProtectedRoute path="/security-progress" component={SecurityProgressPage} />
-			<Route path="/company" component={CompanyDashboardPage} />
-			<Route path="/onboarding" component={OnboardingPage} />
-			{/* Public Routes */}
-			<Route path="/did-agent" component={DIDAgentPage} />
-			<Route path="/agent" component={DIDAgentPage} />
-			<Route path="/agent-test" component={AgentTestPage} />
-			<Route path="/frameworks/nca-ecc" component={NcaEccPage} />
-			<ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />
-			<Route path="/frameworks/sama" component={SamaPage} />
-			<ProtectedRoute path="/frameworks/sama-assessment" component={SAMAFrameworkPage} />
-			<Route path="/frameworks/pdpl" component={PdplPage} />
-			<Route path="/frameworks/iso-27001" component={Iso27001Page} />
-			{/* Report Routes */}
-			<Route path="/shared-report/:token" component={SharedReportPage} />
-			<ProtectedRoute path="/reports/:id" component={NotFound} />
-			<Route component={NotFound} />
-		</Switch>
-	);
+        return (
+                <Switch>
+                        <Route path="/" component={HomePage} />
+                        {/* Public Pages */}
+                        <Route path="/solution" component={SolutionPage} />
+                        <Route path="/pricing" component={PricingPage} />
+                        <Route path="/about" component={AboutPage} />
+                        {/* Standard Authentication Routes */}
+                        <Route path="/login" component={AuthPage} />
+                        <Route path="/auth" component={AuthPage} />
+                        {/* Clerk Authentication Routes */}
+                        <Route path="/clerk-auth" component={ClerkAuthPage} />
+                        <Route path="/clerk-login" component={ClerkAuthPage} />
+                        <ClerkProtectedRoute path="/clerk-admin" component={ClerkAdminPage} />
+                        {/* New Role-Protected Routes */}
+                        <AdminProtectedRoute path="/admin-dashboard" component={AdminDashboard} />
+                        <UserProtectedRoute path="/user-dashboard" component={UserDashboard} />
+                        {/* Protected Routes - accessible through either auth system */}
+                        <ProtectedRoute path="/dashboard" component={DashboardPage} />
+                        <ProtectedRoute path="/admin" component={AdminPage} />
+                        <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
+                        <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
+                        <ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
+                        <ProtectedRoute path="/risk-prediction" component={RiskPredictionPage} />
+                        <ProtectedRoute path="/policies" component={PolicyManagementPage} />
+                        <ProtectedRoute path="/security-timeline" component={SecurityTimelineDemo} />
+                        <ProtectedRoute path="/security-progress" component={SecurityProgressPage} />
+                        <Route path="/company" component={CompanyDashboardPage} />
+                        <Route path="/onboarding" component={OnboardingPage} />
+                        {/* Public Routes */}
+                        <Route path="/did-agent" component={DIDAgentPage} />
+                        <Route path="/agent" component={DIDAgentPage} />
+                        <Route path="/agent-test" component={AgentTestPage} />
+                        <Route path="/frameworks/nca-ecc" component={NcaEccPage} />
+                        <ProtectedRoute path="/frameworks/nca-ecc-assessment" component={NcaEccAssessmentPage} />
+                        <Route path="/frameworks/sama" component={SamaPage} />
+                        <ProtectedRoute path="/frameworks/sama-assessment" component={SAMAFrameworkPage} />
+                        <Route path="/frameworks/pdpl" component={PdplPage} />
+                        <Route path="/frameworks/iso-27001" component={Iso27001Page} />
+                        {/* Report Routes */}
+                        <Route path="/shared-report/:token" component={SharedReportPage} />
+                        <ProtectedRoute path="/reports/:id" component={NotFound} />
+                        <Route component={NotFound} />
+                </Switch>
+        );
 }
 
 function App() {
-	return (
-		<QueryClientProvider client={queryClient}>
-			<CustomClerkProvider>
-				<AuthProvider>
-					<HelmetProvider>
-						<ThemeProvider>
-							<Router />
-							<Toaster />
-						</ThemeProvider>
-					</HelmetProvider>
-				</AuthProvider>
-			</CustomClerkProvider>
-		</QueryClientProvider>
-	);
+        return (
+                <QueryClientProvider client={queryClient}>
+                        <CustomClerkProvider>
+                                <AuthProvider>
+                                        <HelmetProvider>
+                                                <ThemeProvider>
+                                                        <Router />
+                                                        <Toaster />
+                                                </ThemeProvider>
+                                        </HelmetProvider>
+                                </AuthProvider>
+                        </CustomClerkProvider>
+                </QueryClientProvider>
+        );
 }
 
 export default App;
