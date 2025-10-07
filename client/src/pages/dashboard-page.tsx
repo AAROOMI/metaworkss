@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Sidebar from "@/components/dashboard/sidebar";
 import ComplianceScore from "@/components/dashboard/compliance-score";
 import RiskHeatmap from "@/components/risks/risk-heatmap";
+import CompanyInfoSection from "@/components/landing/company-info-section";
 import { Link } from "wouter";
 import { Shield, AlertTriangle, CheckCircle, Clock, FileText, Download, BarChart3, Network, Lock, Database, Cloud, UserCheck, Settings, Clipboard, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -208,6 +209,9 @@ export default function DashboardPage() {
               </span>
             </div>
           </div>
+          
+          {/* Company Information Dashboard */}
+          <CompanyInfoSection />
           
           {/* Dashboard Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

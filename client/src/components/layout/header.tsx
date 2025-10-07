@@ -20,7 +20,7 @@ export default function Header() {
   };
   
   const handleSignup = () => {
-    navigate("/auth");
+    navigate("/contact-us");
   };
   
   const handleClerkAuth = () => {

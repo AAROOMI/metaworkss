@@ -8,6 +8,7 @@ import HomePage from "@/pages/home-page";
 import SolutionPage from "@/pages/solution-page";
 import PricingPage from "@/pages/pricing-page";
 import AboutPage from "@/pages/about-page";
+import ContactUsPage from "@/pages/contact-us-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
@@ -48,6 +49,7 @@ function Router() {
                         <Route path="/solution" component={SolutionPage} />
                         <Route path="/pricing" component={PricingPage} />
                         <Route path="/about" component={AboutPage} />
+                        <Route path="/contact-us" component={ContactUsPage} />
                         {/* Standard Authentication Routes */}
                         <Route path="/login" component={AuthPage} />
                         <Route path="/auth" component={AuthPage} />
