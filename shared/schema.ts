@@ -449,6 +449,39 @@ export const insertAssessmentRiskSchema = createInsertSchema(assessmentRisks).om
   updatedAt: true
 });
 
+// Contact Messages and Demo Requests
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("new"), // 'new', 'read', 'replied', 'archived'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const demoRequests = pgTable("demo_requests", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  company: text("company"),
+  message: text("message"),
+  status: text("status").notNull().default("new"), // 'new', 'contacted', 'scheduled', 'completed', 'cancelled'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Create insert schemas for contact and demo
+export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
+  id: true,
+  status: true,
+  createdAt: true
+});
+
+export const insertDemoRequestSchema = createInsertSchema(demoRequests).omit({
+  id: true,
+  status: true,
+  createdAt: true
+});
+
 // Define onboarding and gamification types
 export type OnboardingStep = typeof onboardingSteps.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
@@ -468,3 +501,10 @@ export type AssessmentRisk = typeof assessmentRisks.$inferSelect;
 
 export type InsertRisk = z.infer<typeof insertRiskSchema>;
 export type InsertAssessmentRisk = z.infer<typeof insertAssessmentRiskSchema>;
+
+// Define contact and demo types
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type DemoRequest = typeof demoRequests.$inferSelect;
+
+export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+export type InsertDemoRequest = z.infer<typeof insertDemoRequestSchema>;
