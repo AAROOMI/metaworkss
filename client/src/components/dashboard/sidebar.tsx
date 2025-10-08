@@ -16,6 +16,7 @@ import {
   AlertTriangle,
   History,
   GraduationCap,
+  Mail,
 } from "lucide-react";
 
 const menuItems = [
@@ -33,6 +34,11 @@ const menuItems = [
     name: "User Management",
     icon: Users,
     path: "/admin",
+  },
+  {
+    name: "Customer Messages",
+    icon: Mail,
+    path: "/admin-messages",
   },
   {
     name: "Policy Management",

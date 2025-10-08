@@ -34,6 +34,7 @@ import ClerkAdminPage from "@/pages/clerk-admin-page";
 import UserDashboard from "@/pages/user-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import SharedReportPage from "@/pages/shared-report-page";
+import AdminMessagesPage from "@/pages/admin-messages-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ClerkProtectedRoute } from "@/lib/clerk-protected-route";
@@ -63,6 +64,7 @@ function Router() {
                         {/* Protected Routes - accessible through either auth system */}
                         <ProtectedRoute path="/dashboard" component={DashboardPage} />
                         <ProtectedRoute path="/admin" component={AdminPage} />
+                        <ProtectedRoute path="/admin-messages" component={AdminMessagesPage} />
                         <ProtectedRoute path="/virtual-assistant" component={VirtualAssistantPage} />
                         <ProtectedRoute path="/risk-management" component={RiskManagementPage} />
                         <ProtectedRoute path="/risk-assessment" component={RiskAssessmentPage} />
