@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/landing/footer";
-import { Mail, MessageSquare, User, Send, CheckCircle, Calendar, Sparkles } from "lucide-react";
+import { Mail, MessageSquare, User, Send, CheckCircle, Calendar, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet-async";
 import backgroundImage from "@assets/metawork background.png";
+
+declare global {
+  interface Window {
+    Calendly?: any;
+  }
+}
 
 export default function ContactUsPage() {
   const [activeTab, setActiveTab] = useState<"contact" | "demo">("demo");
@@ -15,7 +21,24 @@ export default function ContactUsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isContactSubmitted, setIsContactSubmitted] = useState(false);
+  const [isCalendlyLoaded, setIsCalendlyLoaded] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if Calendly script is loaded
+    const checkCalendlyLoaded = () => {
+      if (window.Calendly) {
+        setIsCalendlyLoaded(true);
+      } else {
+        // Keep checking until loaded
+        setTimeout(checkCalendlyLoaded, 100);
+      }
+    };
+
+    if (activeTab === "demo") {
+      checkCalendlyLoaded();
+    }
+  }, [activeTab]);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -152,7 +175,7 @@ export default function ContactUsPage() {
 
           {/* Demo Booking with Calendly */}
           {activeTab === "demo" && (
-            <div className="backdrop-blur-sm bg-gradient-to-br from-primary/20 to-emerald-400/20 border border-primary/30 rounded-2xl p-10 shadow-2xl">
+            <div className="backdrop-blur-sm bg-[#0f1517]/60 border border-white/10 rounded-2xl p-10 shadow-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                 {/* Left Section - Benefits */}
                 <div className="space-y-6">
@@ -194,7 +217,15 @@ export default function ContactUsPage() {
                 </div>
 
                 {/* Right Section - Calendly Scheduler */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden" style={{ minHeight: '650px' }}>
+                <div className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden relative" style={{ minHeight: '650px' }}>
+                  {!isCalendlyLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="text-center">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                        <p className="text-white text-sm">Loading calendar...</p>
+                      </div>
+                    </div>
+                  )}
                   <div 
                     className="calendly-inline-widget" 
                     data-url="https://calendly.com/abdullaharoomi/30min"
