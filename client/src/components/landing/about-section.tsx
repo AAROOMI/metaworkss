@@ -1,5 +1,5 @@
 import React from "react";
-import { Award, MapPin, Rocket, Users, Shield, Heart, Target, Zap, Globe } from "lucide-react";
+import { Award, MapPin, Rocket, Users, Shield, Heart, Target, Zap, Globe, Building2 } from "lucide-react";
 import mcitLogo from "@assets/Hnet.com-image_7.original_1759845224098.png";
 import miskLogo from "@assets/MiSK_Foundation_Logo.svg_1759845282340.png";
 
@@ -20,9 +20,9 @@ const achievements = [
     description: "Supported by the Ministry of Communication and Information Technology, advancing digital transformation in the Kingdom"
   },
   {
-    icon: Award,
-    title: "Code Tech Champions 5",
-    description: "Recognized by Code Tech Champions 5 for our technical excellence and innovation in compliance automation"
+    icon: Building2,
+    title: "Trusted by Major Companies in Saudi",
+    description: "Sports Boulevard Foundation, Saudi Ceramics, Honda, STC, PWC, PIF, Ministry of Energy, Elm"
   }
 ];
 
@@ -71,19 +71,19 @@ export default function AboutSection() {
         <div className="mb-16">
           <p className="text-center text-gray-400 mb-8 text-sm uppercase tracking-wider">Supported By</p>
           <div className="flex flex-wrap items-center justify-center gap-12 md:gap-16">
-            <div className="backdrop-blur-sm bg-white/5 border border-primary/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300">
+            <div className="backdrop-blur-sm bg-white border border-primary/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300">
               <img 
                 src={mcitLogo} 
                 alt="Ministry of Communication and Information Technology" 
-                className="h-24 md:h-32 w-auto object-contain"
+                className="h-24 md:h-28 w-auto object-contain"
                 data-testid="img-mcit-logo"
               />
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-primary/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300">
+            <div className="backdrop-blur-sm bg-white border border-primary/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300">
               <img 
                 src={miskLogo} 
                 alt="MiSK Foundation" 
-                className="h-16 md:h-20 w-auto object-contain"
+                className="h-24 md:h-28 w-auto object-contain"
                 data-testid="img-misk-logo"
               />
             </div>
