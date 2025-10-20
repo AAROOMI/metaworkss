@@ -13,15 +13,8 @@ export default function ContactUsPage() {
     email: "",
     message: ""
   });
-  const [demoFormData, setDemoFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    message: ""
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isContactSubmitted, setIsContactSubmitted] = useState(false);
-  const [isDemoSubmitted, setIsDemoSubmitted] = useState(false);
   const { toast } = useToast();
 
   const validateEmail = (email: string) => {
@@ -31,13 +24,6 @@ export default function ContactUsPage() {
   const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setContactFormData({
       ...contactFormData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleDemoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setDemoFormData({
-      ...demoFormData,
       [e.target.name]: e.target.value
     });
   };
@@ -95,64 +81,12 @@ export default function ContactUsPage() {
     }
   };
 
-  const handleDemoSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!demoFormData.name || !demoFormData.email) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!validateEmail(demoFormData.email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/book-demo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(demoFormData)
-      });
-
-      if (response.ok) {
-        setIsDemoSubmitted(true);
-        setDemoFormData({ name: "", email: "", company: "", message: "" });
-        toast({
-          title: "Demo Request Sent!",
-          description: "We'll contact you shortly to schedule your demo."
-        });
-      } else {
-        throw new Error("Failed to submit demo request");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to submit request. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen text-foreground relative">
       <Helmet>
         <title>Contact Us - MetaWorks | Get Started with Compliance Solutions</title>
         <meta name="description" content="Get in touch with MetaWorks. Book a demo or send us a message to learn how our AI-powered compliance platform can help your organization." />
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
       </Helmet>
 
       {/* Background image */}
@@ -216,154 +150,58 @@ export default function ContactUsPage() {
             </div>
           </div>
 
-          {/* Demo Form */}
+          {/* Demo Booking with Calendly */}
           {activeTab === "demo" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-              {/* Benefits */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-white mb-6">What You'll Get:</h3>
-                {[
-                  {
-                    title: "Personalized Demo",
-                    description: "30-minute customized walkthrough tailored to your organization's needs"
-                  },
-                  {
-                    title: "Expert Consultation",
-                    description: "Direct access to our compliance experts to answer your questions"
-                  },
-                  {
-                    title: "ROI Analysis",
-                    description: "See how much time and money you can save with our automation"
-                  },
-                  {
-                    title: "Free Trial Access",
-                    description: "Get started immediately with a 14-day free trial"
-                  }
-                ].map((benefit, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center flex-shrink-0">
-                      <CheckCircle className="w-5 h-5 text-white" />
+            <div className="backdrop-blur-sm bg-gradient-to-br from-primary/20 to-emerald-400/20 border border-primary/30 rounded-2xl p-10 shadow-2xl">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                {/* Left Section - Benefits */}
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold mb-6" style={{ color: '#00f0ff' }}>
+                    What You'll Get:
+                  </h3>
+                  {[
+                    {
+                      title: "Personalized Demo",
+                      description: "30-minute customized walkthrough tailored to your organization's needs"
+                    },
+                    {
+                      title: "Expert Consultation",
+                      description: "Direct access to our compliance experts to answer your questions"
+                    },
+                    {
+                      title: "ROI Analysis",
+                      description: "See how much time and money you can save with our automation"
+                    },
+                    {
+                      title: "Free Trial Access",
+                      description: "Get started immediately with a 14-day free trial"
+                    }
+                  ].map((benefit, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold mb-1" style={{ color: '#00f0ff' }}>
+                          {benefit.title}
+                        </h4>
+                        <p style={{ color: 'rgba(255,255,255,0.85)' }}>
+                          {benefit.description}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-lg font-semibold text-white mb-1">{benefit.title}</h4>
-                      <p className="text-gray-400">{benefit.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              {/* Demo Form */}
-              <div>
-                {isDemoSubmitted ? (
-                  <div className="backdrop-blur-sm bg-gradient-to-br from-primary/10 to-emerald-400/10 border border-primary/20 rounded-2xl p-12 text-center">
-                    <CheckCircle className="w-16 h-16 text-primary mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold mb-2 text-white">Request Received!</h3>
-                    <p className="text-gray-300 mb-6">
-                      Thank you for your interest. Our team will contact you within 24 hours to schedule your demo.
-                    </p>
-                    <button
-                      onClick={() => setIsDemoSubmitted(false)}
-                      className="py-2 px-6 rounded-lg font-medium bg-gradient-to-r from-primary to-emerald-400 text-white shadow-lg hover:shadow-xl transition-all"
-                      data-testid="button-book-another"
-                    >
-                      Book Another Demo
-                    </button>
-                  </div>
-                ) : (
-                  <div className="backdrop-blur-sm bg-card/30 border border-primary/20 rounded-2xl p-8">
-                    <form onSubmit={handleDemoSubmit} className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            Full Name *
-                          </div>
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={demoFormData.name}
-                          onChange={handleDemoChange}
-                          required
-                          className="w-full px-4 py-3 rounded-lg bg-background border border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors focus:outline-none text-white"
-                          placeholder="John Doe"
-                          data-testid="input-demo-name"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          <div className="flex items-center gap-2">
-                            <Mail className="w-4 h-4" />
-                            Work Email *
-                          </div>
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={demoFormData.email}
-                          onChange={handleDemoChange}
-                          required
-                          className="w-full px-4 py-3 rounded-lg bg-background border border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors focus:outline-none text-white"
-                          placeholder="john@company.com"
-                          data-testid="input-demo-email"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            Company Name
-                          </div>
-                        </label>
-                        <input
-                          type="text"
-                          name="company"
-                          value={demoFormData.company}
-                          onChange={handleDemoChange}
-                          className="w-full px-4 py-3 rounded-lg bg-background border border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors focus:outline-none text-white"
-                          placeholder="Your Company"
-                          data-testid="input-demo-company"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Additional Information
-                        </label>
-                        <textarea
-                          name="message"
-                          value={demoFormData.message}
-                          onChange={handleDemoChange}
-                          rows={3}
-                          className="w-full px-4 py-3 rounded-lg bg-background border border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors focus:outline-none text-white resize-none"
-                          placeholder="Tell us about your compliance needs (optional)"
-                          data-testid="input-demo-message"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full py-3 px-6 rounded-lg font-medium bg-gradient-to-r from-primary to-emerald-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-                        data-testid="button-submit-demo"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Submitting...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-5 h-5" />
-                            Request Demo
-                          </>
-                        )}
-                      </button>
-                    </form>
-                  </div>
-                )}
+                {/* Right Section - Calendly Scheduler */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden" style={{ minHeight: '650px' }}>
+                  <div 
+                    className="calendly-inline-widget" 
+                    data-url="https://calendly.com/abdullaharoomi/30min"
+                    style={{ minWidth: '320px', height: '650px', width: '100%' }}
+                    data-testid="calendly-widget"
+                  />
+                </div>
               </div>
             </div>
           )}
