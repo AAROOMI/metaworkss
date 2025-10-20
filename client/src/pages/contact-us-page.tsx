@@ -156,7 +156,7 @@ export default function ContactUsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                 {/* Left Section - Benefits */}
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-bold mb-6" style={{ color: '#00f0ff' }}>
+                  <h3 className="text-2xl font-bold text-white mb-6">
                     What You'll Get:
                   </h3>
                   {[
@@ -182,10 +182,10 @@ export default function ContactUsPage() {
                         <CheckCircle className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h4 className="text-lg font-semibold mb-1" style={{ color: '#00f0ff' }}>
+                        <h4 className="text-lg font-semibold text-white mb-1">
                           {benefit.title}
                         </h4>
-                        <p style={{ color: 'rgba(255,255,255,0.85)' }}>
+                        <p className="text-white/85">
                           {benefit.description}
                         </p>
                       </div>
