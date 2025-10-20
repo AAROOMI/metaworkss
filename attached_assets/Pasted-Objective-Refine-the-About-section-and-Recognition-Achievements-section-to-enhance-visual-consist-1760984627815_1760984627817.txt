@@ -1,0 +1,92 @@
+Objective:
+Refine the About section and Recognition & Achievements section to enhance visual consistency, improve logo visibility, and update recognition details for MetaWorks.
+
+1. About Section — Logo Display Update
+
+Goal:
+Ensure both “Supported By” logos appear in perfectly aligned, visually balanced rectangles with a clean white-transparent glass effect.
+
+Implementation Details:
+
+Equal Sizing:
+
+Both logo containers (rectangles) should be equal in height and width for uniform presentation.
+
+Minimum width: 180px; Height: 100px (adjust responsively).
+
+Layout:
+
+Maintain horizontal alignment and equal spacing between both logos.
+
+Center logos vertically and horizontally within each rectangle.
+
+Design Style:
+
+Apply a white-transparent glass gradient (similar to frosted glass).
+
+Use backdrop blur for smooth transparency.
+
+Suggested CSS:
+
+.support-logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 100px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.support-logo-box img {
+  max-width: 100px;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+
+Result: A minimal, transparent-glass aesthetic that makes the logos stand out clearly on dark backgrounds.
+
+2. Recognition & Achievements Section — Content and Structure
+
+Goal:
+Clean up and modernize the “Recognition & Achievements” section to reflect accurate partnerships and credibility.
+
+Updates Required:
+
+Keep “Graduate 1” and “Tech Champions 5” (or “Code Tech Champions 5”) as the only program recognitions.
+
+Remove any mention of MCIT support.
+
+Under the recognitions, add a “Trusted By” or “Used By Professionals From” subsection featuring logos or names of companies using MetaWorks’ solutions.
+
+Suggested Text:
+
+🏆 Recognitions & Achievements  
+- Graduate: Tech Champions 5  
+- Recognized under Code Tech Champions 5 by Encode  
+
+💼 Trusted By  
+Used by professionals from leading organizations including:  
+PwC, STC, Elm, Cognna, and CrowdStrike.
+
+
+Design Style:
+
+Keep the same dark theme with accent aqua headings.
+
+Use equal-sized transparent-glass boxes for each partner or recognition logo (same as in the “Supported By” section).
+
+Apply consistent spacing and alignment to create a clean, enterprise-grade feel.
+
+3. Outcome
+
+After implementation:
+
+The About section features two perfectly aligned, glass-gradient logo boxes with equal dimensions and clean transparency for visibility.
+
+The Recognition & Achievements section displays only verified recognitions (Graduate 1, Code Tech Champions 5) and a new “Trusted By” subsection highlighting companies using MetaWorks’ solutions.
+
+The entire section maintains MetaWorks’ futuristic dark theme with aqua highlights and frosted glass-style gradients — delivering a consistent, professional brand image.

@@ -6,24 +6,26 @@ import miskLogo from "@assets/MiSK_Foundation_Logo.svg_1759845282340.png";
 const achievements = [
   {
     icon: Award,
-    title: "Misk Launchpad 7 Graduate",
+    title: "Graduate 1",
     description: "Successfully graduated from Misk Launchpad's 7th cohort, accelerating our growth in Saudi Arabia's startup ecosystem"
   },
   {
     icon: Rocket,
     title: "Tech Champions 5",
     description: "Proud participant of Tech Champions 5 program, showcasing innovation in cybersecurity compliance solutions"
-  },
-  {
-    icon: Heart,
-    title: "MCIT Support",
-    description: "Supported by the Ministry of Communication and Information Technology, advancing digital transformation in the Kingdom"
-  },
-  {
-    icon: Award,
-    title: "Code Tech Champions 5",
-    description: "Recognized by Code Tech Champions 5 for our technical excellence and innovation in compliance automation"
   }
+];
+
+const trustedCompanies = [
+  { name: "Honda", logo: "" },
+  { name: "Saudi Ceramics", logo: "" },
+  { name: "HTC", logo: "" },
+  { name: "Elm", logo: "" },
+  { name: "PIF", logo: "" },
+  { name: "PwC", logo: "" },
+  { name: "STC", logo: "" },
+  { name: "Sports Boulevard Foundation", logo: "" },
+  { name: "Ministry of Energy", logo: "" }
 ];
 
 const values = [
@@ -70,20 +72,28 @@ export default function AboutSection() {
         {/* Partner Logos */}
         <div className="mb-16">
           <p className="text-center text-gray-400 mb-8 text-sm uppercase tracking-wider">Supported By</p>
-          <div className="flex flex-wrap items-center justify-center gap-12 md:gap-16">
-            <div className="backdrop-blur-sm bg-white/5 border border-primary/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            <div 
+              className="flex items-center justify-center backdrop-blur-[10px] bg-white/15 border border-white/25 rounded-xl hover:border-white/40 transition-all duration-300"
+              style={{ width: '180px', height: '100px', minWidth: '180px' }}
+            >
               <img 
                 src={mcitLogo} 
                 alt="Ministry of Communication and Information Technology" 
-                className="h-24 md:h-32 w-auto object-contain"
+                className="object-contain"
+                style={{ maxWidth: '100px', maxHeight: '60px' }}
                 data-testid="img-mcit-logo"
               />
             </div>
-            <div className="backdrop-blur-sm bg-white/5 border border-primary/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300">
+            <div 
+              className="flex items-center justify-center backdrop-blur-[10px] bg-white/15 border border-white/25 rounded-xl hover:border-white/40 transition-all duration-300"
+              style={{ width: '180px', height: '100px', minWidth: '180px' }}
+            >
               <img 
                 src={miskLogo} 
                 alt="MiSK Foundation" 
-                className="h-16 md:h-20 w-auto object-contain"
+                className="object-contain"
+                style={{ maxWidth: '100px', maxHeight: '60px' }}
                 data-testid="img-misk-logo"
               />
             </div>
@@ -92,7 +102,7 @@ export default function AboutSection() {
 
         {/* Story Section */}
         <div className="backdrop-blur-sm bg-gradient-to-br from-primary/10 to-emerald-400/10 border border-primary/20 rounded-2xl p-8 md:p-12 mb-16 shadow-xl">
-          <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center text-white">Our Story</h3>
+          <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">Our Story</h3>
           <div className="max-w-4xl mx-auto space-y-5 text-gray-200 text-lg leading-relaxed">
             <p>
               <strong className="text-primary">MetaWorks</strong> is a pioneering cybersecurity compliance platform proudly born and raised in the Kingdom of Saudi Arabia. 
@@ -104,7 +114,7 @@ export default function AboutSection() {
               We believe compliance should be an enabler of trust, security, and sustainable growth—not a burden.
             </p>
             <p>
-              With the prestigious support of <strong className="text-white">Misk Launchpad 7</strong>, <strong className="text-white">Tech Champions 5</strong>, 
+              With the prestigious support of <strong className="text-white">Misk Launchpad</strong>, <strong className="text-white">Tech Champions 5</strong>, 
               and the <strong className="text-white">Ministry of Communication and Information Technology (MCIT)</strong>, we've developed a world-class 
               platform that combines cutting-edge AI technology with deep regulatory expertise and regional insights.
             </p>
@@ -117,8 +127,8 @@ export default function AboutSection() {
 
         {/* Achievements Grid */}
         <div className="mb-16">
-          <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center text-white">Recognition & Achievements</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">🏆 Recognition & Achievements</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {achievements.map((achievement, index) => (
               <div 
                 key={index}
@@ -136,6 +146,26 @@ export default function AboutSection() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Trusted By Section */}
+          <div className="mt-12">
+            <h4 className="text-xl md:text-2xl font-bold mb-4 text-center text-white">💼 Trusted By</h4>
+            <p className="text-center text-gray-400 mb-8 max-w-2xl mx-auto">
+              Used by professionals from leading organizations including:
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+              {trustedCompanies.map((company, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center justify-center backdrop-blur-[10px] bg-white/15 border border-white/25 rounded-xl hover:border-white/40 transition-all duration-300"
+                  style={{ width: '180px', height: '100px', minWidth: '180px' }}
+                  data-testid={`card-company-${index}`}
+                >
+                  <p className="text-white font-semibold text-center px-4 text-sm">{company.name}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
